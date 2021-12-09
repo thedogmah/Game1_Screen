@@ -1,0 +1,129 @@
+#pragma once
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Network.hpp>
+#include <vector>
+#include <iostream>
+#include <ctime>
+
+//Class as the game engine.
+
+class Game
+{
+
+private:
+
+	//Variables	
+
+	//UI
+	
+	//Window
+	sf::Vector2i screenSize ;
+	sf::RenderWindow* window;
+	sf::VideoMode videoMode;
+	sf::Event ev;
+	
+	//Camera
+	sf::View view;
+	float vZoom = 1.0;
+	float moveSpeed = 1000.0;
+	sf::Vector2f aPosition;
+	
+	//Mouse Positions
+
+
+	sf::Vector2i mousePosWindow;
+	sf::Vector2f mousePosView; 
+
+
+	//Resources
+	// Interface
+	sf::Font fontUI;
+
+
+	//Network
+	
+	
+
+
+	//boundaries
+	sf::RectangleShape Rec;
+	
+
+	//Sprites
+
+	//Actors
+	sf::Texture actorTexture;
+	sf::Sprite actorMain;
+	sf::Texture bg;
+	sf::Texture Char;
+	sf::Texture Char2;
+	sf::Texture Char3;
+	sf::Texture Char4;
+	sf::Sprite CharBG;
+	sf::Sprite spChar;
+
+	sf::Image image;
+
+
+
+	//Weather
+	int randomh, randomr, randomg, randomb, randomx, randomsp[1500];
+	int part = 1;
+
+	sf::RectangleShape rectangle[1000];
+
+	
+	//Text
+	sf::Text uiText;
+	sf::Text textTwo;
+	//Game logic
+	unsigned points;
+	float enemySpawnTimer;
+	float enemySpawnTimerMax;
+	int maxEnemies;
+	int health;
+	bool mouseHeld;
+	bool endGame;
+	//Game Objects
+	sf::RectangleShape enemy;
+	std::vector<sf::RectangleShape> enemies;
+	std::vector<sf::Text> ui;
+	//Private functions
+
+	void initInterface();
+	void initVariables();
+	void initRain();
+	void initWindow();
+	void initEnemies();
+	void initSprites();
+
+	void checkCollide();
+public:
+	//Constructors / Destructors
+	Game();
+	virtual ~Game();
+	
+	//Accessors
+	
+	const bool running() const;
+
+
+	//Functions
+	void spawnEnemy();
+	
+	
+	void pollEvents();
+
+	void updateEnemies();
+	void update();
+	
+	void renderRain();
+	void renderEnemies();
+	void renderInterface(sf::RenderTarget &target);
+	void render();
+	void updateMousePositions();
+};
+
