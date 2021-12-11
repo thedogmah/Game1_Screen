@@ -27,6 +27,12 @@
     <ClCompile Include="multiworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="clientside.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="login.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -36,6 +42,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Network.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientside.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="login.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

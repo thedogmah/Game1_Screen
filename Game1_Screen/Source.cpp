@@ -1,6 +1,6 @@
 #include "Game.h"
 #include <iostream>
-
+#include "clientside.h"
 using namespace sf;
 
 //weather variables
@@ -9,29 +9,9 @@ void multi();
 int main()
 {
 	
-	sf::IpAddress ip = sf::IpAddress::getPublicAddress();
-	sf::TcpSocket socket;
-	
-	sf::Packet gamepacket;
-	bool connect = false;
-	while (!connect)
-		if (socket.connect(sf::IpAddress::LocalHost, 2000) == sf::Socket::Done)
-		{
-			connect = true;
-			std::cout << "Connection\n ";
-			std::cout << "Connection\n ";
-			std::cout << "Connection\n ";
-			std::cout << "Connection\n ";
-			std::cout << "Connection\n ";
-			std::cout << "Connection\n ";
-			std::cout << "Connectio\n\n\n\n\nn ";
-			std::cout << "Connection\n ";
-			std::cout << "Connection\n\n\n\n\n\n\n ";
-			std::cout << "Connection\n\n\n\n\n\n\n\n\n\n\n\n\n ";
 
-		}
-		else
-			std::cout << "probing for server\n " << sf::IpAddress::LocalHost<< "3000\n";
+	
+	
 
 
 	//sfmlconnect();
@@ -41,15 +21,19 @@ int main()
 //Init srand
 	std::srand(static_cast<unsigned>(time(NULL)));
 	Game game;
+	game.login();
 	//Game Loop
 	game.running();
 	sf::Music music;
 	music.openFromFile("Enigma.ogg");
 	//music.play();
 
+	//game.initClient(&game.rsocket);
+
 	while (game.running())
 	{
 		//update
+		
 		game.update();
 
 

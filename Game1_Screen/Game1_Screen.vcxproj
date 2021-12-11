@@ -147,13 +147,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="clientside.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="login.cpp" />
     <ClCompile Include="multiworld.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="clientside.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="login.h" />
     <ClInclude Include="multiworld.h" />
     <ClInclude Include="Network.h" />
   </ItemGroup>

@@ -7,16 +7,23 @@
 #include <vector>
 #include <iostream>
 #include <ctime>
-
+#include "clientside.h"
 //Class as the game engine.
 
 class Game
 {
+public:
+	//packet movement string
+	std::string movement;
+
+	sf::Packet rpacket;
+	sf::TcpSocket rsocket;
 
 private:
 
 	//Variables	
-
+	std::string username;
+	
 	//UI
 	
 	//Window
@@ -99,13 +106,16 @@ private:
 	void initWindow();
 	void initEnemies();
 	void initSprites();
-
+	void initConnection();
+	
 	void checkCollide();
 public:
+	void initClient(sf::TcpSocket* rsocket);
+	
 	//Constructors / Destructors
 	Game();
 	virtual ~Game();
-	
+	clientside client; //initalise clientside object to create send packet and functions. see clientside.h
 	//Accessors
 	
 	const bool running() const;
@@ -113,7 +123,7 @@ public:
 
 	//Functions
 	void spawnEnemy();
-	
+	void login();
 	
 	void pollEvents();
 

@@ -1,5 +1,5 @@
 #include "Game.h"
-
+#include "clientside.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -159,6 +159,7 @@ Game::Game()
 	this->initWindow();
 	this->initEnemies();
 	this->initInterface();
+	this->initConnection();
 } 
 
 Game::~Game()
@@ -173,6 +174,26 @@ const bool Game::running() const
 	return this->window->isOpen();
 }
 
+void Game::initConnection()
+{
+
+	
+
+	bool connect = false;
+	while (!connect)
+		if (client.socket.connect(client.ip, 2000) == sf::Socket::Done)
+		{
+			connect = true;
+			std::cout << "Connection made\n ";
+			std::cout << "Connected to server \n " << client.socket.getRemoteAddress();
+
+
+		}
+		else
+			std::cout << "probing for server\n " << sf::IpAddress::LocalHost << "3000\n";
+
+
+}
 void Game::spawnEnemy()
 {
 
@@ -209,6 +230,16 @@ void Game::pollEvents()
 			if (this->ev.key.code == sf::Keyboard::Down)
 			{
 				//spChar.setTexture(Char);
+
+				movement = "Down ";
+				movement += username;
+				client.sendingpacket << movement;
+				
+				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					std::cout << "packet 'Down' not sent";
+				}
+				client.sendingpacket.clear();
+
 				spChar.move(0, 10);
 				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
@@ -223,8 +254,21 @@ void Game::pollEvents()
 			}
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
+
 				//spChar.setTexture(Char2);
 				spChar.move(-10, 0);
+
+				//send position to server
+
+				movement = "Left ";
+				movement += username;
+				client.sendingpacket << movement;
+				
+				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					std::cout << "packet 'Left' not sent";
+				}
+				client.sendingpacket.clear();
+
 				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
 
@@ -239,6 +283,16 @@ void Game::pollEvents()
 			if (this->ev.key.code == sf::Keyboard::Up)
 			{
 				//spChar.setTexture(Char3);
+				
+				movement = "Up ";
+				movement += username;
+				client.sendingpacket << movement;
+				//spChar.setTexture(Char4);
+				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					std::cout << "packet 'Up' not sent";
+				}
+				client.sendingpacket.clear();
+
 				spChar.move(0, -10);
 				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
@@ -252,8 +306,16 @@ void Game::pollEvents()
 				window->setView(view);
 			}	if (this->ev.key.code == sf::Keyboard::Right)
 			{
+				std::string right = "Right ";
+				right += username;
+				client.sendingpacket << right;
 				//spChar.setTexture(Char4);
+				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					std::cout << "packet 'Right' not sent"; 
+					}
+				client.sendingpacket.clear();
 				spChar.move(10, 0);
+				
 				
 				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
@@ -283,6 +345,24 @@ void Game::pollEvents()
 		}
 
 	}}
+
+	void Game::initClient(sf::TcpSocket* rsocket)
+	{
+
+			while (true) {
+			//rsocket->setBlocking(false);
+			if (rsocket->receive(this->rpacket) == sf::Socket::Done)
+			{
+				std::cout << "received data";
+			}
+			else
+				std::cout << "\npacket not received";
+
+			std::this_thread::sleep_for((std::chrono::milliseconds)10);
+			//}
+		}
+
+	}
 
 void Game::updateEnemies()
 {
@@ -468,7 +548,7 @@ void Game::update()
 	this->pollEvents();
 	this->updateMousePositions();
 	this->updateEnemies();
-
+	client.ReceivePackets(&client.socket);
 }
 
 
@@ -478,4 +558,11 @@ void Game::updateMousePositions()
 	this->mousePosView = this->window->mapPixelToCoords(this->mousePosWindow);
 	//Uncomment to display mouse position in console
 	//std::cout << "Mouse is at: " << mousePosWindow.x << ", " << mousePosWindow.y << std::endl;
+}
+
+void Game::login()
+{
+
+	std::cout << "Please enter Character name: ";
+	std::cin >> username;
 }
