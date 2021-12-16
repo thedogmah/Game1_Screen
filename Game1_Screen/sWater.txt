@@ -1,0 +1,53 @@
+uniform vec3      iResolution;           // viewport resolution (in pixels)
+uniform float     iTime;                 // shader playback time (in seconds)
+uniform float     iTimeDelta;            // render time (in seconds)
+uniform int       iFrame;                // shader playback frame
+uniform float     iChannelTime[4];       // channel playback time (in seconds)
+uniform vec3      iChannelResolution[4]; // channel resolution (in pixels)
+uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
+uniform sampler2D iChannel0;          // input channel. XX = 2D/Cube
+uniform sampler2D iChannel1;          
+uniform vec4      iDate;                 // (year, month, day, time in seconds)
+uniform float     iSampleRate;           // sound sample rate (i.e., 44100)
+ 
+const float speed = 0.1;
+ 
+void main()
+{
+    //main
+    vec2 p_m = gl_FragCoord.xy / iResolution.xy;
+    
+    //distortion
+    vec2 p_d = p_m;
+    
+    //just mirror it for fun :D so you can see the effect
+    if(p_m.y < 0.5)
+    {
+        p_m.y =  1. - p_m.y;
+    }
+ 
+    //on bottom section do the main distortion stuff
+    if((gl_FragCoord.xy / iResolution.xy).y < 0.5)
+    {
+        //move the distortion
+        p_d.t -= iTime * speed;
+        
+        //dst = distortion in this case
+        vec4 dst_map_val = texture(iChannel1, p_d);
+        
+        //from 0 to 1  -> -1 to 1
+        vec2 dst_offset = dst_map_val.xy;
+        dst_offset -= vec2(.5,.5);
+        dst_offset *= 2.;
+        
+        dst_offset *= 0.01;
+        vec2 dist_tex_coord = p_m.st + dst_offset;
+        gl_FragColor  = texture(iChannel0, dist_tex_coord); 
+        
+    }
+    //upper section for fun :D
+    else
+    {
+        gl_FragColor  = texture(iChannel0, gl_FragCoord.xy / iResolution.xy); 
+    }
+}

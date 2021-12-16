@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <iostream>
 #include "clientside.h"
+#include "Player.h"
 using namespace sf;
 
 //weather variables
@@ -12,7 +13,7 @@ int main()
 
 	
 	
-
+	
 
 	//sfmlconnect();
 	//multi();
@@ -27,18 +28,32 @@ int main()
 	sf::Music music;
 	music.openFromFile("Enigma.ogg");
 	//music.play();
-
+	sf::Clock clock;
 	//game.initClient(&game.rsocket);
+	Animation character(&game.playerTexture, sf::Vector2u(4, 4), 0.14f);
+	//Animation walkFront(&game.playerTwoTexture, sf::Vector2u(4, 2), 0.15f);
 
+	float deltaTime = 0.0f;
 	while (game.running())
 	{
 		//update
+		deltaTime = clock.restart().asSeconds();
 		
 		game.update();
-
-
+	
+		
+		character.Update(0, deltaTime, game.faceRight, game.faceDown, game.faceUp, game.still);
+		
+		//walkFront.Update(1, deltaTime, game.faceRight);
+		
 		//render
+		//std::cout << game.spChar.getScale().x;
+		//game.spChar.setScale(1, 1);
+		//game.spChar.setTextureRect(character.uvRect);
+		game.player.actor.setTextureRect(character.uvRect);
+		//game.playerTwo.actor.setTextureRect(walkFront.uvRect);
 		game.render();
+		
 	}
 
 	

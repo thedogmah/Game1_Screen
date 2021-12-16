@@ -8,6 +8,8 @@
 #include <iostream>
 #include <ctime>
 #include "clientside.h"
+#include "Animation.h"
+#include "Player.h"
 //Class as the game engine.
 
 class Game
@@ -15,14 +17,34 @@ class Game
 public:
 	//packet movement string
 	std::string movement;
-
+	Player player;
+	Player playerTwo;
+	bool faceRight;
+	bool faceDown;
+	bool faceUp;
+	bool still;
 	sf::Packet rpacket;
 	sf::TcpSocket rsocket;
+	std::string username;
+
+	sf::Shader water;
+	
+	//animatedCharacter
+	
+	//player.setPosition(500.0f, 300.0f);
+	sf::Texture playerTexture;
+	sf::Image iplayerTexture;
+	
+	//player2AnimatedChar
+	sf::Texture playerTwoTexture;
+	sf::Image iplayerTwoTexture;
+
+	sf::Sprite spChar;
+	
 
 private:
 
 	//Variables	
-	std::string username;
 	
 	//UI
 	
@@ -37,7 +59,7 @@ private:
 	float vZoom = 1.0;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	
+	float zoomfactor = 0.63;
 	//Mouse Positions
 
 
@@ -60,6 +82,7 @@ private:
 	
 
 	//Sprites
+	
 
 	//Actors
 	sf::Texture actorTexture;
@@ -70,7 +93,8 @@ private:
 	sf::Texture Char3;
 	sf::Texture Char4;
 	sf::Sprite CharBG;
-	sf::Sprite spChar;
+	
+
 
 	sf::Image image;
 
@@ -84,6 +108,7 @@ private:
 
 	
 	//Text
+	sf::Text userText;
 	sf::Text uiText;
 	sf::Text textTwo;
 	//Game logic
@@ -132,6 +157,7 @@ public:
 	
 	void renderRain();
 	void renderEnemies();
+	void renderPlayers();
 	void renderInterface(sf::RenderTarget &target);
 	void render();
 	void updateMousePositions();

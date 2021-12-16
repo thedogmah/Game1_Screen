@@ -11,6 +11,21 @@
 #include "clientside.h"
 #include <thread>
 #include <mutex>
+
+sf::Packet& operator << (sf::Packet& packet, sf::Vector2i& location)
+
+{	
+	return packet << location.x << location.y;
+}
+
+
+sf::Packet& operator >> (sf::Packet& packet, sf::Vector2i& location)
+
+{
+	
+	return packet >> location.x << location.y;
+}
+
 clientside::clientside()
 {
 
@@ -47,17 +62,45 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 {
 
 	
+	
 	sf::Packet packet;
 	//while (true) {
 	socket->setBlocking(false);
 	if (socket->receive(packet) == sf::Socket::Done)
 	{
 		std::string data;
-		packet >> data;
-		std::cout << "From server data: " << data << std::endl;
+		std::string ip;
+		std::string port;
+		std::string username;
+		sf::Vector2i  location;
+		packet >> username >> data >> location.x >> location.y >> ip >> port;
+	//	std::cout << "From server data: " << data << " now at: " << location.x << ", " << location.y << std::endl;
+		
+		iPlayers.loadFromFile("wo1.png");
+		iPlayers.createMaskFromColor(sf::Color::Black);
+		tPlayers.loadFromImage(iPlayers);
+		sPlayers.setTexture(tPlayers);
+		
+		sPlayers.setPosition(float(location.x), float(location.y));
+	//	vPlayers.push_back(sPlayers);
+		PlayerMap.insert(std::pair<std::string, sf::Sprite>(username, sPlayers));
+		//loop through vector and
+		std::map<std::string, sf::Sprite>::iterator it = PlayerMap.find(username);
+		if (it != PlayerMap.end())
+			it->second = sPlayers;
+
+
+		/*for (auto e : vPlayers)
+		{
+			if e.id
+		}*/
+		//if ID found, update position, if not found, push back.
+
+
+		packet.clear();
 	}
 	
-		std::this_thread::sleep_for((std::chrono::milliseconds)10);
+//		std::this_thread::sleep_for((std::chrono::milliseconds)10);
 	//}
 }
 

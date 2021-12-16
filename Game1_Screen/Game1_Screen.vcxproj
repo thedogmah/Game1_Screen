@@ -147,22 +147,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="clientside.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="login.cpp" />
     <ClCompile Include="multiworld.cpp" />
     <ClCompile Include="Network.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="clientside.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="login.h" />
     <ClInclude Include="multiworld.h" />
     <ClInclude Include="Network.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\char.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="sWater.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
