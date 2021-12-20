@@ -261,10 +261,23 @@ void Game::pollEvents()
 	while (this->window->pollEvent(this->ev)) {
 		switch (this->ev.type)
 		{
-		case sf::Event::Closed:
-			this->window->close();
+
+			case sf::Event::TextEntered:
+				if (ev.text.unicode < 128)
+				{
+					chat.playerInput += ev.text.unicode;
+					chat.playerText.setString(chat.playerInput);
+					chat.playerText.setPosition(spChar.getPosition().x, spChar.getPosition().y - 150);
+				}
+			
+			
+
+		//case sf::Event::Closed:
+		//	this->window->close();
 			break;
 		case sf::Event::KeyPressed:
+			if (this->ev.key.code == sf::Keyboard::Delete)
+				chat.playerInput = "";
 			if (this->ev.key.code == sf::Keyboard::Escape)
 				this->window->close();
 			if (this->ev.key.code == sf::Keyboard::Down)
@@ -279,11 +292,11 @@ void Game::pollEvents()
 				location.x = spChar.getPosition().x;
 				location.y = spChar.getPosition().y;
 
-				std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+				//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 				std::string down = "Down ";
 				down += username;
-				client.sendingpacket << username << down << location.x << location.y;
-
+				client.sendingpacket << username << down << location.x << location.y << chat.playerInput.toAnsiString();
+				//DEBUG COMMENTS std::cout << "Printing message from Game.dowNkey function: " << chat.playerInput.toAnsiString();
 
 				movement = "Down ";
 				movement += username;
@@ -323,10 +336,10 @@ void Game::pollEvents()
 				location.x = spChar.getPosition().x;
 				location.y = spChar.getPosition().y;
 
-				std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+				//DEBUG COMMENTSstd::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 				std::string left = "Left ";
 				left += username;
-				client.sendingpacket << username << left << location.x << location.y;
+				client.sendingpacket << username << left << location.x << location.y << chat.playerInput.toAnsiString();
 
 				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
 					std::cout << "packet 'Left' not sent";
@@ -358,10 +371,10 @@ void Game::pollEvents()
 				location.x = spChar.getPosition().x;
 				location.y = spChar.getPosition().y;
 
-				std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+				//DEBUG COMMENTS  std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 				std::string up = "Up ";
 				up += username;
-				client.sendingpacket << username << up << location.x << location.y;
+				client.sendingpacket << username << up << location.x << location.y << chat.playerInput.toAnsiString();
 
 				//spChar.setTexture(Char4);
 				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
@@ -392,10 +405,10 @@ void Game::pollEvents()
 				location.x = spChar.getPosition().x;
 				location.y = spChar.getPosition().y;
 
-				std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+				//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 				std::string right = "Right ";
 				right += username;
-				client.sendingpacket << username << right << location.x << location.y;
+				client.sendingpacket << username << right << location.x << location.y << chat.playerInput.toAnsiString();
 
 
 				//spChar.setTexture(Char4);
@@ -424,7 +437,7 @@ void Game::pollEvents()
 
 		case sf::Event::KeyReleased:
 		{still = true;
-		std::cout << "Key released";
+		//DEBUG COMMENTS std::cout << "Key released";
 		}
 			break;
 
@@ -438,6 +451,56 @@ void Game::pollEvents()
 			std::cout << vZoom;
 			break;
 		}
+
+		case sf::Event::MouseButtonPressed:
+
+		
+			int nNodeSize = 9;
+			int nSelectedNodeX = sf::Mouse::getPosition().x / nNodeSize;
+			int nSelectedNodeY = sf::Mouse::getPosition().y / nNodeSize;
+			if (ev.type == sf::Event::MouseButtonPressed) // Use mouse to draw maze, shift and ctrl to place start and end
+			{
+				
+				std::cout << "hey1";
+				 routefind.solve_AStar();
+				
+
+				if (nSelectedNodeX >= 0 && nSelectedNodeX < routefind.nMapWidth)
+					std::cout << "hey1";
+				if (nSelectedNodeY >= 0 && nSelectedNodeY < routefind.nMapHeight)
+				{
+					if (ev.mouseButton.button == sf::Mouse::Left)
+						routefind.nodeStart = &routefind.nodes[nSelectedNodeY * routefind.nMapWidth + nSelectedNodeX];
+					else if (ev.mouseButton.button == sf::Mouse::Right)
+						routefind.nodeEnd = &routefind.nodes[nSelectedNodeY * routefind.nMapWidth + nSelectedNodeX];
+					else
+						routefind.nodes[nSelectedNodeY * routefind.nMapWidth + nSelectedNodeX].bObstacle = !routefind.nodes[nSelectedNodeY * routefind.nMapWidth + nSelectedNodeX].bObstacle;
+
+					 // Solve in "real-time" gives a nice effect
+				}
+			}
+			std::cout << "hey2";
+
+
+
+			routefind.OnUserUpdate(0.0f);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 		}
@@ -645,9 +708,12 @@ void Game::render()
 	this->window->draw(player.actor);
 	//this->window->draw(playerTwo.actor);
 	this->window->draw(userText);
+	window->draw(chat.playerText);
+	for (auto rec : routefind.gridRecs) {
+		this->window->draw(rec);
+	}
 	this->window->display(); //Tell app that window is done drawing.
 	
-
 }
 
 void Game::update()
@@ -656,9 +722,11 @@ void Game::update()
 	//Event Polling
 	this->pollEvents();
 	this->updateMousePositions();
+	
 	this->updateEnemies();
+	
 	client.ReceivePackets(&client.socket);
-	//this->renderPlayers();
+	this->renderPlayers();
 }
 
 
@@ -679,20 +747,60 @@ void Game::login()
 }
 
 void Game::renderPlayers()
-{
+{//renders play chat when online.
 	for (auto& e : client.PlayerMap)
 	{
 		//std::cout << "\n" << e.getPosition().x << ", " << e.getPosition().y << std::endl;
 		if (e.first != username)
 		{
 			this->window->draw(e.second);
+			for (auto& f : client.ChatMap)
 
+			{
+				if (e.first == f.first)
+				{
+					sf::String playerInput{};
+					playerInput = f.second;
+					sf::Text playerText;
+					playerText.setString(playerInput);
+					playerText.setCharacterSize(15);
+					playerText.setPosition(e.second.getPosition().x, e.second.getPosition().y +220);
+					playerText.setFont(fontUI);
+					this->window->draw(playerText);
+				}
+			}
 		}
-		
 
-		 
+	/*	for (auto& f : client.ChatMap)
+		{
+			std::cout << e.first << f.first << f.second << std::endl;
+		*/
+			/*if (e.first == f.first)
+			{
+				sf::String playerInput;
+				sf::Text playerText;
+				playerInput = f.second;
+				playerText.setPosition(e.second.getPosition().x, e.second.getPosition().y);
+				playerText.setFillColor(sf::Color::Red);
+				playerText.setString(playerInput);
+				playerText.setFont(fontUI);
+				this->window->draw(playerText);
+
+				}*/
+//				conversations.push_back(playerText);
+				
+				//location to draw text. ;
+				
+			
+
+		
 	}
 
-	//client.vPlayers.clear();
-	return void();
+		
+
+
+
+		//client.vPlayers.clear();
+		return void();
+	
 }

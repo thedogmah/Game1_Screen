@@ -26,6 +26,9 @@ sf::Packet& operator >> (sf::Packet& packet, sf::Vector2i& location)
 	return packet >> location.x << location.y;
 }
 
+
+
+sf::Text message;
 clientside::clientside()
 {
 
@@ -72,10 +75,11 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		std::string ip;
 		std::string port;
 		std::string username;
+		std::string message;
 		sf::Vector2i  location;
-		packet >> username >> data >> location.x >> location.y >> ip >> port;
+		packet >> username >> data >> location.x >> location.y >> message >> ip >> port ;
 	//	std::cout << "From server data: " << data << " now at: " << location.x << ", " << location.y << std::endl;
-		
+		//DEBUG COMMENTS std::cout << "Printing message from clientside function: " << message ;
 		iPlayers.loadFromFile("wo1.png");
 		iPlayers.createMaskFromColor(sf::Color::Black);
 		tPlayers.loadFromImage(iPlayers);
@@ -84,12 +88,26 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		sPlayers.setPosition(float(location.x), float(location.y));
 	//	vPlayers.push_back(sPlayers);
 		PlayerMap.insert(std::pair<std::string, sf::Sprite>(username, sPlayers));
+
+
 		//loop through vector and
 		std::map<std::string, sf::Sprite>::iterator it = PlayerMap.find(username);
 		if (it != PlayerMap.end())
 			it->second = sPlayers;
 
 
+		ChatMap.insert(std::pair<std::string, std::string>(username, message));
+
+		std::map<std::string, std::string>::iterator it2 = ChatMap.find(username);
+		if (it2 != ChatMap.end())
+			it2->second = message;
+
+
+		for (auto e : ChatMap)
+		{
+			//DEBUG COMMENTS std::cout << "\n " << e.first;
+			//DEBUG COMMENTS std::cout << "\n " << e.second;
+		}
 		/*for (auto e : vPlayers)
 		{
 			if e.id

@@ -2,6 +2,7 @@
 #include <iostream>
 #include "clientside.h"
 #include "Player.h"
+#include "aStar.h"
 using namespace sf;
 
 //weather variables
@@ -9,9 +10,6 @@ using namespace sf;
 void multi();
 int main()
 {
-	
-
-	
 	
 	
 
@@ -22,9 +20,11 @@ int main()
 //Init srand
 	std::srand(static_cast<unsigned>(time(NULL)));
 	Game game;
+
 	game.login();
 	//Game Loop
 	game.running();
+	
 	sf::Music music;
 	music.openFromFile("Enigma.ogg");
 	//music.play();
@@ -32,12 +32,15 @@ int main()
 	//game.initClient(&game.rsocket);
 	Animation character(&game.playerTexture, sf::Vector2u(4, 4), 0.14f);
 	//Animation walkFront(&game.playerTwoTexture, sf::Vector2u(4, 2), 0.15f);
+	game.routefind.OnUserCreate();
+
 
 	float deltaTime = 0.0f;
 	while (game.running())
 	{
 		//update
 		deltaTime = clock.restart().asSeconds();
+		game.routefind.OnUserUpdate(0.05f);
 		
 		game.update();
 	

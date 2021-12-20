@@ -10,12 +10,30 @@
 #include "clientside.h"
 #include "Animation.h"
 #include "Player.h"
+#include "Chat.h"
+#include "aStar.h"
 //Class as the game engine.
 
 class Game
 {
 public:
 	//packet movement string
+
+	aStar routefind;
+	
+	struct gsNode {
+
+		bool bObstacle = false;
+		bool bVisited = false;
+		float fGlobalGoal;		//Distance to goal so far
+		float fLocalGoal;		//Distance to goal if we took alternative
+		int x;
+		int y;
+		std::vector<gsNode*> vecNeighbours;
+		gsNode* parent;
+
+	};
+
 	std::string movement;
 	Player player;
 	Player playerTwo;
@@ -74,6 +92,8 @@ private:
 
 	//Network
 	
+	//Chat instance
+	Chat chat;
 	
 
 
@@ -123,6 +143,7 @@ private:
 	sf::RectangleShape enemy;
 	std::vector<sf::RectangleShape> enemies;
 	std::vector<sf::Text> ui;
+	std::vector<sf::Text> conversations;
 	//Private functions
 
 	void initInterface();

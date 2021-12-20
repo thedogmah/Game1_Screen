@@ -15,6 +15,8 @@ class clientside {
 public:
 	//map for storing players
 	std::map<std::string, sf::Sprite>PlayerMap;
+	std::map<std::string, std::string>ChatMap;
+
 	//Image resources for storing online players to draw and place in map (above) - within receive packet function
 	std::vector<sf::Sprite> vPlayers;
 	sf::Image iPlayers;
