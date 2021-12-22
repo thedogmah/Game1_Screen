@@ -16,7 +16,7 @@
 #include <list>
 
 aStar::aStar() {
-	this->nMapWidth = 100; this->nMapHeight = 10;
+	this->nMapWidth = 150; this->nMapHeight = 22 ;
 	this->init();
 		}
 	//m_sAppName = L"Path Finding";
@@ -38,27 +38,52 @@ aStar::aStar() {
 	};
 
 
+	struct paths {
+
+		int x;
+		int y;
+	};
+
+	std::vector<paths> path;
+	
 	sNode* nodes = nullptr;
 
 
 	sNode* nodeStart = nullptr;
 	sNode* nodeEnd = nullptr;
+	
+	
 
 	void aStar::init()
 	{
-		int nNodeSize = 48;
-		int nNodeBorder = 2;
-		for (int x = 0; x < this->nMapWidth; x++)
-			for (int y = 0; y < this->nMapHeight; y++) {
+		vaGrid.setPrimitiveType(sf::Lines);
+		vaGrid.resize((nMapHeight * nMapWidth) * 2);
+		
+		int nNodeSize = 100;
+		int nNodeBorder = 0;
+		for (int x = 0; x < nMapHeight ; ++x)
+			 {
+				
+				sf::Vertex* quad = &vaGrid[x*2];
+				//std::cout << nMapWidth << ", "<<  x <<", "<< y << "\n";
+				// define its 2/4 points 
+				quad[0].position = sf::Vector2f(0, (x+1) * nNodeSize);
+				quad[1].position = sf::Vector2f(nMapWidth * nNodeSize, (x+1)*nNodeSize);
+				quad[0].color = sf::Color::White;
+				quad[1].color = sf::Color::White;
+			}
+	
+				
+				
 
-				sf::RectangleShape rectangle;
+			/*	sf::RectangleShape rectangle;
 				rectangle.setSize(sf::Vector2f(nNodeSize, nNodeSize));
 				rectangle.setOutlineColor(sf::Color::Red);
 				rectangle.setOutlineThickness(5);
-				rectangle.setPosition((x*nNodeSize), (y*nNodeSize));
+				rectangle.setPosition((x*nNodeSize), (y*nNodeSize));*/
 
-				this->gridRecs.push_back(rectangle);
-			}
+				//this->gridRecs.push_back(rectangle);
+		
 	}
 
 	 bool aStar::OnUserCreate()
@@ -103,8 +128,8 @@ aStar::aStar() {
 
 		}
 
-		nodeStart = &nodes[99];
-		nodeEnd = &nodes[40];
+		nodeStart = &nodes[0];
+		nodeEnd = &nodes[0];
 		return true;
 	}
 
@@ -190,8 +215,8 @@ aStar::aStar() {
 					// point the algo will realise this path is worse and abandon it, and then go
 					// and search along the next best path.
 					nodeNeighbour->fGlobalGoal = nodeNeighbour->fLocalGoal + heuristic(nodeNeighbour, nodeEnd);
-					
-						std::cout << nodeNeighbour->parent->x << ", " << nodeNeighbour->parent->y << std::endl;
+					//path
+					//	std::cout << nodeNeighbour->parent->x << ", " << nodeNeighbour->parent->y << std::endl;
 						
 					
 				}
@@ -205,11 +230,11 @@ aStar::aStar() {
 
 
 
-	bool aStar::OnUserUpdate(float fElapsedTime)
+	std::vector<aStar::paths> aStar::OnUserUpdate(float fElapsedTime)
 	{
 		int nNodeSize = 48;
 		int nNodeBorder = 2;
-
+		path.clear();
 		//Integer Division to get cursor position in node space
 
 
@@ -251,14 +276,19 @@ aStar::aStar() {
 			if (nodeEnd != nullptr)
 			{
 				sNode* p = nodeEnd; 
-				while (p->parent != nullptr)
+				while (p->parent != nullptr) 
 				{
-					std::cout << p->x << ", " << p->y << "\n";
+					paths coords;
+					p = p->parent;
+					//std::cout << p->x << ", " << p->y << "\n"; 
+					coords.x = p->x;
+					coords.y= p->y;
+					path.push_back(coords);
 					
-				}
+				} 
 			}
-
-		return true;
+			
+		return path;
 	};
 
 

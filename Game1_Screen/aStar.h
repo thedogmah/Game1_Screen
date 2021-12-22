@@ -18,12 +18,18 @@ class aStar
 
 public:
 
-	
 	aStar();
 
-	
+	struct paths {
+
+		int x;
+		int y;
+	};
+
+	std::vector<paths> path;
 
 	struct sNode {
+
 
 		bool bObstacle = false;
 		bool bVisited = false;
@@ -35,8 +41,8 @@ public:
 		sNode* parent;
 
 	};
-
-	std::vector<sf::RectangleShape> gridRecs;
+	sf::VertexArray vaGrid;
+	std::vector<sf::Vertex> gridRecs;
 	sf::Event ev;
 	sNode* nodes = nullptr;
 	int nMapWidth;
@@ -54,7 +60,7 @@ public:
 
 
 public:
-	virtual bool OnUserUpdate(float fElapsedTime);
+	 std::vector<paths> OnUserUpdate(float fElapsedTime);
 	
 	
 };

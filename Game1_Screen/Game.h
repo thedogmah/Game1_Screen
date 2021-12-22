@@ -34,9 +34,12 @@ public:
 
 	};
 
+
 	std::string movement;
 	Player player;
 	Player playerTwo;
+	bool grid;			//bool to switch / flag node grid on or off (see below)
+	bool gridPath;		//bool to switch / flag a* drawing on or off
 	bool faceRight;
 	bool faceDown;
 	bool faceUp;
@@ -114,7 +117,8 @@ private:
 	sf::Texture Char4;
 	sf::Sprite CharBG;
 	
-
+	//NPCS
+	std::vector<sf::RectangleShape> npcs;
 
 	sf::Image image;
 

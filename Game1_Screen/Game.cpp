@@ -433,14 +433,28 @@ void Game::pollEvents()
 				window->setView(view);
 			}
 			//	this->enemy.setPosition(sf::Vector2f(102.f, 100.f));
+			
+			if (this->ev.key.code == sf::Keyboard::RShift)
+				if (grid == true)
+					grid = false;
+				else
+					grid = true;
+
+			if (this->ev.key.code == sf::Keyboard::RControl)
+				if (gridPath == true)
+					gridPath = false;
+				else
+					gridPath = true;
+			break;
 			break;
 
 		case sf::Event::KeyReleased:
 		{still = true;
+		
 		//DEBUG COMMENTS std::cout << "Key released";
 		}
-			break;
-
+			
+		break;
 		case sf::Event::MouseWheelMoved:
 		{
 			vZoom = 1.0;
@@ -455,41 +469,71 @@ void Game::pollEvents()
 		case sf::Event::MouseButtonPressed:
 
 		
-			int nNodeSize = 9;
-			int nSelectedNodeX = sf::Mouse::getPosition().x / nNodeSize;
-			int nSelectedNodeY = sf::Mouse::getPosition().y / nNodeSize;
+			int nNodeSize =100;
+			sf::Vector2i XY = sf::Mouse::getPosition(*window);
+			//int nSelectedNodeY = sf::Mouse::getPosition(window) ;
+			
+			std::cout << "\nPixels" << XY.x << ", " << XY.y << "";
+				sf::Vector2f worldPos = window->mapPixelToCoords(XY,view);
+
+			
+			std::cout << "\nCoords" << worldPos.x << ", " << worldPos.y;
 			if (ev.type == sf::Event::MouseButtonPressed) // Use mouse to draw maze, shift and ctrl to place start and end
 			{
 				
-				std::cout << "hey1";
-				 routefind.solve_AStar();
 				
-
-				if (nSelectedNodeX >= 0 && nSelectedNodeX < routefind.nMapWidth)
-					std::cout << "hey1";
-				if (nSelectedNodeY >= 0 && nSelectedNodeY < routefind.nMapHeight)
+			
+				//routefind.nodeEnd->x = (worldPos.x / 100);
+				// routefind.nodeEnd->y =( worldPos.y / 100);
+				 std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+				if (XY.x >= 0 && XY.x <= (routefind.nMapWidth * nNodeSize))
+					std::cout << "\nClicked Within Bounds";
+				if (XY.y >= 0 && XY.y <= (routefind.nMapHeight *nNodeSize))
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
-						routefind.nodeStart = &routefind.nodes[nSelectedNodeY * routefind.nMapWidth + nSelectedNodeX];
+					{
+
+						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
+						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
+					}
 					else if (ev.mouseButton.button == sf::Mouse::Right)
-						routefind.nodeEnd = &routefind.nodes[nSelectedNodeY * routefind.nMapWidth + nSelectedNodeX];
+					{
+						routefind.nodeEnd = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
+
+						std::cout << "\nNew end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "";
+						std::cout << "\nOriginal Start node is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
+					}
 					else
-						routefind.nodes[nSelectedNodeY * routefind.nMapWidth + nSelectedNodeX].bObstacle = !routefind.nodes[nSelectedNodeY * routefind.nMapWidth + nSelectedNodeX].bObstacle;
+					{
+						npcs.clear();
+						
+					}
+						//routefind.nodes[XY.y * routefind.nMapWidth + XY.x].bObstacle = !routefind.nodes[XY.y * routefind.nMapWidth + XY.x].bObstacle;
 
 					 // Solve in "real-time" gives a nice effect
 				}
+				
 			}
-			std::cout << "hey2";
+			
 
-
+			routefind.solve_AStar();
 
 			routefind.OnUserUpdate(0.0f);
+			std::cout << "Path (starting at the end) is: ";
+			for (auto a : routefind.path)
+			{
+				sf::RectangleShape shape;
+				shape.setSize(sf::Vector2f(nNodeSize/5, nNodeSize/5));
+				shape.setPosition(sf::Vector2f(a.x *100 ,a.y *100));
+				shape.setFillColor(sf::Color::Red);
+				npcs.push_back(shape);
+				
+				std::cout << "\nDrawn green shape results at : " << (a.x * 100) << ", " << (a.y * 100) << " |  ";
+			}
 
 
-
-
-
-
+			
 
 
 
@@ -709,11 +753,20 @@ void Game::render()
 	//this->window->draw(playerTwo.actor);
 	this->window->draw(userText);
 	window->draw(chat.playerText);
-	for (auto rec : routefind.gridRecs) {
-		this->window->draw(rec);
+	 
+	if (grid)
+	{
+		this->window->draw(routefind.vaGrid);
+	
+	}
+	if (gridPath)
+	{
+		for (auto npc : npcs)
+			this->window->draw(npc);
 	}
 	this->window->display(); //Tell app that window is done drawing.
 	
+
 }
 
 void Game::update()
