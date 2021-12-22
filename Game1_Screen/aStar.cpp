@@ -59,18 +59,31 @@ aStar::aStar() {
 		vaGrid.setPrimitiveType(sf::Lines);
 		vaGrid.resize((nMapHeight * nMapWidth) * 2);
 		
+		vaLine.setPrimitiveType(sf::Lines);
+		vaLine.resize((nMapHeight * nMapWidth) * 2);
+
+
 		int nNodeSize = 100;
 		int nNodeBorder = 0;
-		for (int x = 0; x < nMapHeight ; ++x)
-			 {
-				
-				sf::Vertex* quad = &vaGrid[x*2];
-				//std::cout << nMapWidth << ", "<<  x <<", "<< y << "\n";
-				// define its 2/4 points 
-				quad[0].position = sf::Vector2f(0, (x+1) * nNodeSize);
-				quad[1].position = sf::Vector2f(nMapWidth * nNodeSize, (x+1)*nNodeSize);
-				quad[0].color = sf::Color::White;
-				quad[1].color = sf::Color::White;
+		for (int x = 0; x < nMapHeight; ++x)
+		{
+				sf::Vertex* line = &vaGrid[x * 2];
+			//std::cout << nMapWidth << ", "<<  x <<", "<< y << "\n";
+			// define its 2/4 points 
+			line[0].position = sf::Vector2f(0, (x + 1) * nNodeSize);
+			line[1].position = sf::Vector2f(nMapWidth * nNodeSize, (x + 1) * nNodeSize);
+			line[0].color = sf::Color::Green;
+			line[1].color = sf::Color::Green;
+		}
+
+				for (int x = 0; x < nMapWidth; ++x){
+					sf::Vertex* hLine = &vaLine[x * 2];
+
+				hLine[0].position = sf::Vector2f(x*nNodeSize, 0);
+				hLine[1].position = sf::Vector2f(x*nNodeSize, nMapHeight *nNodeSize );
+				hLine[0].color = sf::Color::Green;
+				hLine[1].color = sf::Color::Green;
+
 			}
 	
 				

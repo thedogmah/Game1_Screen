@@ -60,8 +60,8 @@ client.sPlayers.setScale(0.21, 0.21);
 void Game::initWindow()
 {
 
-	this->videoMode.height = 900;
-	this->videoMode.width = 1200;
+	this->videoMode.height = 1070;
+	this->videoMode.width = 1710;
 //	this->videoMode.getDesktopMode;
 	this->window = new sf::RenderWindow(this->videoMode, "Game: Text Engine", sf::Style::Titlebar | sf::Style::Close);
 	this->window->setFramerateLimit(70);
@@ -130,9 +130,11 @@ void Game::initSprites()
 	aMain.left += 146;
 	actorMain.setTextureRect(aMain);
 	image.loadFromFile("wo1.png");
-	
-
 	image.createMaskFromColor(sf::Color::Black);
+	npc1.loadFromFile("wo1.png");
+	npc1.createMaskFromColor(sf::Color::Black);
+	texNpc1.loadFromImage(npc1);
+	sprNpc1.setTexture(texNpc1);
 	Char.loadFromImage(image);
 	spChar.setTexture(Char);
 	//spChar.rotate(45.0f);
@@ -152,6 +154,7 @@ void Game::initSprites()
 	//spChar.setTexture(Char);
 	CharBG.scale(1.0, 1.0);
 	spChar.scale(0.21, 0.21);
+	sprNpc1.scale(0.21, 0.21);
 	if (!Char2.loadFromFile("wo2.png"))
 	{
 		std::cout << "Couldn't load char_png texture" << std::endl;
@@ -196,6 +199,7 @@ Game::Game()
 {
 	
 	this->initVariables();
+	this->initNPC();
 	this->initWindow();
 	this->initEnemies();
 	this->initInterface();
@@ -233,6 +237,24 @@ void Game::initConnection()
 			std::cout << "probing for server\n " << sf::IpAddress::LocalHost << "3000\n";
 
 
+}
+void Game::initNPC()
+{
+	if (!texNpc1.loadFromImage(iplayerTexture))
+	{
+		std::cout << "didn't load NPC1";
+	}
+	else std::cout << "\nloaded NPC texture";
+	//Animation npc(&texNpc1, sf::Vector2u(1, 1), 0.14f, routefind.path);
+	npc.uvRect.width = texNpc1.getSize().x;
+	npc.uvRect.height = texNpc1.getSize().y;
+	npc.imageCount = sf::Vector2u(4, 4);
+	npc.switchTime = 0.2f;
+		
+		
+	//	uvRect.width = texture.getSize().x / float(imageCount.x);
+	//uvRect.height = texture->getSize().y / float(imageCount.y);
+	npc.actor.setTextureRect(npc.uvRect);
 }
 void Game::spawnEnemy()
 {
@@ -325,6 +347,7 @@ void Game::pollEvents()
 			}
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
+				
 				still = false;
 				faceUp = false;
 				faceDown = false;
@@ -492,7 +515,7 @@ void Game::pollEvents()
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
-
+						npc.path = routefind.path;
 						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
@@ -518,21 +541,22 @@ void Game::pollEvents()
 			
 
 			routefind.solve_AStar();
-
+			npc.pathCount = routefind.path.size();
+			std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
 			routefind.OnUserUpdate(0.0f);
-			std::cout << "Path (starting at the end) is: ";
+			std::cout << "\nPath (starting at the end) is: ";
 			for (auto a : routefind.path)
 			{
 				sf::RectangleShape shape;
-				shape.setSize(sf::Vector2f(nNodeSize/5, nNodeSize/5));
+				shape.setSize(sf::Vector2f(nNodeSize/7, nNodeSize/7));
 				shape.setPosition(sf::Vector2f(a.x *100 ,a.y *100));
 				shape.setFillColor(sf::Color::Red);
 				npcs.push_back(shape);
 				
-				std::cout << "\nDrawn green shape results at : " << (a.x * 100) << ", " << (a.y * 100) << " |  ";
+				std::cout << "\nDrawn Node results at : " << a.x  << ", " << a.y * 100 << " |  ";
 			}
 
-
+			
 			
 
 
@@ -750,23 +774,30 @@ void Game::render()
 	this->renderPlayers();
 
 	this->window->draw(player.actor);
+	
+	npc.Update(0, 0.2f, faceRight, faceDown, faceUp, still);
+	npc.actor.setTextureRect(npc.uvRect);
+	this->window->draw(npc.actor);
 	//this->window->draw(playerTwo.actor);
 	this->window->draw(userText);
 	window->draw(chat.playerText);
-	 
+	
+	//Testing NPC animation.
+	window->draw(sprNpc1);
 	if (grid)
 	{
 		this->window->draw(routefind.vaGrid);
-	
+		this->window->draw(routefind.vaLine);
 	}
 	if (gridPath)
 	{
 		for (auto npc : npcs)
 			this->window->draw(npc);
+
 	}
 	this->window->display(); //Tell app that window is done drawing.
 	
-
+	
 }
 
 void Game::update()

@@ -42,6 +42,7 @@ public:
 
 	};
 	sf::VertexArray vaGrid;
+	sf::VertexArray vaLine;
 	std::vector<sf::Vertex> gridRecs;
 	sf::Event ev;
 	sNode* nodes = nullptr;

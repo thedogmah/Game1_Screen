@@ -31,6 +31,7 @@ int main()
 	sf::Clock clock;
 	//game.initClient(&game.rsocket);
 	Animation character(&game.playerTexture, sf::Vector2u(4, 4), 0.14f);
+	
 	//Animation walkFront(&game.playerTwoTexture, sf::Vector2u(4, 2), 0.15f);
 	game.routefind.OnUserCreate();
 	game.routefind.solve_AStar();
@@ -54,6 +55,7 @@ int main()
 		//game.spChar.setScale(1, 1);
 		//game.spChar.setTextureRect(character.uvRect);
 		game.player.actor.setTextureRect(character.uvRect);
+		
 		//game.playerTwo.actor.setTextureRect(walkFront.uvRect);
 		game.render();
 		

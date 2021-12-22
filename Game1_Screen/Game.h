@@ -60,8 +60,16 @@ public:
 	sf::Texture playerTwoTexture;
 	sf::Image iplayerTwoTexture;
 
-	sf::Sprite spChar;
+
+	//NPCS
+	std::vector<sf::RectangleShape> npcs;
 	
+	sf::Sprite spChar;
+	sf::Image image;
+	sf::Sprite sprNpc1;
+	sf::Texture texNpc1;
+	sf::Image npc1;
+	Animation npc;
 
 private:
 
@@ -117,11 +125,8 @@ private:
 	sf::Texture Char4;
 	sf::Sprite CharBG;
 	
-	//NPCS
-	std::vector<sf::RectangleShape> npcs;
 
-	sf::Image image;
-
+	
 
 
 	//Weather
@@ -157,7 +162,7 @@ private:
 	void initEnemies();
 	void initSprites();
 	void initConnection();
-	
+	void initNPC();
 	void checkCollide();
 public:
 	void initClient(sf::TcpSocket* rsocket);
