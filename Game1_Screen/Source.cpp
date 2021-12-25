@@ -40,6 +40,7 @@ int main()
 	while (game.running())
 	{
 		//update
+
 		deltaTime = clock.restart().asSeconds();
 		game.routefind.OnUserUpdate(0.05f);
 		

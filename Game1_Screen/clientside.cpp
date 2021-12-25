@@ -63,8 +63,6 @@ clientside::clientside()
 
 void clientside::ReceivePackets(sf::TcpSocket* socket)
 {
-
-	
 	
 	sf::Packet packet;
 	//while (true) {
@@ -107,7 +105,7 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		{
 			//DEBUG COMMENTS std::cout << "\n " << e.first;
 			//DEBUG COMMENTS std::cout << "\n " << e.second;
-		}
+		}		
 		/*for (auto e : vPlayers)
 		{
 			if e.id

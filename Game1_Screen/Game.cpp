@@ -246,15 +246,19 @@ void Game::initNPC()
 	}
 	else std::cout << "\nloaded NPC texture";
 	//Animation npc(&texNpc1, sf::Vector2u(1, 1), 0.14f, routefind.path);
-	npc.uvRect.width = texNpc1.getSize().x;
-	npc.uvRect.height = texNpc1.getSize().y;
+	npc.actor.setSize(sf::Vector2f(97, 200));
+	npc.eFacing = Animation::eDirectionFacing::East;
+
 	npc.imageCount = sf::Vector2u(4, 4);
-	npc.switchTime = 0.2f;
-		
-		
-	//	uvRect.width = texture.getSize().x / float(imageCount.x);
-	//uvRect.height = texture->getSize().y / float(imageCount.y);
-	npc.actor.setTextureRect(npc.uvRect);
+	npc.currentImage.x = 0;
+	
+	//npc.npcStepTime = 0.14f;
+	//npc.actor.setTexture(&playerTexture);
+	npc.actor.setTexture(&texNpc1);
+	npc.uvRect.width = texNpc1.getSize().x / float(npc.imageCount.x);
+	npc.uvRect.height = texNpc1.getSize().y / float(npc.imageCount.y);
+	
+//	npc.actor.setTextureRect(npc.uvRect);
 }
 void Game::spawnEnemy()
 {
@@ -491,7 +495,7 @@ void Game::pollEvents()
 
 		case sf::Event::MouseButtonPressed:
 
-		
+			bool pathColor = false;
 			int nNodeSize =100;
 			sf::Vector2i XY = sf::Mouse::getPosition(*window);
 			//int nSelectedNodeY = sf::Mouse::getPosition(window) ;
@@ -508,30 +512,62 @@ void Game::pollEvents()
 			
 				//routefind.nodeEnd->x = (worldPos.x / 100);
 				// routefind.nodeEnd->y =( worldPos.y / 100);
-				 std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
-				if (XY.x >= 0 && XY.x <= (routefind.nMapWidth * nNodeSize))
-					std::cout << "\nClicked Within Bounds";
-				if (XY.y >= 0 && XY.y <= (routefind.nMapHeight *nNodeSize))
+				 //std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+			
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
-						npc.path = routefind.path;
+						
+						if (!pathColor)
+							pathColor = true;
+						else
+							pathColor = false;
 						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
+						
+						npc.path.clear();
+						npc.currentCount = 0;
+						routefind.solve_AStar();
+
+						
+						std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
+						
+						std::cout << "\nPath (starting at the end) is: ";
+					
+					
+
 					}
 					else if (ev.mouseButton.button == sf::Mouse::Right)
 					{
-						routefind.nodeEnd = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
+						//npc.path.clear();
+						if (pathColor)
+							pathColor = true;
+						else
+							pathColor = false;
 
+						routefind.nodeEnd = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
+						
 						std::cout << "\nNew end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "";
 						std::cout << "\nOriginal Start node is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
+						
+						
+						
+						std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
+
+						std::cout << "\nPath (starting at the end) is: ";
+
+						
+
+							
 					}
 					else
 					{
 						npcs.clear();
-						
+						routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)].bObstacle = true;
 					}
+					
+
 						//routefind.nodes[XY.y * routefind.nMapWidth + XY.x].bObstacle = !routefind.nodes[XY.y * routefind.nMapWidth + XY.x].bObstacle;
 
 					 // Solve in "real-time" gives a nice effect
@@ -539,23 +575,12 @@ void Game::pollEvents()
 				
 			}
 			
-
-			routefind.solve_AStar();
-			npc.pathCount = routefind.path.size();
-			std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
-			routefind.OnUserUpdate(0.0f);
-			std::cout << "\nPath (starting at the end) is: ";
-			for (auto a : routefind.path)
-			{
-				sf::RectangleShape shape;
-				shape.setSize(sf::Vector2f(nNodeSize/7, nNodeSize/7));
-				shape.setPosition(sf::Vector2f(a.x *100 ,a.y *100));
-				shape.setFillColor(sf::Color::Red);
-				npcs.push_back(shape);
-				
-				std::cout << "\nDrawn Node results at : " << a.x  << ", " << a.y * 100 << " |  ";
-			}
-
+			
+			
+			if (pathColor)
+				pathColor = false;
+			if (!pathColor)
+				pathColor = true;
 			
 			
 
@@ -773,11 +798,44 @@ void Game::render()
 	//window->draw(actorMain);
 	this->renderPlayers();
 
-	this->window->draw(player.actor);
 	
-	npc.Update(0, 0.2f, faceRight, faceDown, faceUp, still);
+	
+
+	routefind.solve_AStar();
+	npc.path = routefind.OnUserUpdate(0.0f);
+	//npc.pathCount = routefind.path.size();
+	
+	
+
+
+	
+	this->window->draw(player.actor);
+	float deltaTime = 0.0f;
+	deltaTime = npcClock.restart().asSeconds();
+	npc.Update(0, deltaTime, faceRight, faceDown, faceUp, still);
+	
+
+	for (auto a : routefind.path)
+	{
+		sf::RectangleShape shape;
+		shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
+		shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
+		
+			shape.setFillColor(sf::Color::Blue);
+		npcs.push_back(shape);
+
+		std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+	}
+
 	npc.actor.setTextureRect(npc.uvRect);
 	this->window->draw(npc.actor);
+	if (npc.currentCount >= npc.path.size()-1) {
+		routefind.nodeStartBuffer = routefind.nodeStart;
+		routefind.nodeEndBuffer = routefind.nodeEnd;
+		routefind.nodeEnd = routefind.nodeStartBuffer;
+		routefind.nodeStart = routefind.nodeEndBuffer;
+		npc.currentCount = 0;
+	}
 	//this->window->draw(playerTwo.actor);
 	this->window->draw(userText);
 	window->draw(chat.playerText);
@@ -826,7 +884,7 @@ void Game::login()
 {
 
 	std::cout << "\nPlease enter Character name: ";
-	std::cin >> username;
+	username = "RyanB1";
 	userText.setString(username);
 }
 

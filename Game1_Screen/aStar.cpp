@@ -16,7 +16,7 @@
 #include <list>
 
 aStar::aStar() {
-	this->nMapWidth = 150; this->nMapHeight = 22 ;
+	this->nMapWidth = 75; this->nMapHeight = 22 ;
 	this->init();
 		}
 	//m_sAppName = L"Path Finding";
@@ -40,8 +40,15 @@ aStar::aStar() {
 
 	struct paths {
 
-		int x;
-		int y;
+		float x;
+		float y;
+
+		paths(float x, float y)
+		{
+			this->x = x;
+			this->y = y;
+		}
+		paths();
 	};
 
 	std::vector<paths> path;
@@ -141,8 +148,8 @@ aStar::aStar() {
 
 		}
 
-		nodeStart = &nodes[0];
-		nodeEnd = &nodes[0];
+		nodeStart = &nodes[40];
+		nodeEnd = &nodes[30];
 		return true;
 	}
 
@@ -294,8 +301,8 @@ aStar::aStar() {
 					paths coords;
 					p = p->parent;
 					//std::cout << p->x << ", " << p->y << "\n"; 
-					coords.x = p->x;
-					coords.y= p->y;
+					coords.x = static_cast<float>(p->x);
+					coords.y= static_cast<float>(p->y);
 					path.push_back(coords);
 					
 				} 

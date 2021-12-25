@@ -62,6 +62,7 @@ public:
 
 
 	//NPCS
+	sf::Clock npcClock;
 	std::vector<sf::RectangleShape> npcs;
 	
 	sf::Sprite spChar;

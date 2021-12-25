@@ -22,8 +22,18 @@ public:
 
 	struct paths {
 
-		int x;
-		int y;
+		float x;
+		float y;
+
+		paths(float x, float y)
+		{
+			this->x = x;
+			this->y = y;
+		}
+		paths() {
+			x = 0;
+			y = 0;
+		}
 	};
 
 	std::vector<paths> path;
@@ -51,6 +61,8 @@ public:
 
 	sNode* nodeStart = nullptr;
 	sNode* nodeEnd = nullptr;
+	sNode* nodeEndBuffer = nullptr;
+	sNode* nodeStartBuffer = nullptr;
 
 public:
 	virtual bool OnUserCreate();

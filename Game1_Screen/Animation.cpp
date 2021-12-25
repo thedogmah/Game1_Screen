@@ -12,8 +12,8 @@ Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switch
 	totalTime = 0.0f;
 	currentImage.x = 0;
 	
-	uvRect.width = texture->getSize().x / float(imageCount.x);
-	uvRect.height = texture->getSize().y / float(imageCount.y);
+	uvRect.width = texture->getSize().x / static_cast<float>(imageCount.x);
+	uvRect.height = texture->getSize().y / static_cast<float>(imageCount.y);
 }
 
 Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<aStar::paths> path)
@@ -32,71 +32,182 @@ Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switch
 
 
 
+
 void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, bool faceUp, bool still)
 {
-//Caution. This if statement sets initial parameters only for NPCS
-	if (this->path.size() > 0)
-	{
-		faceRight = true;
-	} //}
-
-	if (still == true)
-	{
-		row += 3;
-	}
-	else
-	if (faceDown == true)
-			row += 1;
-	else
-	if (faceUp == true)
-			row += 2;
+	////Caution. This if statement sets initial parameters only for NPCS
+	std::cout << "\n\nStart of animate npc function, still is: " << still;
 	
-			
-	currentImage.y = row;
-	totalTime += deltaTime;
-
-	if (totalTime >= switchTime)
+	if (path.size() == 0)
 	{
-		totalTime -= switchTime;
-		currentImage.x++;
-		if (currentImage.x >= imageCount.x)
+		//these 3 set the row (whether animation is facing up or down or not moving)
+		if (still == true)
 		{
-			currentImage.x = 0;
+			row += 3;
 		}
-	
-	}
-
-	uvRect.top = currentImage.y * uvRect.height;
-
-	if (faceRight)
-	{
-		uvRect.left = currentImage.x * uvRect.width;
-		uvRect.width = abs(uvRect.width);
-	}
-	else
-	{
-		uvRect.left = (currentImage.x + 1) * abs(uvRect.width);
-		uvRect.width = -abs(uvRect.width);
-	}
-	row = 0;
-	actor.setSize(sf::Vector2f(100, 100));
-
-	actor.setTextureRect(uvRect);
-	if (this->path.size() > 0) {
-		
-		pathCount = path.size();
-		if(currentCount<=pathCount)
-			//calculate direction based on previous. (4 if statements will do it.
-
-		actor.setTextureRect(uvRect);
-		actor.setPosition((this->path[this->currentCount].x *100), (this->path[this->currentCount].y *100));
-		direction.x = path[pathCount+1].x;
-		direction.y = path[pathCount+1].y;
-		if (currentCount < pathCount)
-			currentCount++;
 		else
-			currentCount = 0;
+			if (faceDown == true)
+				row += 1;
+			else
+				if (faceUp == true)
+					row += 2;
+
+
+		currentImage.y = row;
+		totalTime += deltaTime;
+		
+		if (totalTime >= switchTime)
+		{
+			totalTime -= switchTime;
+			currentImage.x++;
+			if (currentImage.x >= imageCount.x)
+			{
+				currentImage.x = 0;
+			}
+
+		}
+
+		uvRect.top = currentImage.y * uvRect.height;
+
+		if (faceRight)
+		{
+			uvRect.left = currentImage.x * uvRect.width;
+			uvRect.width = abs(uvRect.width);
+		}
+		else
+		{
+			uvRect.left = (currentImage.x + 1) * abs(uvRect.width);
+			uvRect.width = -abs(uvRect.width);
+		}
+
 	}
+
+	
+	//adds time since last frape to npc total time
+	npcWalkSpeed += deltaTime;
+	npcTotalTime += deltaTime;
+	std::cout << "\n\nMiddle of animate npc function, still is: " << still;
+	//actor.setTextureRect(uvRect);
+	if (this->path.size() > 0) {
+		//still = false;
+		if (currentCount != 0 && currentCount < path.size()) //if its NOT the first step, meaning we have a previous step
+		{
+			currentSteps.x = path[currentCount].x;
+			currentSteps.y = path[currentCount].y;
+			this->prevSteps.x = this->path[this->currentCount - 1].x;
+			this->prevSteps.y = this->path[this->currentCount - 1].y;
+			getPath();
+			
+		}
+		
+		if (eFacing == South || eFacing == East || eFacing == North || eFacing == West)
+		{
+			still = false;
+		}
+		//set to still if previous step and current step / coordinates are teh same.
+		if (currentCount <path.size())
+		if (this->prevSteps.x == this->path[this->currentCount].x && this->prevSteps.y == this->path[this->currentCount].y)
+			still = true;
+		if (still == true || currentCount >= path.size())
+		{
+			row += 3;
+		}
+		else
+			if (eFacing == South)
+				row = 1;
+			else
+				if (eFacing == North)
+					row = 2;
+
+
+		currentImage.y = row;
+		
+
+		if (npcTotalTime >= npcStepTime)
+		{
+			npcTotalTime -= npcStepTime;
+			currentImage.x++;
+			if (currentImage.x >= imageCount.x)
+			{
+				currentImage.x = 0;
+			}
+
+		}
+
+		uvRect.top = currentImage.y * uvRect.height;
+
+		if (eFacing == East)
+		{
+			uvRect.left = currentImage.x * uvRect.width;
+			uvRect.width = abs(uvRect.width);
+		}
+		else //facing West
+		{
+			uvRect.left = (currentImage.x + 1) * abs(uvRect.width);
+			uvRect.width = -abs(uvRect.width);
+		}
+
+
+		pathCount = path.size();
+		if (currentCount < path.size())
+		{
+			if (npcWalkSpeed >= npcWalkSwitch)
+			{
+				npcWalkSpeed = 0;
+				//actor.setTextureRect(uvRect);
+				actor.setPosition((this->path[this->currentCount].x * 100), (this->path[this->currentCount].y * 100));
+			//	direction.x = static_cast<float>(path[pathCount].x);
+				//direction.y = static_cast<float>(path[pathCount].y);
+				
+				if (currentCount == (path.size() - 1))
+				{
+					currentCount = currentCount;
+					row = 3;
+					
+				}
+				else
+				currentCount++;//current count will iterate to 1 within the GetPath function, breaking this deadlock // 
+			}
+		}
+		if (currentCount >= path.size())
+		{
+			currentCount = 0;
+			path.clear();
+			
+		}
+		
+	}
+	std::cout << "\n\nEnd of animate npc function, still is: " << still; 
+}
+	//row = 0;
+
+
+void Animation::getPath()
+{
+			if (this->prevSteps.x < this->currentSteps.x)
+			{
+				eFacing = East;
+				std::cout << "\nFacing East from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
+
+			}
+			if (this->prevSteps.x > this->currentSteps.x)
+			{
+				std::cout << "\nFacing West from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
+				eFacing = West;
+			}
+			if (this->prevSteps.y > this->currentSteps.y)
+			{
+				std::cout << "\nFacing North from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
+				eFacing = North;
+			}
+			if (this->prevSteps.y < this->currentSteps.y)
+			{
+				eFacing = South;
+				std::cout << "\nFacing South from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
+			}
+		
+		
+		
 }
 Animation::~Animation()
 {
