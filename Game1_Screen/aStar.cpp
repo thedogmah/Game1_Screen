@@ -148,8 +148,8 @@ aStar::aStar() {
 
 		}
 
-		nodeStart = &nodes[40];
-		nodeEnd = &nodes[30];
+		nodeStart = &nodes[10];
+		nodeEnd = &nodes[20];
 		return true;
 	}
 

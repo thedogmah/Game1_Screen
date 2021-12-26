@@ -35,7 +35,8 @@ int main()
 	//Animation walkFront(&game.playerTwoTexture, sf::Vector2u(4, 2), 0.15f);
 	game.routefind.OnUserCreate();
 	game.routefind.solve_AStar();
-
+	//game.humanity.aStarPath.OnUserCreate();
+	//game.humanity.aStarPath.solve_AStar();
 	float deltaTime = 0.0f;
 	while (game.running())
 	{

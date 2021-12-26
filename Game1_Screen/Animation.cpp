@@ -36,7 +36,7 @@ Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switch
 void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, bool faceUp, bool still)
 {
 	////Caution. This if statement sets initial parameters only for NPCS
-	std::cout << "\n\nStart of animate npc function, still is: " << still;
+//	std::cout << "\n\nStart of animate npc function, still is: " << still;
 	
 	if (path.size() == 0)
 	{
@@ -86,7 +86,7 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 	//adds time since last frape to npc total time
 	npcWalkSpeed += deltaTime;
 	npcTotalTime += deltaTime;
-	std::cout << "\n\nMiddle of animate npc function, still is: " << still;
+	//std::cout << "\n\nMiddle of animate npc function, still is: " << still;
 	//actor.setTextureRect(uvRect);
 	if (this->path.size() > 0) {
 		//still = false;
@@ -177,7 +177,7 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 		}
 		
 	}
-	std::cout << "\n\nEnd of animate npc function, still is: " << still; 
+	//std::cout << "\n\nEnd of animate npc function, still is: " << still; 
 }
 	//row = 0;
 
@@ -187,23 +187,23 @@ void Animation::getPath()
 			if (this->prevSteps.x < this->currentSteps.x)
 			{
 				eFacing = East;
-				std::cout << "\nFacing East from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
+		//		std::cout << "\nFacing East from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
 
 			}
 			if (this->prevSteps.x > this->currentSteps.x)
 			{
-				std::cout << "\nFacing West from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
+		//		std::cout << "\nFacing West from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
 				eFacing = West;
 			}
 			if (this->prevSteps.y > this->currentSteps.y)
 			{
-				std::cout << "\nFacing North from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
+		//		std::cout << "\nFacing North from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
 				eFacing = North;
 			}
 			if (this->prevSteps.y < this->currentSteps.y)
 			{
 				eFacing = South;
-				std::cout << "\nFacing South from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
+			//	std::cout << "\nFacing South from" << prevSteps.x << ", " << prevSteps.y << " to: " << currentSteps.x << ", " << currentSteps.y << std::endl;
 			}
 		
 		

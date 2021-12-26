@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "Chat.h"
 #include "aStar.h"
+#include "Population.h"
 //Class as the game engine.
 
 class Game
@@ -62,6 +63,7 @@ public:
 
 
 	//NPCS
+	
 	sf::Clock npcClock;
 	std::vector<sf::RectangleShape> npcs;
 	
@@ -71,7 +73,7 @@ public:
 	sf::Texture texNpc1;
 	sf::Image npc1;
 	Animation npc;
-
+	Population humanity;
 private:
 
 	//Variables	
@@ -81,6 +83,7 @@ private:
 	//Window
 	sf::Vector2i screenSize ;
 	sf::RenderWindow* window;
+	
 	sf::VideoMode videoMode;
 	sf::Event ev;
 	

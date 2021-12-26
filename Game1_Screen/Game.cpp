@@ -5,6 +5,7 @@
 #include <sstream>
 #include "Animation.h"
 #include "Player.h"
+#include "Population.h"
 void Game::initInterface()
 {
 
@@ -59,7 +60,7 @@ client.sPlayers.setScale(0.21, 0.21);
 
 void Game::initWindow()
 {
-
+	
 	this->videoMode.height = 1070;
 	this->videoMode.width = 1710;
 //	this->videoMode.getDesktopMode;
@@ -70,6 +71,10 @@ void Game::initWindow()
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
+	humanity.populate();
+	
+	humanity.window = window;
+	humanity.peopleAmount = 5;
 }
 void Game::initEnemies()
 {
@@ -257,6 +262,8 @@ void Game::initNPC()
 	npc.actor.setTexture(&texNpc1);
 	npc.uvRect.width = texNpc1.getSize().x / float(npc.imageCount.x);
 	npc.uvRect.height = texNpc1.getSize().y / float(npc.imageCount.y);
+
+	
 	
 //	npc.actor.setTextureRect(npc.uvRect);
 }
@@ -343,7 +350,7 @@ void Game::pollEvents()
 				if (aPosition.y < 0)
 					aPosition.y = 0;
 
-				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
+				view.reset(sf::FloatRect(0, 0, screenSize.x, screenSize.y));
 				
 
 				view.zoom(zoomfactor);
@@ -798,22 +805,22 @@ void Game::render()
 	//window->draw(actorMain);
 	this->renderPlayers();
 
-	
-	
-
 	routefind.solve_AStar();
 	npc.path = routefind.OnUserUpdate(0.0f);
 	//npc.pathCount = routefind.path.size();
 	
-	
-
-
-	
 	this->window->draw(player.actor);
 	float deltaTime = 0.0f;
+	
 	deltaTime = npcClock.restart().asSeconds();
+	
 	npc.Update(0, deltaTime, faceRight, faceDown, faceUp, still);
 	
+	
+	humanity.people[0].Update(0, deltaTime, faceRight, faceDown, faceUp, still);
+
+	humanity.people[0].actor.setTextureRect(humanity.people[0].uvRect);
+	humanity.drawPeople();
 
 	for (auto a : routefind.path)
 	{
@@ -824,7 +831,7 @@ void Game::render()
 			shape.setFillColor(sf::Color::Blue);
 		npcs.push_back(shape);
 
-		std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+		//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
 	}
 
 	npc.actor.setTextureRect(npc.uvRect);
@@ -841,7 +848,7 @@ void Game::render()
 	window->draw(chat.playerText);
 	
 	//Testing NPC animation.
-	window->draw(sprNpc1);
+	//window->draw(sprNpc1);
 	if (grid)
 	{
 		this->window->draw(routefind.vaGrid);
