@@ -13,6 +13,7 @@
 #include "Chat.h"
 #include "aStar.h"
 #include "Population.h"
+#include <thread>
 //Class as the game engine.
 
 class Game
@@ -73,6 +74,7 @@ public:
 	sf::Texture texNpc1;
 	sf::Image npc1;
 	Animation npc;
+	std::thread collissionThread;
 	Population humanity;
 private:
 
@@ -92,7 +94,7 @@ private:
 	float vZoom = 1.0;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 0.63;
+	float zoomfactor = 1.8;
 	//Mouse Positions
 
 

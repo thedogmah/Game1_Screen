@@ -252,7 +252,7 @@ aStar::aStar() {
 
 	std::vector<aStar::paths> aStar::OnUserUpdate(float fElapsedTime)
 	{
-		float nNodeSize = 48;
+		float nNodeSize = 100;
 		int nNodeBorder = 2;
 		path.clear();
 		//Integer Division to get cursor position in node space

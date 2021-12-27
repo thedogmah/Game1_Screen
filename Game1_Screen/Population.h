@@ -6,7 +6,7 @@ class Population
 {
 
 public:
-	
+	 
 	Population();
 
 	Population(int cpeopleAmount, int boundx, int boundy, sf::RenderWindow &window);
@@ -27,6 +27,8 @@ public:
 	bool populate();
 	bool drawPeople();
 	aStar aStarPath;
+
+	
 private:
 
 

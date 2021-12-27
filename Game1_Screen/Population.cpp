@@ -16,9 +16,9 @@ bool Population::populate()
 {
 	for (int x = 0; x < peopleAmount/*(this->peopleAmount)*/; x++) {
 		//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
-		
-		int start = 780 +rand() %  (650);
-		int end = 780 +rand() %  (650);
+		Human.ID = x;
+		int start = 780 +rand() %  (600);
+		int end = 780 +rand() %  (600);
 		imgHuman.loadFromFile("WomanWalking4.png");
 		imgHuman.createMaskFromColor(sf::Color::Black);
 		if (!texHuman.loadFromImage(imgHuman))

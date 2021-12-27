@@ -34,10 +34,13 @@ int main()
 	//game.humanity.aStarPath.OnUserCreate();
 	//game.humanity.aStarPath.solve_AStar();
 	float deltaTime = 0.0f;
+	
 	while (game.running())
 	{
+		
+	//	std::cout << " " << float(fps);
 		//update
-
+		//lastTime = currentTime;
 		deltaTime = clock.restart().asSeconds();
 		game.routefind.OnUserUpdate(0.05f);
 		

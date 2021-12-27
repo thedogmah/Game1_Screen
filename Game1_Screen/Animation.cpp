@@ -181,6 +181,20 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 	//row = 0;
 
 
+sf::Vector2i Animation::getLocality()
+{
+	sf::Vector2i locality;
+	int x, y;
+	x = static_cast<int>(this->actor.getPosition().x);
+	y = static_cast<int>(this->actor.getPosition().y);
+	//std::cout << "\n original float position before locality: " << float(actor.getPosition().x) << ", y: " << float(actor.getPosition().y);
+	locality.x = x;
+	locality.y = y;
+	return locality;
+
+
+}
+
 void Animation::getPath()
 {
 			if (this->prevSteps.x < this->currentSteps.x)

@@ -67,11 +67,11 @@ void Game::initWindow()
 	this->window = new sf::RenderWindow(this->videoMode, "Game: Text Engine", sf::Style::Titlebar | sf::Style::Close);
 	this->window->setFramerateLimit(70);
 
-	//view.setCenter(1000, 900);
+	view.setCenter(3700, 900);
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
-	humanity.peopleAmount = 90;
+	humanity.peopleAmount = 230;
 	humanity.populate();
 	
 	humanity.window = window;
@@ -184,21 +184,49 @@ void Game::initSprites()
 }
 void Game::checkCollide()
 {
-	sf::Vector2f posStop(spChar.getPosition().x, spChar.getPosition().y);
-	if (spChar.getGlobalBounds().intersects(Rec.getGlobalBounds()))
-	{
-		std::cout << "Collision with Character and Rec\n";
-	//	CharBG.setOrigin(CharBG.getGlobalBounds().height, CharBG.getGlobalBounds().width);
-	//	CharBG.setScale(-1.1, 1.1);
-		//window->draw(CharBG);
-		//CharBG.setOrigin(0, 0);
-		//view.rotate(180);
-		//spChar.rotate(180);
-		window->setView(view);
-		//spChar.setScale(-0.21, 0.21);
+	//sf::Vector2f posStop(spChar.getPosition().x, spChar.getPosition().y);
+	//if (spChar.getGlobalBounds().intersects(Rec.getGlobalBounds()))
+	//{
+	//	std::cout << "Collision with Character and Rec\n";
+	////	CharBG.setOrigin(CharBG.getGlobalBounds().height, CharBG.getGlobalBounds().width);
+	////	CharBG.setScale(-1.1, 1.1);
+	//	//window->draw(CharBG);
+	//	//CharBG.setOrigin(0, 0);
+	//	//view.rotate(180);
+	//	//spChar.rotate(180);
+	//	window->setView(view);
+	//	//spChar.setScale(-0.21, 0.21);
+	//
+	//	spChar.move(0, 0);
+	//}
 	
-		spChar.move(0, 0);
-	}
+	//sf::Vector2f XY = npc2.actor.getPosition();
+	//sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
+	for (auto &npc : humanity.people)
+		npc.pathSearch.solve_AStar();
+		//npc2.pathSearch.solve_AStar();
+		for (auto &npc2 : humanity.people) {
+			sf::Vector2i XY = npc2.getLocality();
+		//	std::cout << "npc2 position: " << npc2.actor.getPosition().x << ", " << npc2.actor.getPosition().y << "\n";
+			sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
+			//std::cout << "converted world pos" << worldPos.x << ", " << worldPos.y << "\n";
+
+			if (npc.actor.getGlobalBounds().intersects(npc2.actor.getGlobalBounds()) && npc.ID != npc2.ID  && npc.pathSearch.nodeEnd != nullptr && npc.pathSearch.nodeStart != nullptr)
+				//npc.pathSearch.nodes[0].bObstacle = true;
+			{
+				//npc.pathSearch.solve_AStar();
+				
+			//	std::cout << "node is | " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].x << ", " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].y << " | ";
+				//std::cout << "node is | " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].x << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].y << " | ";
+
+				npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100)].bObstacle = true;
+				//npc.pathSearch.solve_AStar();
+				//npc2.pathSearch.solve_AStar();
+				npc.path = npc.pathSearch.OnUserUpdate(0.2f);
+				npc2.path = npc2.pathSearch.OnUserUpdate(0.2f);
+			}
+		}
+		
 }
 //Constructors / Destructors.
 Game::Game()
@@ -550,7 +578,7 @@ void Game::pollEvents()
 
 				//routefind.nodeEnd->x = (worldPos.x / 100);
 				// routefind.nodeEnd->y =( worldPos.y / 100);
-				 //std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+				 std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
@@ -560,8 +588,8 @@ void Game::pollEvents()
 							pathColor = true;
 						else
 							pathColor = false;
-					//	std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
-					//	std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
+						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 						for (auto npc : humanity.people)
 						{
 							if (npc.actor.getGlobalBounds().contains(this->mousePosView))
@@ -576,12 +604,15 @@ void Game::pollEvents()
 									shape.setFillColor(sf::Color::White);
 									npcsPath.push_back(shape);
 
-									//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+									std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
 								}
 							}
 						}
+						//Documentation > Below > Worldpos.y (down (220) / 100 will give 22 positions, (21 with 0)
+						//						> mulitplied by the (width plus the x coordinate / 100). 
 						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
 
+						//	routefind.nodes		 [(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)].bObstacle = true;
 						npc.path.clear();
 						npc.currentCount = 0;
 						routefind.solve_AStar();
@@ -626,9 +657,9 @@ void Game::pollEvents()
 						else
 						{
 							
-							npcs.clear(); // the blue line path for path find results.
-							routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)].bObstacle = true;
-							routefind.solve_AStar();
+							//npcs.clear(); // the blue line path for path find results.
+							//routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)].bObstacle = true;
+							//routefind.solve_AStar();
 						}
 
 
@@ -744,9 +775,9 @@ void Game::renderRain()
 		for (int i = 0; i < 900; i++) {
 			randomh = 1 + rand() % (15);
 			randomsp[i] = 15 + rand() % (28);
-			randomx = 1 + rand() % (2200);
-			randomr = 210 + rand() % (45);
-			randomg = 210 + rand() % (45);
+			randomx = 2700 + rand() % (2200);
+			randomr = 0 + rand() % (45);
+			randomg = 100 + rand() % (45);
 			randomb = 210 + rand() % (45);
 			rectangle[i].setSize(sf::Vector2f(4, randomh));
 			rectangle[i].setPosition(randomx, -7);
@@ -756,17 +787,18 @@ void Game::renderRain()
 
 		}
 	}
-		for (int i = 0; i < 900; i++)
-		{}//	this->window->draw(rectangle[i]);
-
+	for (int i = 0; i < 900; i++)
+	{
+		this->window->draw(rectangle[i]);
+	}
 
 		for (int i = 0; i < 700; i++) {
 		if (rectangle[i].getPosition().y > 2000){
-			randomx = -300 + rand() % (2500);
+			randomx = 2700 + rand() % (2500);
 			rectangle[i].setPosition(randomx, -5);
 			randomsp[i] = 15 + rand() % (28);
-			randomr = 210 + rand() % (45);
-			randomg = 210 + rand() % (45);
+			randomr = 0 + rand() % (45);
+			randomg = 100 + rand() % (45);
 			randomb = 210 + rand() % (45);
 		
 		}
@@ -841,7 +873,7 @@ void Game::render()
 
 	this->renderInterface(*this->window);
 	this->renderRain();
-	this->checkCollide();
+	
 	//window->draw(spChar);
 	
 	//window->draw(actorMain);
@@ -857,10 +889,14 @@ void Game::render()
 	deltaTime = npcClock.restart().asSeconds();
 	
 	npc.Update(0, deltaTime, faceRight, faceDown, faceUp, still);
-	
+	std::thread cThread(&Game::checkCollide, this);
+	// Main thread waits for the new thread th to stop execution and as a result, its own execution gets blocked
+	cThread.join();
+	//this->checkCollide();
 	for (auto &person : humanity.people)
 	{
 		//person.pathSearch.solve_AStar();
+		
 		person.pathSearch.OnUserUpdate(0.02f);
 		person.Update(0, deltaTime, false, false, false, false);
 	person.actor.setTextureRect(person.uvRect);

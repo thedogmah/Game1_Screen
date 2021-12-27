@@ -10,9 +10,11 @@ public:
 	Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<aStar::paths> path);
 	~Animation();
 	
-
+	sf::Vector2i getLocality();
 	void getPath();
 //	Player player;
+	bool isNPC = true;
+	int ID; //unique ID for each animation created, particularly for poplation class.
 	sf::RectangleShape actor;	//Rectangle will display NPC image.
 	sf::IntRect uvRect;
 	aStar pathSearch;
