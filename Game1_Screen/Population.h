@@ -11,7 +11,7 @@ public:
 
 	Population(int cpeopleAmount, int boundx, int boundy, sf::RenderWindow &window);
 
-	int peopleAmount = 10;
+	int peopleAmount;
 	struct cBounds {
 		int x, y;
 	} coordBounds;

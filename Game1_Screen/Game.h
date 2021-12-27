@@ -61,12 +61,12 @@ public:
 	sf::Texture playerTwoTexture;
 	sf::Image iplayerTwoTexture;
 
-
+	bool npcMove = false;
 	//NPCS
 	
 	sf::Clock npcClock;
 	std::vector<sf::RectangleShape> npcs;
-	
+	std::vector<sf::RectangleShape> npcsPath;
 	sf::Sprite spChar;
 	sf::Image image;
 	sf::Sprite sprNpc1;

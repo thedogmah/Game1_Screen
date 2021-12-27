@@ -90,6 +90,7 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 	//actor.setTextureRect(uvRect);
 	if (this->path.size() > 0) {
 		//still = false;
+	//	std::cout << "\nPath greater than 0\n";
 		if (currentCount != 0 && currentCount < path.size()) //if its NOT the first step, meaning we have a previous step
 		{
 			currentSteps.x = path[currentCount].x;
@@ -97,6 +98,7 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 			this->prevSteps.x = this->path[this->currentCount - 1].x;
 			this->prevSteps.y = this->path[this->currentCount - 1].y;
 			getPath();
+		//	std::cout << "\nPrevious steps set\n";
 			
 		}
 		
@@ -149,32 +151,29 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 
 
 		pathCount = path.size();
-		if (currentCount < path.size())
+		if (currentCount < path.size()-1)
 		{
 			if (npcWalkSpeed >= npcWalkSwitch)
 			{
 				npcWalkSpeed = 0;
-				//actor.setTextureRect(uvRect);
-				actor.setPosition((this->path[this->currentCount].x * 100), (this->path[this->currentCount].y * 100));
+			//	actor.setTextureRect(uvRect);
+				actor.setPosition((this->path[this->currentCount].x * 100.0f), (this->path[this->currentCount].y * 100.0f));
 			//	direction.x = static_cast<float>(path[pathCount].x);
 				//direction.y = static_cast<float>(path[pathCount].y);
-				
-				if (currentCount == (path.size() - 1))
+		//		std::cout << "\nNew position set";
+				currentCount++;
+				if (currentCount == (path.size()))
 				{
-					currentCount = currentCount;
-					row = 3;
-					
+					//currentCount = currentCount;
+					//row = 3;
+					//currentCount++;
 				}
-				else
-				currentCount++;//current count will iterate to 1 within the GetPath function, breaking this deadlock // 
+				//else
+				//currentCount++;//current count will iterate to 1 within the GetPath function, breaking this deadlock // 
 			}
 		}
-		if (currentCount >= path.size())
-		{
-			currentCount = 0;
-			path.clear();
-			
-		}
+	
+		
 		
 	}
 	//std::cout << "\n\nEnd of animate npc function, still is: " << still; 

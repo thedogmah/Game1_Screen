@@ -10,12 +10,8 @@ using namespace sf;
 void multi();
 int main()
 {
-	
-	
-
 	//sfmlconnect();
 	//multi();
-	
 
 //Init srand
 	std::srand(static_cast<unsigned>(time(NULL)));

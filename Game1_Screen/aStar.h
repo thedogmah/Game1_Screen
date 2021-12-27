@@ -45,8 +45,8 @@ public:
 		bool bVisited = false;
 		float fGlobalGoal;		//Distance to goal so far
 		float fLocalGoal;		//Distance to goal if we took alternative
-		int x;
-		int y;
+		float x;
+		float y;
 		std::vector<sNode*> vecNeighbours;
 		sNode* parent;
 

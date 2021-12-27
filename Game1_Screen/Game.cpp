@@ -71,10 +71,11 @@ void Game::initWindow()
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
+	humanity.peopleAmount = 90;
 	humanity.populate();
 	
 	humanity.window = window;
-	humanity.peopleAmount = 5;
+
 }
 void Game::initEnemies()
 {
@@ -295,18 +296,20 @@ void Game::pollEvents()
 		switch (this->ev.type)
 		{
 
-			case sf::Event::TextEntered:
-				if (ev.text.unicode < 128)
-				{
-					chat.playerInput += ev.text.unicode;
-					chat.playerText.setString(chat.playerInput);
-					chat.playerText.setPosition(spChar.getPosition().x, spChar.getPosition().y - 150);
-				}
-			
-			
+		case sf::Event::TextEntered:
+			if (ev.text.unicode < 128)
+			{
+				chat.playerInput += ev.text.unicode;
+				chat.playerText.setString(chat.playerInput);
+				chat.playerText.setPosition(spChar.getPosition().x, spChar.getPosition().y - 150);
+			}
 
-		//case sf::Event::Closed:
-		//	this->window->close();
+
+
+			//case sf::Event::Closed:
+			//	this->window->close();
+
+
 			break;
 		case sf::Event::KeyPressed:
 			if (this->ev.key.code == sf::Keyboard::Delete)
@@ -320,7 +323,7 @@ void Game::pollEvents()
 				faceRight = false;
 				faceUp = false;
 				faceDown = true;
-				
+
 				sf::Vector2i location;
 				location.x = spChar.getPosition().x;
 				location.y = spChar.getPosition().y;
@@ -334,7 +337,7 @@ void Game::pollEvents()
 				movement = "Down ";
 				movement += username;
 				client.sendingpacket << movement;
-				
+
 				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
 					std::cout << "packet 'Down' not sent";
 				}
@@ -351,14 +354,14 @@ void Game::pollEvents()
 					aPosition.y = 0;
 
 				view.reset(sf::FloatRect(0, 0, screenSize.x, screenSize.y));
-				
+
 
 				view.zoom(zoomfactor);
 				window->setView(view);
 			}
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
-				
+
 				still = false;
 				faceUp = false;
 				faceDown = false;
@@ -389,9 +392,16 @@ void Game::pollEvents()
 					aPosition.y = 0;
 
 				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-				
+
 				view.zoom(zoomfactor);
 				window->setView(view);
+			}
+			if (this->ev.key.code == sf::Keyboard::LControl)
+			{
+				if (npcMove)
+					npcMove = false;
+				else
+					npcMove = true;
 			}
 			if (this->ev.key.code == sf::Keyboard::Up)
 			{
@@ -424,9 +434,9 @@ void Game::pollEvents()
 					aPosition.x = 0;
 				if (aPosition.y < 0)
 					aPosition.y = 0;
-				
+
 				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-				
+
 				view.zoom(zoomfactor);
 				window->setView(view);
 			}	if (this->ev.key.code == sf::Keyboard::Right)
@@ -447,27 +457,27 @@ void Game::pollEvents()
 
 				//spChar.setTexture(Char4);
 				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					std::cout << "packet 'Right' not sent"; 
-					}
+					std::cout << "packet 'Right' not sent";
+				}
 				client.sendingpacket.clear();
 				spChar.move(8, 0);
 				player.actor.move(8, 0);
-				
+
 				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
-				
+
 				if (aPosition.x < 0)
 					aPosition.x = 0;
 				if (aPosition.y < 0)
 					aPosition.y = 0;
 
 				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-				
+
 				view.zoom(zoomfactor);
 				window->setView(view);
 			}
 			//	this->enemy.setPosition(sf::Vector2f(102.f, 100.f));
-			
+
 			if (this->ev.key.code == sf::Keyboard::RShift)
 				if (grid == true)
 					grid = false;
@@ -483,11 +493,11 @@ void Game::pollEvents()
 			break;
 
 		case sf::Event::KeyReleased:
-		{still = true;
-		
-		//DEBUG COMMENTS std::cout << "Key released";
+		{
+
+			//DEBUG COMMENTS std::cout << "Key released";
 		}
-			
+
 		break;
 		case sf::Event::MouseWheelMoved:
 		{
@@ -500,119 +510,151 @@ void Game::pollEvents()
 			break;
 		}
 
+		case sf::Event::MouseMoved:
+
+			for (auto npc : humanity.people)
+			{
+				if (npc.actor.getGlobalBounds().contains(this->mousePosView))
+				{
+					npcsPath.clear();
+					for (auto& a : npc.path)
+					{
+						sf::RectangleShape shape;
+						shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
+						shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
+
+						shape.setFillColor(sf::Color::Green);
+						npcsPath.push_back(shape);
+
+						//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+					}
+				}
+			}
+
 		case sf::Event::MouseButtonPressed:
 
 			bool pathColor = false;
-			int nNodeSize =100;
+			int nNodeSize = 100;
 			sf::Vector2i XY = sf::Mouse::getPosition(*window);
 			//int nSelectedNodeY = sf::Mouse::getPosition(window) ;
-			
-			std::cout << "\nPixels" << XY.x << ", " << XY.y << "";
-				sf::Vector2f worldPos = window->mapPixelToCoords(XY,view);
 
-			
-			std::cout << "\nCoords" << worldPos.x << ", " << worldPos.y;
+			//std::cout << "\nPixels" << XY.x << ", " << XY.y << "";
+			sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
+
+
+			//std::cout << "\nCoords" << worldPos.x << ", " << worldPos.y;
 			if (ev.type == sf::Event::MouseButtonPressed) // Use mouse to draw maze, shift and ctrl to place start and end
 			{
-				
-				
-			
+
+
+
 				//routefind.nodeEnd->x = (worldPos.x / 100);
 				// routefind.nodeEnd->y =( worldPos.y / 100);
 				 //std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
-			
+
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
-						
+
 						if (!pathColor)
 							pathColor = true;
 						else
 							pathColor = false;
-						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
-						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+					//	std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
+					//	std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+						for (auto npc : humanity.people)
+						{
+							if (npc.actor.getGlobalBounds().contains(this->mousePosView))
+							{
+								npcsPath.clear();
+								for (auto &a : npc.path)
+								{
+									sf::RectangleShape shape;
+									shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
+									shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
+
+									shape.setFillColor(sf::Color::White);
+									npcsPath.push_back(shape);
+
+									//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+								}
+							}
+						}
 						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
-						
+
 						npc.path.clear();
 						npc.currentCount = 0;
 						routefind.solve_AStar();
-
-						
 						std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
-						
 						std::cout << "\nPath (starting at the end) is: ";
-					
-					
-
+						if (npcMove) {
+							//	humanity.aStarPath.nodeStart = &humanity.aStarPath.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
+							//	humanity.aStarPath.solve_AStar();
+							//	humanity.aStarPath.OnUserUpdate(0.2f);
+								//humanity.people[0].path = humanity.aStarPath.OnUserUpdate(0.2f);
+						}
 					}
-					else if (ev.mouseButton.button == sf::Mouse::Right)
-					{
-						//npc.path.clear();
-						if (pathColor)
-							pathColor = true;
+						if (ev.mouseButton.button == sf::Mouse::Right)
+						{
+							//npc.path.clear();
+							if (pathColor)
+								pathColor = true;
+							else
+								pathColor = false;
+						
+							routefind.nodeEnd = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
+							npc.path.clear();
+							npc.currentCount = 0;
+							routefind.solve_AStar();
+							std::cout << "\nNew end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "";
+							std::cout << "\nOriginal Start node is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
+
+							std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
+
+							std::cout << "\nPath (starting at the end) is: ";
+							npc.path.clear();
+							npc.currentCount = 0;
+							routefind.solve_AStar();
+							if (npcMove) {
+
+							//	humanity.aStarPath.nodeEnd = &humanity.aStarPath.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
+							//	humanity.aStarPath.solve_AStar();
+							//	humanity.aStarPath.OnUserUpdate(0.2f);
+							//	humanity.people[0].path = humanity.aStarPath.OnUserUpdate(0.2f);
+							}
+						}
 						else
-							pathColor = false;
-
-						routefind.nodeEnd = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
-						
-						std::cout << "\nNew end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "";
-						std::cout << "\nOriginal Start node is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
-						
-						
-						
-						std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
-
-						std::cout << "\nPath (starting at the end) is: ";
-
-						
-
+						{
 							
-					}
-					else
-					{
-						npcs.clear();
-						routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)].bObstacle = true;
-					}
-					
+							npcs.clear(); // the blue line path for path find results.
+							routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)].bObstacle = true;
+							routefind.solve_AStar();
+						}
+
 
 						//routefind.nodes[XY.y * routefind.nMapWidth + XY.x].bObstacle = !routefind.nodes[XY.y * routefind.nMapWidth + XY.x].bObstacle;
 
 					 // Solve in "real-time" gives a nice effect
+					}
+
 				}
-				
+
+
+
+				if (pathColor)
+					pathColor = false;
+				if (!pathColor)
+					pathColor = true;
 			}
-			
-			
-			
-			if (pathColor)
-				pathColor = false;
-			if (!pathColor)
-				pathColor = true;
-			
-			
-
-
-
-
-
-
-
-
-
-
-
-
 
 		}
-		
-	}
 
-	//set text name locations
-	userText.setPosition(spChar.getPosition().x - 15, spChar.getPosition().y - 65);
-	
+		//set text name locations
+		userText.setPosition(spChar.getPosition().x - 15, spChar.getPosition().y - 65);
+
+
 	
 }
-
 	//void Game::initClient(sf::TcpSocket* rsocket)
 	//{
 
@@ -787,7 +829,7 @@ void Game::render()
 
 	/* 
 	
-	Renders the game objects.
+	//Renders the game objects.
 
 	*/
 
@@ -807,7 +849,7 @@ void Game::render()
 
 	routefind.solve_AStar();
 	npc.path = routefind.OnUserUpdate(0.0f);
-	//npc.pathCount = routefind.path.size();
+	npc.pathCount = routefind.path.size();
 	
 	this->window->draw(player.actor);
 	float deltaTime = 0.0f;
@@ -816,11 +858,58 @@ void Game::render()
 	
 	npc.Update(0, deltaTime, faceRight, faceDown, faceUp, still);
 	
-	
-	humanity.people[0].Update(0, deltaTime, faceRight, faceDown, faceUp, still);
+	for (auto &person : humanity.people)
+	{
+		//person.pathSearch.solve_AStar();
+		person.pathSearch.OnUserUpdate(0.02f);
+		person.Update(0, deltaTime, false, false, false, false);
+	person.actor.setTextureRect(person.uvRect);
+	}
 
-	humanity.people[0].actor.setTextureRect(humanity.people[0].uvRect);
 	humanity.drawPeople();
+	//person.Update(0, deltaTime, false, false, false, false);
+	//person.actor.setTextureRect(person.uvRect);
+
+	/*humanity.people[0].Update(0, deltaTime, false, false, false, false);
+	humanity.people[1].Update(0, deltaTime, false, false, false, false);
+	humanity.people[2].Update(0, deltaTime, false, false, false, false);
+	humanity.people[3].Update(0, deltaTime, false, false, false, false);
+	humanity.people[4].Update(0, deltaTime, false, false, false, false);
+	humanity.people[5].Update(0, deltaTime, false, false, false, false);
+	humanity.people[6].Update(0, deltaTime, false, false, false, false);
+	humanity.people[7].Update(0, deltaTime, false, false, false, false);
+	humanity.people[8].Update(0, deltaTime, false, false, false, false);
+	humanity.people[9].Update(0, deltaTime, false, false, false, false);
+	humanity.people[10].Update(0, deltaTime, false, false, false, false);
+	humanity.people[11].Update(0, deltaTime, false, false, false, false);
+	humanity.people[12].Update(0, deltaTime, false, false, false, false);
+	humanity.people[13].Update(0, deltaTime, false, false, false, false);
+	humanity.people[14].Update(0, deltaTime, false, false, false, false);
+	humanity.people[15].Update(0, deltaTime, false, false, false, false);
+	humanity.people[16].Update(0, deltaTime, false, false, false, false);
+	humanity.people[17].Update(0, deltaTime, false, false, false, false);
+	humanity.people[0].actor.setTextureRect(humanity.people[0].uvRect);
+	humanity.people[1].actor.setTextureRect(humanity.people[1].uvRect);
+	humanity.people[2].actor.setTextureRect(humanity.people[2].uvRect);
+	humanity.people[3].actor.setTextureRect(humanity.people[3].uvRect);
+	humanity.people[4].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[5].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[6].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[7].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[8].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[9].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[10].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[11].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[12].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[13].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[14].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[15].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[16].actor.setTextureRect(humanity.people[4].uvRect);
+	humanity.people[17].actor.setTextureRect(humanity.people[4].uvRect);*/
+
+
+
+	
 
 	for (auto a : routefind.path)
 	{
@@ -834,8 +923,19 @@ void Game::render()
 		//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
 	}
 
+//	for (auto a : humanity.people[0].path)
+	//{
+	//	sf::RectangleShape shape;
+	//	shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
+	//	shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
+
+	//	shape.setFillColor(sf::Color::Blue);
+	//	npcs.push_back(shape);
+
+	//	//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+	//}
 	npc.actor.setTextureRect(npc.uvRect);
-	this->window->draw(npc.actor);
+	
 	if (npc.currentCount >= npc.path.size()-1) {
 		routefind.nodeStartBuffer = routefind.nodeStart;
 		routefind.nodeEndBuffer = routefind.nodeEnd;
@@ -843,6 +943,18 @@ void Game::render()
 		routefind.nodeStart = routefind.nodeEndBuffer;
 		npc.currentCount = 0;
 	}
+//for(auto people : humanity.people)
+//	if (people.currentCount >= people.path.size() - 2) {
+//		//std::cout << people.currentCount << "#### : ####" << people.pathSearch.path.size() << "\n";
+//		people.pathSearch.nodeStartBuffer = routefind.nodeStart;
+//		people.pathSearch.nodeEndBuffer = routefind.nodeEnd;
+//		people.pathSearch.nodeEnd = routefind.nodeStartBuffer;
+//		people.pathSearch.nodeStart = routefind.nodeEndBuffer;
+//		people.Update(0, deltaTime, false, false, false, false);
+//		people.path = people.pathSearch.OnUserUpdate(0.2f);
+//		people.currentCount = 0;
+//	}
+	this->window->draw(npc.actor);
 	//this->window->draw(playerTwo.actor);
 	this->window->draw(userText);
 	window->draw(chat.playerText);
@@ -856,7 +968,12 @@ void Game::render()
 	}
 	if (gridPath)
 	{
-		for (auto npc : npcs)
+		for (auto &npc : npcs)
+			this->window->draw(npc);
+
+	}
+	{
+		for (auto &npc : npcsPath)
 			this->window->draw(npc);
 
 	}
