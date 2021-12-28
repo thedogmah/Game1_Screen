@@ -25,9 +25,9 @@ public:
 	float switchTime;
 	bool completed; // is GetPath function done filling in missing steps?
 	float npcTotalTime = 0.0f; //total time given independently from delta time.
-	float npcStepTime = 0.2f; //how fast to update coordinates from path to actual sprite position. (Is contrasted with delta time)
+	float npcStepTime = 0.32f; //how fast to update coordinates from path to actual sprite position. (Is contrasted with delta time)
 	float npcWalkSpeed = 0.0f;
-	float npcWalkSwitch = 0.3f;
+	float npcWalkSwitch = 0.35f;
 	enum eDirectionFacing { North, South, East, West } eFacing;
 //	enum {Moving ,Still, Sitting, Running } eAction;
 	

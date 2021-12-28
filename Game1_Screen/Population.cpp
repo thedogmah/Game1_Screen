@@ -2,6 +2,8 @@
 
 Population::Population()
 {
+	imgHuman.loadFromFile("WomanWalking4_2.png");
+	//imgHuman2.loadFromFile("WomanWalking4.png");
 }
 
 Population::Population(int cpeopleAmount, int x, int y, sf::RenderWindow &window)
@@ -14,12 +16,24 @@ Population::Population(int cpeopleAmount, int x, int y, sf::RenderWindow &window
 
 bool Population::populate()
 {
+	water.loadFromFile("sWater.txt", sf::Shader::Fragment);
+	
+	water.setUniform("u_resolution", sf::Vector2f(1710.0, 1070.0));
+	
+	water.setUniform("u_mouse", sf::Vector2f(sf::Mouse::getPosition()));
+
+	//water.loadFromFile("sWater.txt", sf::Shader::Fragment);
+
+	
 	for (int x = 0; x < peopleAmount/*(this->peopleAmount)*/; x++) {
+		
+		//
+		
 		//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
 		Human.ID = x;
 		int start = 780 +rand() %  (600);
 		int end = 780 +rand() %  (600);
-		imgHuman.loadFromFile("WomanWalking4.png");
+		//imgHuman.loadFromFile("WomanWalking4.png");
 		imgHuman.createMaskFromColor(sf::Color::Black);
 		if (!texHuman.loadFromImage(imgHuman))
 		{
@@ -36,23 +50,27 @@ bool Population::populate()
 		Human.imageCount = sf::Vector2u(4, 4);
 		Human.path = Human.pathSearch.OnUserUpdate(0.0f);
 		Human.uvRect.width = texHuman.getSize().x / float(Human.imageCount.x);
+		
 		Human.uvRect.height = texHuman.getSize().y / float(Human.imageCount.y);
-
+		std::cout << Human.imageCount.x << ", y image count is " << Human.imageCount.y;
 		people.push_back(Human);
 	}
 	return true;
 }
 
-bool Population::drawPeople()
+bool Population::drawPeople(float dayTime, float uTime)
 {
-	//class should make use of the parameters passed to constructor to draw that amount.
-	for (auto &person : people)
-	{
+	dayTime += 0.5;
+	water.setUniform("u_time", uTime);
+	water.setUniform("dayTime", dayTime);
 
-		person.actor.setSize(sf::Vector2f(97, 200));
-		person.eFacing = Animation::eDirectionFacing::East;
+	//class should make use of the parameters passed to constructor to draw that amount.
+	for (auto &person : this->people)
+	{
+	//	person.actor.setSize(sf::Vector2f(97, 200));
+	//	person.eFacing = Animation::eDirectionFacing::East;
 		//
-		person.currentImage.x = 0;
+		//person.currentImage.x = 0;
 		person.npcStepTime = 0.14f;
 		
 	person.actor.setTexture(&texHuman);
@@ -67,7 +85,8 @@ bool Population::drawPeople()
 		person.actor.setTextureRect(person.uvRect);
 	//	std::cout << person.path.size() << "\n";
 	//	std::cout << person.npcTotalTime << "| total < step > " << person.npcStepTime<< "\n";
-		window->draw(person.actor);
+		
+		window->draw(person.actor, &water);
 		if (person.currentCount >= person.path.size() - 1) {
 			person.pathSearch.nodeStartBuffer = person.pathSearch.nodeStart;
 			person.pathSearch.nodeEndBuffer = person.pathSearch.nodeEnd;

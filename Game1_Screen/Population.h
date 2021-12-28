@@ -21,11 +21,14 @@ public:
 	float populationDeltaTime;
 	sf::RenderWindow* window;
 	sf::Image imgHuman;
+	sf::Image imgHuman2;
 	sf::Sprite sprHuman;
 	sf::Texture texHuman;
 	Animation Human;
+	sf::Shader water;
 	bool populate();
-	bool drawPeople();
+	bool textureSwitch = true;
+	bool drawPeople(float, float);
 	aStar aStarPath;
 
 	

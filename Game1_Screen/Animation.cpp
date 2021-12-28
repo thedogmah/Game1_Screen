@@ -125,9 +125,9 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 		currentImage.y = row;
 		
 
-		if (npcTotalTime >= npcStepTime)
+		if (npcTotalTime >=npcWalkSwitch  )
 		{
-			npcTotalTime -= npcStepTime;
+			npcTotalTime -= npcWalkSwitch;
 			currentImage.x++;
 			if (currentImage.x >= imageCount.x)
 			{

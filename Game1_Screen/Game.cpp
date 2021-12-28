@@ -6,6 +6,7 @@
 #include "Animation.h"
 #include "Player.h"
 #include "Population.h"
+#include <math.h>
 void Game::initInterface()
 {
 
@@ -71,7 +72,7 @@ void Game::initWindow()
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
-	humanity.peopleAmount = 230;
+	humanity.peopleAmount = 50;
 	humanity.populate();
 	
 	humanity.window = window;
@@ -123,8 +124,11 @@ void Game::initSprites()
 
 
 	water.loadFromFile("sWater.txt", sf::Shader::Fragment);
-	water.setUniform("iResolution", sf::Vector3f(3000, 2200.0, 1000.0));
-	water.setUniform("iTime", 100);
+	water.setUniform("u_time", uTime);
+	water.setUniform("u_resolution", sf::Vector2f(1710.0, 1070.0));
+	water.setUniform("dayTime", dayTime);
+	water.setUniform("u_mouse", sf::Vector2f(sf::Mouse::getPosition()));
+
 	//load actor
 	actorTexture.loadFromFile("walkss.png");
 	sf::IntRect aMain(1, 1, 142 , 180);
@@ -202,6 +206,7 @@ void Game::checkCollide()
 	
 	//sf::Vector2f XY = npc2.actor.getPosition();
 	//sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
+
 	for (auto &npc : humanity.people)
 		npc.pathSearch.solve_AStar();
 		//npc2.pathSearch.solve_AStar();
@@ -211,7 +216,7 @@ void Game::checkCollide()
 			sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
 			//std::cout << "converted world pos" << worldPos.x << ", " << worldPos.y << "\n";
 
-			if (npc.actor.getGlobalBounds().intersects(npc2.actor.getGlobalBounds()) && npc.ID != npc2.ID  && npc.pathSearch.nodeEnd != nullptr && npc.pathSearch.nodeStart != nullptr)
+			if (npc.actor.getGlobalBounds().intersects(npc2.actor.getGlobalBounds()) && npc.ID != npc2.ID && npc.pathSearch.nodeEnd != nullptr)
 				//npc.pathSearch.nodes[0].bObstacle = true;
 			{
 				//npc.pathSearch.solve_AStar();
@@ -222,8 +227,8 @@ void Game::checkCollide()
 				npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100)].bObstacle = true;
 				//npc.pathSearch.solve_AStar();
 				//npc2.pathSearch.solve_AStar();
-				npc.path = npc.pathSearch.OnUserUpdate(0.2f);
-				npc2.path = npc2.pathSearch.OnUserUpdate(0.2f);
+				//npc.path = npc.pathSearch.OnUserUpdate(0.2f);
+				//npc2.path = npc2.pathSearch.OnUserUpdate(0.2f);
 			}
 		}
 		
@@ -282,7 +287,7 @@ void Game::initNPC()
 	//Animation npc(&texNpc1, sf::Vector2u(1, 1), 0.14f, routefind.path);
 	npc.actor.setSize(sf::Vector2f(97, 200));
 	npc.eFacing = Animation::eDirectionFacing::East;
-
+	//npc.switchTime = 0.2f;
 	npc.imageCount = sf::Vector2u(4, 4);
 	npc.currentImage.x = 0;
 	
@@ -431,6 +436,8 @@ void Game::pollEvents()
 				else
 					npcMove = true;
 			}
+			
+				
 			if (this->ev.key.code == sf::Keyboard::Up)
 			{
 				player.actor.move(0, -8);
@@ -505,7 +512,16 @@ void Game::pollEvents()
 				window->setView(view);
 			}
 			//	this->enemy.setPosition(sf::Vector2f(102.f, 100.f));
-
+			if (this->ev.key.code == sf::Keyboard::F2)
+			{
+				dayTime -= 0.05;
+				water.setUniform("dayTime", dayTime);
+			}
+			if (this->ev.key.code == sf::Keyboard::F3)
+			{
+				dayTime += 0.05;
+				water.setUniform("dayTime", dayTime);
+			}
 			if (this->ev.key.code == sf::Keyboard::RShift)
 				if (grid == true)
 					grid = false;
@@ -518,7 +534,7 @@ void Game::pollEvents()
 				else
 					gridPath = true;
 			break;
-			break;
+			
 
 		case sf::Event::KeyReleased:
 		{
@@ -777,7 +793,7 @@ void Game::renderRain()
 			randomsp[i] = 15 + rand() % (28);
 			randomx = 2700 + rand() % (2200);
 			randomr = 0 + rand() % (45);
-			randomg = 100 + rand() % (45);
+			randomg = 30 + rand() % (35);
 			randomb = 210 + rand() % (45);
 			rectangle[i].setSize(sf::Vector2f(4, randomh));
 			rectangle[i].setPosition(randomx, -7);
@@ -798,7 +814,7 @@ void Game::renderRain()
 			rectangle[i].setPosition(randomx, -5);
 			randomsp[i] = 15 + rand() % (28);
 			randomr = 0 + rand() % (45);
-			randomg = 100 + rand() % (45);
+			randomg = 30 + rand() % (35);
 			randomb = 210 + rand() % (45);
 		
 		}
@@ -814,11 +830,11 @@ void Game::renderRain()
 }
 void Game::renderEnemies()
 {
-	for (auto& e : this->enemies)
-	{
-		this->window->draw(e);
+	//for (auto& e : this->enemies)
+//	{
+//		this->window->draw(e);
 	
-	}
+//	}
 //	if (spChar.getPosition().x > 1450)
 //		spChar.setPosition(10, 1050);
 //else
@@ -827,11 +843,12 @@ void Game::renderEnemies()
 
 void Game::renderInterface(sf::RenderTarget& target)
 {
-	Rec.setSize(sf::Vector2f(40.f, 80.f));
+	uTime = timeShader.restart().asSeconds();
+/*	Rec.setSize(sf::Vector2f(40.f, 80.f));
 	Rec.setFillColor(sf::Color::Red);
 	Rec.setPosition(1090, 1560);
 	window->draw(Rec);
-	std::stringstream ss;
+	*/std::stringstream ss;
 	
 	ui[0].setPosition(sf::Mouse::getPosition(*window).x + 35, sf::Mouse::getPosition(*window).y -40);
 
@@ -868,7 +885,7 @@ void Game::render()
 	this->window->clear(); //Clear old frame
 	
 	//Draw game objects
-	window->draw(CharBG);
+	window->draw(CharBG,&water);
 	this->renderEnemies();
 
 	this->renderInterface(*this->window);
@@ -882,10 +899,12 @@ void Game::render()
 	routefind.solve_AStar();
 	npc.path = routefind.OnUserUpdate(0.0f);
 	npc.pathCount = routefind.path.size();
-	
-	this->window->draw(player.actor);
+	dayTime += 0.55;
+	water.setUniform("dayTime", dayTime);
+	this->window->draw(player.actor, &water);
 	float deltaTime = 0.0f;
-	
+	dayTime -= 0.55;
+	water.setUniform("dayTime", dayTime);
 	deltaTime = npcClock.restart().asSeconds();
 	
 	npc.Update(0, deltaTime, faceRight, faceDown, faceUp, still);
@@ -895,14 +914,14 @@ void Game::render()
 	//this->checkCollide();
 	for (auto &person : humanity.people)
 	{
-		//person.pathSearch.solve_AStar();
+		person.pathSearch.solve_AStar();
 		
-		person.pathSearch.OnUserUpdate(0.02f);
+		person.path = person.pathSearch.OnUserUpdate(0.2f);
 		person.Update(0, deltaTime, false, false, false, false);
-	person.actor.setTextureRect(person.uvRect);
+//	person.actor.setTextureRect(person.uvRect);
 	}
 
-	humanity.drawPeople();
+	humanity.drawPeople(dayTime, uTime);
 	//person.Update(0, deltaTime, false, false, false, false);
 	//person.actor.setTextureRect(person.uvRect);
 
@@ -990,7 +1009,7 @@ void Game::render()
 //		people.path = people.pathSearch.OnUserUpdate(0.2f);
 //		people.currentCount = 0;
 //	}
-	this->window->draw(npc.actor);
+	this->window->draw(npc.actor, &water);
 	//this->window->draw(playerTwo.actor);
 	this->window->draw(userText);
 	window->draw(chat.playerText);
@@ -1004,13 +1023,13 @@ void Game::render()
 	}
 	if (gridPath)
 	{
-		for (auto &npc : npcs)
-			this->window->draw(npc);
+		//for (auto &npc : npcs)
+		//	this->window->draw(npc);
 
 	}
 	{
-		for (auto &npc : npcsPath)
-			this->window->draw(npc);
+		//for (auto &npc : npcsPath)
+			//this->window->draw(npc);
 
 	}
 	this->window->display(); //Tell app that window is done drawing.
@@ -1044,7 +1063,7 @@ void Game::login()
 {
 
 	std::cout << "\nPlease enter Character name: ";
-	username = "RyanB1";
+	username = "Jodie";
 	userText.setString(username);
 }
 

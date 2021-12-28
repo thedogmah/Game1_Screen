@@ -88,7 +88,9 @@ private:
 	
 	sf::VideoMode videoMode;
 	sf::Event ev;
-	
+	sf::Clock timeShader;
+	float uTime;
+	float dayTime = 0.7;
 	//Camera
 	sf::View view;
 	float vZoom = 1.0;
