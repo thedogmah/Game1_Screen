@@ -11,7 +11,7 @@
 		this->actor.setSize(sf::Vector2f(97.0f, 200.0f));
 	//	actor.setScale(0.21, 0.21);
 		
-		actor.setPosition(8180, 1180);
+		actor.setPosition(4180, 1080);
 	
 	}
 

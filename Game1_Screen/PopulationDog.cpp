@@ -1,22 +1,15 @@
-#include "Population.h"
+#include "PopulationDog.h"
 
-Population::Population()
+PopulationDog::PopulationDog()
 {
-	imgHuman.loadFromFile("WomanWalking4_2.png");
+	imgHuman.loadFromFile("dog_gradult.png");
 
-
-	
 }
 
-Population::Population(int cpeopleAmount, int x, int y, sf::RenderWindow &window)
-{
-	this->peopleAmount = 50;
-	this->coordBounds.x = x;
-	this->coordBounds.y = y;
-	this->populate();
-	}
 
-bool Population::populate()
+
+
+bool PopulationDog::populate()
 {
 	water.loadFromFile("sWater.txt", sf::Shader::Fragment);
 
@@ -24,18 +17,16 @@ bool Population::populate()
 
 	water.setUniform("u_mouse", sf::Vector2f(sf::Mouse::getPosition()));
 
-		
 
-		//water.loadFromFiI'mfaorle("sWater.txt", sf::Shader::Fragment);
-
-		imgHuman.createMaskFromColor(sf::Color::Black);
+	
+		imgHuman.createMaskFromColor(sf::Color::White);
 		if (!texHuman.loadFromImage(imgHuman))
 		{
-			std::cout << "Human not loaded";
+			std::cout << "Dog not loaded";
 		}
 
 		Human.actor.setTexture(&texHuman);
-		Human.actor.setSize(sf::Vector2f(97, 200));
+		Human.actor.setSize(sf::Vector2f(84, 55));
 		Human.actor.setPosition(4500.0f, 1000.0f);
 		Human.pathSearch.OnUserCreate();
 		Human.imageCount = sf::Vector2u(4, 4);
@@ -48,8 +39,8 @@ bool Population::populate()
 
 			//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
 			Human.ID = x;
-			int start = 780 + rand() % (750);
-			int end = 880 + rand() % (700);
+			int start = 900 + rand() % (190);
+			int end = 900 + rand() % (190);
 			//imgHuman.loadFromFile("WomanWalking4.png");
 
 			Human.pathSearch.nodeStart = &Human.pathSearch.nodes[start];
@@ -60,39 +51,39 @@ bool Population::populate()
 
 			//std::cout << Human.imageCount.x << ", y image count is " << Human.imageCount.y;
 			people.push_back(Human);
+
+
+			
 		}
-	
-	return true;
+		return true;
 }
 
-bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
+bool PopulationDog::drawPeople(float dayTime, float uTime, float deltaTime)
 {
 	dayTime += 0.5;
 	water.setUniform("u_time", uTime);
 	water.setUniform("dayTime", dayTime);
 
-	
 	//class should make use of the parameters passed to constructor to draw that amount.
-	for (auto &person : this->people)
+	for (auto& person : this->people)
 	{
-	//	person.actor.setSize(sf::Vector2f(97, 200));
-	//	person.eFacing = Animation::eDirectionFacing::East;
-		//
-		//person.currentImage.x = 0;
-		//person.npcStepTime = 0.14f;
-		
-	//	person.actor.setTexture(&texHuman);
-		
-		
+		//	person.actor.setSize(sf::Vector2f(97, 200));
+		//	person.eFacing = Animation::eDirectionFacing::East;
+			//
+			//person.currentImage.x = 0;
+			//person.npcStepTime = 0.14f;
+
+		//	person.actor.setTexture(&texHuman);
+
+		populationDeltaTime = populationClock.restart().asSeconds();
 		//populationDeltaTime = populationClock.restart().asSeconds();
 		//person.path = person.pathSearch.OnUserUpdate(0.2f);
 		person.UpdateNpc(0, deltaTime);
-	//	std::cout << person.currentCount << " : " << person.pathSearch.path.size() << "\n";
-		//person.actor.setTextureRect(person.uvRect);
-	//	std::cout << person.path.size() << "\n";
-	//	std::cout << person.npcTotalTime << "| total < step > " << person.npcStepTime<< "\n";
+		//	std::cout << person.currentCount << " : " << person.pathSearch.path.size() << "\n";
+			//person.actor.setTextureRect(person.uvRect);
+		//	std::cout << person.path.size() << "\n";
+		//	std::cout << person.npcTotalTime << "| total < step > " << person.npcStepTime<< "\n";
 
-		if (this->rt.contains(person.actor.getPosition().x, person.actor.getPosition().y) )
 		window->draw(person.actor, &water);
 		if (person.currentCount >= person.path.size() - 1) {
 			person.pathSearch.nodeStartBuffer = person.pathSearch.nodeStart;
@@ -103,18 +94,10 @@ bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
 			person.pathSearch.solve_AStar();
 			person.path.clear();
 			person.path = person.pathSearch.OnUserUpdate(0.2f);
-		
+
 		}
 	}
 	return true;
 }
 
-void Population::createBounds()
-{
 
-	this->rt.left = this->window->getView().getCenter().x - this->window->getSize().x / 2.f - 100;
-	this->rt.top = this->window->getView().getCenter().y - this->window->getSize().y / 2.f - 250;
-	this->rt.width = this->window->getSize().x + 100;
-	this->rt.height = this->window->getSize().y + 250;
-
-}

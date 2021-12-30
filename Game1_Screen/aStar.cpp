@@ -16,7 +16,7 @@
 #include <list>
 
 aStar::aStar() {
-	this->nMapWidth = 75; this->nMapHeight = 22 ;
+	this->nMapWidth = 75; this->nMapHeight = 75 ;
 	this->init();
 		}
 	//m_sAppName = L"Path Finding";
@@ -148,8 +148,8 @@ aStar::aStar() {
 
 		}
 
-		nodeStart = &nodes[10];
-		nodeEnd = &nodes[20];
+		nodeStart = &nodes[0];
+		nodeEnd = &nodes[1];
 		return true;
 	}
 
@@ -209,7 +209,7 @@ aStar::aStar() {
 
 
 			// Check each of this node's neighbours...
-			for (auto nodeNeighbour : nodeCurrent->vecNeighbours)
+    			for (auto nodeNeighbour : nodeCurrent->vecNeighbours)
 			{
 				// ... and only if the neighbour is not visited and is 
 				// not an obstacle, add it to NotTested List
@@ -245,7 +245,59 @@ aStar::aStar() {
 		}
 		
 		return true;
-	};
+	}
+	//std::vector<paths> aStar::pathGangShit(std::vector<paths> path)
+	//{
+	//	paths steps;
+	//	for (auto& step : path)
+	//	{
+	//		isFacing(step, path);
+
+	//			steps.x = path[0].x + 1 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 1, steps);
+	//		steps.x = path[0].x + 2 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 2, steps);
+	//		steps.x = path[0].x + 3 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 3, steps);
+	//		steps.x = path[0].x + 4 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 4, steps);
+	//		steps.x = path[0].x + 5 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 5, steps);
+	//		steps.x = path[0].x + 6 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 6, steps);
+	//		steps.x = path[0].x + 7 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 7, steps);
+	//		steps.x = path[0].x + 8 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 8, steps);
+	//		steps.x = path[0].x + 9 / 10.0;
+	//		steps.y = path[0].y;
+	//		this->path.insert(path.begin() + 9, steps);
+
+
+	//	}
+	//	
+	//	return path;
+	//}
+	//paths aStar::isFacing(paths step)
+	//{
+	//	
+	//		currentSteps.x = step.x;
+	//		currentSteps.y = step.y;
+	//	//	prevSteps.x = path[currentCount - 1].x;
+	//		//prevSteps.y = path[currentCount - 1].y;
+	//	
+	//	
+	//	return step;
+	//}
+	//;
 
 
 
@@ -253,7 +305,7 @@ aStar::aStar() {
 	std::vector<aStar::paths> aStar::OnUserUpdate(float fElapsedTime)
 	{
 		float nNodeSize = 100;
-		int nNodeBorder = 2;
+		int nNodeBorder = 0;
 		path.clear();
 		//Integer Division to get cursor position in node space
 
@@ -307,7 +359,7 @@ aStar::aStar() {
 					
 				} 
 			}
-			
+		//	pathGangShit(paths);
 		return path;
 	};
 

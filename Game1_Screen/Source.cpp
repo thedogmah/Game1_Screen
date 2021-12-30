@@ -48,7 +48,8 @@ int main()
 	
 		
 		character.Update(0, deltaTime, game.faceRight, game.faceDown, game.faceUp, game.still);
-		
+		game.humanity.drawPeople(game.dayTime, game.uTime, game.npcDelta);
+		game.dogGR.drawPeople(game.dayTime, game.uTime, game.npcDelta);
 		//walkFront.Update(1, deltaTime, game.faceRight);
 		
 		//render

@@ -72,10 +72,14 @@ void Game::initWindow()
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
-	humanity.peopleAmount = 50;
+	humanity.peopleAmount =300;
 	humanity.populate();
 	
 	humanity.window = window;
+	humanity.createBounds();
+	dogGR.peopleAmount = 1;
+	dogGR.populate();
+	dogGR.window = window;
 
 }
 void Game::initEnemies()
@@ -183,7 +187,7 @@ void Game::initSprites()
 	sf::Texture Char2;
 	sf::Texture Char4;
 	//spChar.setTexture(Char2);
-	spChar.setPosition(8180, 1180);
+	spChar.setPosition(4180, 1080);
 	
 }
 void Game::checkCollide()
@@ -208,6 +212,7 @@ void Game::checkCollide()
 	//sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
 
 	for (auto &npc : humanity.people)
+		
 		npc.pathSearch.solve_AStar();
 		//npc2.pathSearch.solve_AStar();
 		for (auto &npc2 : humanity.people) {
@@ -216,7 +221,7 @@ void Game::checkCollide()
 			sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
 			//std::cout << "converted world pos" << worldPos.x << ", " << worldPos.y << "\n";
 
-			if (npc.actor.getGlobalBounds().intersects(npc2.actor.getGlobalBounds()) && npc.ID != npc2.ID && npc.pathSearch.nodeEnd != nullptr)
+			if (npc.actor.getGlobalBounds().intersects(npc2.actor.getGlobalBounds()) )//&& npc.ID != npc2.ID && npc.pathSearch.nodeEnd != nullptr)
 				//npc.pathSearch.nodes[0].bObstacle = true;
 			{
 				//npc.pathSearch.solve_AStar();
@@ -260,8 +265,6 @@ const bool Game::running() const
 void Game::initConnection()
 {
 
-	
-
 	bool connect = false;
 	while (!connect)
 		if (client.socket.connect(client.ip, 2000) == sf::Socket::Done)
@@ -274,9 +277,7 @@ void Game::initConnection()
 		}
 		else
 			std::cout << "probing for server\n " << sf::IpAddress::LocalHost << "3000\n";
-
-
-}
+	}
 void Game::initNPC()
 {
 	if (!texNpc1.loadFromImage(iplayerTexture))
@@ -286,20 +287,21 @@ void Game::initNPC()
 	else std::cout << "\nloaded NPC texture";
 	//Animation npc(&texNpc1, sf::Vector2u(1, 1), 0.14f, routefind.path);
 	npc.actor.setSize(sf::Vector2f(97, 200));
-	npc.eFacing = Animation::eDirectionFacing::East;
-	//npc.switchTime = 0.2f;
+	//npc.eFacing = Animation::eDirectionFacing::East;
+	npc.switchTime = 0.2f;
 	npc.imageCount = sf::Vector2u(4, 4);
 	npc.currentImage.x = 0;
 	
 	//npc.npcStepTime = 0.14f;
 	//npc.actor.setTexture(&playerTexture);
-	npc.actor.setTexture(&texNpc1);
+	//npc.actor.setTexture(&texNpc1);
 	npc.uvRect.width = texNpc1.getSize().x / float(npc.imageCount.x);
 	npc.uvRect.height = texNpc1.getSize().y / float(npc.imageCount.y);
 
 	
+	npc.actor.setTextureRect(npc.uvRect);
+
 	
-//	npc.actor.setTextureRect(npc.uvRect);
 }
 void Game::spawnEnemy()
 {
@@ -328,7 +330,7 @@ void Game::pollEvents()
 	while (this->window->pollEvent(this->ev)) {
 		switch (this->ev.type)
 		{
-
+			
 		case sf::Event::TextEntered:
 			if (ev.text.unicode < 128)
 			{
@@ -345,6 +347,7 @@ void Game::pollEvents()
 
 			break;
 		case sf::Event::KeyPressed:
+
 			if (this->ev.key.code == sf::Keyboard::Delete)
 				chat.playerInput = "";
 			if (this->ev.key.code == sf::Keyboard::Escape)
@@ -360,7 +363,7 @@ void Game::pollEvents()
 				sf::Vector2i location;
 				location.x = spChar.getPosition().x;
 				location.y = spChar.getPosition().y;
-
+				std::cout << "\n x: " << spChar.getPosition().x << ", y: " << spChar.getPosition().y << "\n";
 				//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 				std::string down = "Down ";
 				down += username;
@@ -376,8 +379,8 @@ void Game::pollEvents()
 				}
 				client.sendingpacket.clear();
 
-				spChar.move(0, 8);
-				player.actor.move(0, 8);
+				spChar.move(0, 12);
+				player.actor.move(0, 12);
 				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
 
@@ -386,12 +389,14 @@ void Game::pollEvents()
 				if (aPosition.y < 0)
 					aPosition.y = 0;
 
-				view.reset(sf::FloatRect(0, 0, screenSize.x, screenSize.y));
+				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
 
 
 				view.zoom(zoomfactor);
 				window->setView(view);
 			}
+
+			
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
 
@@ -400,8 +405,8 @@ void Game::pollEvents()
 				faceDown = false;
 				faceRight = false;
 				//spChar.setTexture(Char2);
-				spChar.move(-8, 0);
-				player.actor.move(-8, 0);
+				spChar.move(-12, 0);
+				player.actor.move(-12, 0);
 				sf::Vector2i location;
 				location.x = spChar.getPosition().x;
 				location.y = spChar.getPosition().y;
@@ -440,7 +445,7 @@ void Game::pollEvents()
 				
 			if (this->ev.key.code == sf::Keyboard::Up)
 			{
-				player.actor.move(0, -8);
+				player.actor.move(0, -12);
 				//spChar.setTexture(Char3);
 				still = false;
 				faceDown = false;
@@ -461,7 +466,7 @@ void Game::pollEvents()
 				}
 				client.sendingpacket.clear();
 
-				spChar.move(0, -8);
+				spChar.move(0, -12);
 				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
 
@@ -495,8 +500,8 @@ void Game::pollEvents()
 					std::cout << "packet 'Right' not sent";
 				}
 				client.sendingpacket.clear();
-				spChar.move(8, 0);
-				player.actor.move(8, 0);
+				spChar.move(12, 0);
+				player.actor.move(12, 0);
 
 				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
@@ -538,8 +543,9 @@ void Game::pollEvents()
 
 		case sf::Event::KeyReleased:
 		{
-
+			still = true;
 			//DEBUG COMMENTS std::cout << "Key released";
+			
 		}
 
 		break;
@@ -550,30 +556,30 @@ void Game::pollEvents()
 			//std::cout << vZoom <<std::endl; //uncomment to display zoom level to console
 			view.zoom(vZoom);
 			window->setView(view);
-			std::cout << vZoom;
+			//std::cout << vZoom;
 			break;
 		}
 
-		case sf::Event::MouseMoved:
+		//case sf::Event::MouseMoved:
 
-			for (auto npc : humanity.people)
-			{
-				if (npc.actor.getGlobalBounds().contains(this->mousePosView))
-				{
-					npcsPath.clear();
-					for (auto& a : npc.path)
-					{
-						sf::RectangleShape shape;
-						shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
-						shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
+		//	for (auto npc : humanity.people)
+		//	{
+		//		if (npc.actor.getGlobalBounds().contains(this->mousePosView))
+		//		{
+		//			npcsPath.clear();
+		//			for (auto& a : npc.path)
+		//			{
+		//				sf::RectangleShape shape;
+		//				shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
+		//				shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
 
-						shape.setFillColor(sf::Color::Green);
-						npcsPath.push_back(shape);
+		//				shape.setFillColor(sf::Color::Green);
+		//				npcsPath.push_back(shape);
 
-						//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
-					}
-				}
-			}
+		//				//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+		//			}
+		//		}
+		//	}
 
 		case sf::Event::MouseButtonPressed:
 
@@ -590,12 +596,9 @@ void Game::pollEvents()
 			if (ev.type == sf::Event::MouseButtonPressed) // Use mouse to draw maze, shift and ctrl to place start and end
 			{
 
-
-
 				//routefind.nodeEnd->x = (worldPos.x / 100);
 				// routefind.nodeEnd->y =( worldPos.y / 100);
 				 std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
-
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
@@ -606,7 +609,7 @@ void Game::pollEvents()
 							pathColor = false;
 						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
-						for (auto npc : humanity.people)
+					/*	for (auto npc : humanity.people)
 						{
 							if (npc.actor.getGlobalBounds().contains(this->mousePosView))
 							{
@@ -623,7 +626,7 @@ void Game::pollEvents()
 									std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
 								}
 							}
-						}
+						}*/
 						//Documentation > Below > Worldpos.y (down (220) / 100 will give 22 positions, (21 with 0)
 						//						> mulitplied by the (width plus the x coordinate / 100). 
 						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
@@ -670,23 +673,19 @@ void Game::pollEvents()
 							//	humanity.people[0].path = humanity.aStarPath.OnUserUpdate(0.2f);
 							}
 						}
-						else
-						{
+					//	else
+					//	{
 							
 							//npcs.clear(); // the blue line path for path find results.
 							//routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)].bObstacle = true;
 							//routefind.solve_AStar();
-						}
-
+						//}
 
 						//routefind.nodes[XY.y * routefind.nMapWidth + XY.x].bObstacle = !routefind.nodes[XY.y * routefind.nMapWidth + XY.x].bObstacle;
-
 					 // Solve in "real-time" gives a nice effect
 					}
 
 				}
-
-
 
 				if (pathColor)
 					pathColor = false;
@@ -699,8 +698,6 @@ void Game::pollEvents()
 		//set text name locations
 		userText.setPosition(spChar.getPosition().x - 15, spChar.getPosition().y - 65);
 
-
-	
 }
 	//void Game::initClient(sf::TcpSocket* rsocket)
 	//{
@@ -730,55 +727,55 @@ void Game::updateEnemies()
 		Removes the enemies at the edge of the screen.
 	*/
 
-	//Updating the timer for enemy spawning
-	if (this->enemies.size() < this->maxEnemies) {
-		if (this->enemySpawnTimer >= this->enemySpawnTimerMax)
-		{
-			//Spawn the enemy and reset the timer
-			this->spawnEnemy();
-			this->enemySpawnTimer = 0.f;
+	////Updating the timer for enemy spawning
+	//if (this->enemies.size() < this->maxEnemies) {
+	//	if (this->enemySpawnTimer >= this->enemySpawnTimerMax)
+	//	{
+	//		//Spawn the enemy and reset the timer
+	//		this->spawnEnemy();
+	//		this->enemySpawnTimer = 0.f;
 
-		}
-		else
-			this->enemySpawnTimer += 1.f;
-	}
+	//	}
+	//	else
+	//		this->enemySpawnTimer += 1.f;
+	//}
 
-	//Move the enemies and updating
-	for (int i = 0; i < this->enemies.size(); i++) {
-	
-		bool deleted = false;
-		this->enemies[i].move(0.f, 3.f);
+	////Move the enemies and updating
+	//for (int i = 0; i < this->enemies.size(); i++) {
+	//
+	//	bool deleted = false;
+	//	this->enemies[i].move(0.f, 3.f);
 
-		if (this->enemies[i].getPosition().y > this->window->getSize().y)
-		{
-			this->enemies.erase(this->enemies.begin() + i);
-			this->health -= 1;
-			std::cout << "Health: " << health << std::endl;}
-	}
+	//	if (this->enemies[i].getPosition().y > this->window->getSize().y)
+	//	{
+	//		this->enemies.erase(this->enemies.begin() + i);
+	//		this->health -= 1;
+	//		std::cout << "Health: " << health << std::endl;}
+	//}
 
-	//Check if clicked upon
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-		
-		if (this->mouseHeld == false)
-		{
-			this->mouseHeld = true;
-			bool deleted = false;
-			for (size_t i = 0; i < this->enemies.size() && deleted == false; i++)
-			{
-				if (this->enemies[i].getGlobalBounds().contains(this->mousePosView))
-				{
-					deleted = true;
-					this->enemies.erase(this->enemies.begin() + i);
+	////Check if clicked upon
+	//if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+	//	
+	//	if (this->mouseHeld == false)
+	//	{
+	//		this->mouseHeld = true;
+	//		bool deleted = false;
+	//		for (size_t i = 0; i < this->enemies.size() && deleted == false; i++)
+	//		{
+	//			if (this->enemies[i].getGlobalBounds().contains(this->mousePosView))
+	//			{
+	//				deleted = true;
+	//				this->enemies.erase(this->enemies.begin() + i);
 
-					//gain points
-					points += 10;
-					std::cout << "Points: " << points << std::endl;
-				}
-			}
-		}
-	}
-	else
-		this->mouseHeld = false;
+	//				//gain points
+	//				points += 10;
+	//				std::cout << "Points: " << points << std::endl;
+	//			}
+	//		}
+	//	}
+	//}
+	//else
+	//	this->mouseHeld = false;
 
 }
 
@@ -787,46 +784,46 @@ void Game::updateEnemies()
 void Game::renderRain()
 {
 
-	if (part == 1) {
-		for (int i = 0; i < 900; i++) {
-			randomh = 1 + rand() % (15);
-			randomsp[i] = 15 + rand() % (28);
-			randomx = 2700 + rand() % (2200);
-			randomr = 0 + rand() % (45);
-			randomg = 30 + rand() % (35);
-			randomb = 210 + rand() % (45);
-			rectangle[i].setSize(sf::Vector2f(4, randomh));
-			rectangle[i].setPosition(randomx, -7);
-			rectangle[i].setFillColor(sf::Color(randomr, randomg, randomb));
+	//if (part == 1) {
+	//	for (int i = 0; i < 300; i++) {
+	//		randomh = 1 + rand() % (15);
+	//		randomsp[i] = 15 + rand() % (28);
+	//		randomx = 2700 + rand() % (2200);
+	//		randomr = 0 + rand() % (45);
+	//		randomg = 30 + rand() % (35);
+	//		randomb = 210 + rand() % (45);
+	//		rectangle[i].setSize(sf::Vector2f(4, randomh));
+	//		rectangle[i].setPosition(randomx, -7);
+	//		rectangle[i].setFillColor(sf::Color(randomr, randomg, randomb));
 
 
 
-		}
-	}
-	for (int i = 0; i < 900; i++)
-	{
-		this->window->draw(rectangle[i]);
-	}
+	//	}
+	//}
+	//for (int i = 0; i < 300; i++)
+	//{
+	//	this->window->draw(rectangle[i]);
+	//}
 
-		for (int i = 0; i < 700; i++) {
-		if (rectangle[i].getPosition().y > 2000){
-			randomx = 2700 + rand() % (2500);
-			rectangle[i].setPosition(randomx, -5);
-			randomsp[i] = 15 + rand() % (28);
-			randomr = 0 + rand() % (45);
-			randomg = 30 + rand() % (35);
-			randomb = 210 + rand() % (45);
-		
-		}
+	//	for (int i = 0; i < 700; i++) {
+	//	if (rectangle[i].getPosition().y > 2000){
+	//		randomx = 2700 + rand() % (2500);
+	//		rectangle[i].setPosition(randomx, -5);
+	//		randomsp[i] = 15 + rand() % (28);
+	//		randomr = 0 + rand() % (45);
+	//		randomg = 30 + rand() % (35);
+	//		randomb = 210 + rand() % (45);
+	//	
+	//	}
 
-		}
+	//	}
 
-		for (int i = 0; i < 900; i++)
-		{
-			rectangle[i].move(sf::Vector2f(6, randomsp[i]));
-		}
+	//	for (int i = 0; i < 900; i++)
+	//	{
+	//		rectangle[i].move(sf::Vector2f(6, randomsp[i]));
+	//	}
 
-		part = 2;
+	//	part = 2;
 }
 void Game::renderEnemies()
 {
@@ -896,87 +893,158 @@ void Game::render()
 	//window->draw(actorMain);
 	this->renderPlayers();
 
-	routefind.solve_AStar();
-	npc.path = routefind.OnUserUpdate(0.0f);
-	npc.pathCount = routefind.path.size();
+	//routefind.solve_AStar();delta
+	// 
+	//npc.path = routefind.OnUserUpdate(0.0f);
+	//npc.pathCount = routefind.path.size();
 	dayTime += 0.55;
 	water.setUniform("dayTime", dayTime);
-	this->window->draw(player.actor, &water);
-	float deltaTime = 0.0f;
+	
+	float deltaTime;
 	dayTime -= 0.55;
 	water.setUniform("dayTime", dayTime);
 	deltaTime = npcClock.restart().asSeconds();
-	
-	npc.Update(0, deltaTime, faceRight, faceDown, faceUp, still);
-	std::thread cThread(&Game::checkCollide, this);
+	npcDelta = npcDeltaClock.restart().asSeconds();
+	dogTimeHold = deltaTime;
+	//npcTimeHold = npcClock.restart().asSeconds();
+	//std::cout << npcDeltaClock.getElapsedTime().asSeconds() << "\n";
+	//npc.Update(0, deltaTime, faceRight, faceDown, faceUp, still);
+	//std::thread cThread(&Game::checkCollide, this);
 	// Main thread waits for the new thread th to stop execution and as a result, its own execution gets blocked
-	cThread.join();
+	//cThread.join();
 	//this->checkCollide();
-	for (auto &person : humanity.people)
+	for (auto& person : humanity.people)
 	{
-		person.pathSearch.solve_AStar();
 		
-		person.path = person.pathSearch.OnUserUpdate(0.2f);
-		person.Update(0, deltaTime, false, false, false, false);
-//	person.actor.setTextureRect(person.uvRect);
-	}
+		//deltaTime = npcClock.restart().asSeconds();
 
-	humanity.drawPeople(dayTime, uTime);
-	//person.Update(0, deltaTime, false, false, false, false);
+		//person.npcWalkSwitch = 0.2;
+		
+		npcTimeHold+= npcDelta;
+	//	if(npcTimeHold >= npcDeltaSwitch){
+			switch (person.eFacing) {
+			case Animation::East:
+				person.actor.move(1.2, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect);
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor,&water);
+			break;
+			
+			case Animation::West:
+			person.actor.move(-1.2, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+		//	person.actor.setTextureRect(person.uvRect); 
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor, &water);
+			break;
+			
+			case Animation::North:
+			person.actor.move(0, -1.3);
+		//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			npcTimeHold -= npcDelta;
+			//this->window->draw(person.actor, &water);
+		//	person.actor.setTextureRect(person.uvRect);
+			break;
+			
+			case Animation::South:
+			person.actor.move(0, 1.2);
+			person.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect);
+			break;
+			
+			
+			}
+
+		//}
+			humanity.createBounds();
+		person.UpdateNpc(0, npcDelta);
 	//person.actor.setTextureRect(person.uvRect);
-
-	/*humanity.people[0].Update(0, deltaTime, false, false, false, false);
-	humanity.people[1].Update(0, deltaTime, false, false, false, false);
-	humanity.people[2].Update(0, deltaTime, false, false, false, false);
-	humanity.people[3].Update(0, deltaTime, false, false, false, false);
-	humanity.people[4].Update(0, deltaTime, false, false, false, false);
-	humanity.people[5].Update(0, deltaTime, false, false, false, false);
-	humanity.people[6].Update(0, deltaTime, false, false, false, false);
-	humanity.people[7].Update(0, deltaTime, false, false, false, false);
-	humanity.people[8].Update(0, deltaTime, false, false, false, false);
-	humanity.people[9].Update(0, deltaTime, false, false, false, false);
-	humanity.people[10].Update(0, deltaTime, false, false, false, false);
-	humanity.people[11].Update(0, deltaTime, false, false, false, false);
-	humanity.people[12].Update(0, deltaTime, false, false, false, false);
-	humanity.people[13].Update(0, deltaTime, false, false, false, false);
-	humanity.people[14].Update(0, deltaTime, false, false, false, false);
-	humanity.people[15].Update(0, deltaTime, false, false, false, false);
-	humanity.people[16].Update(0, deltaTime, false, false, false, false);
-	humanity.people[17].Update(0, deltaTime, false, false, false, false);
-	humanity.people[0].actor.setTextureRect(humanity.people[0].uvRect);
-	humanity.people[1].actor.setTextureRect(humanity.people[1].uvRect);
-	humanity.people[2].actor.setTextureRect(humanity.people[2].uvRect);
-	humanity.people[3].actor.setTextureRect(humanity.people[3].uvRect);
-	humanity.people[4].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[5].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[6].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[7].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[8].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[9].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[10].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[11].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[12].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[13].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[14].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[15].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[16].actor.setTextureRect(humanity.people[4].uvRect);
-	humanity.people[17].actor.setTextureRect(humanity.people[4].uvRect);*/
-
-
+		person.actor.setTextureRect(person.uvRect);
+	}
 
 	
 
-	for (auto a : routefind.path)
-	{
-		sf::RectangleShape shape;
-		shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
-		shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
-		
-			shape.setFillColor(sf::Color::Blue);
-		npcs.push_back(shape);
+	
 
-		//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+	for (auto& dog : dogGR.people)
+	{
+
+	//deltaTime = npcClock.restart().asSeconds();
+
+		//person.npcWalkSwitch = 0.2;
+
+		dogTimeHold += npcDelta;
+		//	if(npcTimeHold >= npcDeltaSwitch){
+		switch (dog.eFacing) {
+		case Animation::East:
+			dog.actor.move(1.2, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect);
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor,&water);
+			break;
+
+		case Animation::West:
+			dog.actor.move(-1.2, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+		//	person.actor.setTextureRect(person.uvRect); 
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor, &water);
+			break;
+
+		case Animation::North:
+			dog.actor.move(0, -1.3);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			dogTimeHold = 0;
+			//this->window->draw(person.actor, &water);
+		//	person.actor.setTextureRect(person.uvRect);
+			break;
+
+		case Animation::South:
+			dog.actor.move(0, 1.2);
+			dog.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect);
+			break;
+
+			}
+
+		//}
+		dog.UpdateNpc(0, deltaTime);
+		dog.actor.setTextureRect(dog.uvRect);
+
 	}
+	
+	dogGR.drawPeople(dayTime, uTime, dogTimeHold);
+	humanity.drawPeople(dayTime, uTime, npcDelta);
+	this->window->draw(player.actor, &water);
+	//for (auto a : routefind.path)
+	//{
+	//	sf::RectangleShape shape;
+	//	shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
+	//	shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
+	//	
+	//		shape.setFillColor(sf::Color::Blue);
+	//	npcs.push_back(shape);
+
+	//	//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+	//}
 
 //	for (auto a : humanity.people[0].path)
 	//{
@@ -989,15 +1057,15 @@ void Game::render()
 
 	//	//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
 	//}
-	npc.actor.setTextureRect(npc.uvRect);
+	//npc.actor.setTextureRect(npc.uvRect);
 	
-	if (npc.currentCount >= npc.path.size()-1) {
-		routefind.nodeStartBuffer = routefind.nodeStart;
-		routefind.nodeEndBuffer = routefind.nodeEnd;
-		routefind.nodeEnd = routefind.nodeStartBuffer;
-		routefind.nodeStart = routefind.nodeEndBuffer;
-		npc.currentCount = 0;
-	}
+	//if (npc.currentCount >= npc.path.size()-1) {
+	//	routefind.nodeStartBuffer = routefind.nodeStart;
+	//	routefind.nodeEndBuffer = routefind.nodeEnd;
+	//	routefind.nodeEnd = routefind.nodeStartBuffer;
+	//	routefind.nodeStart = routefind.nodeEndBuffer;
+	//	npc.currentCount = 0;
+	//}
 //for(auto people : humanity.people)
 //	if (people.currentCount >= people.path.size() - 2) {
 //		//std::cout << people.currentCount << "#### : ####" << people.pathSearch.path.size() << "\n";
@@ -1009,7 +1077,7 @@ void Game::render()
 //		people.path = people.pathSearch.OnUserUpdate(0.2f);
 //		people.currentCount = 0;
 //	}
-	this->window->draw(npc.actor, &water);
+//	this->window->draw(npc.actor, &water);
 	//this->window->draw(playerTwo.actor);
 	this->window->draw(userText);
 	window->draw(chat.playerText);
@@ -1021,17 +1089,19 @@ void Game::render()
 		this->window->draw(routefind.vaGrid);
 		this->window->draw(routefind.vaLine);
 	}
-	if (gridPath)
-	{
-		//for (auto &npc : npcs)
-		//	this->window->draw(npc);
+	//if (gridPath)
+	//{
+	//	for (auto &npc : npcs)
+	//		this->window->draw(npc);
 
-	}
-	{
-		//for (auto &npc : npcsPath)
-			//this->window->draw(npc);
+	//}
+	//{
+	//	for (auto &npc : npcsPath)
+	//	this->window->draw(npc);
+	//	for(auto &npcs : humanity.people)
+		//this->window->draw(npcs.actor, &water);
 
-	}
+	//}
 	this->window->display(); //Tell app that window is done drawing.
 	
 	

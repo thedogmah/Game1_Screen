@@ -14,6 +14,7 @@
 #include "aStar.h"
 #include "Population.h"
 #include <thread>
+#include "PopulationDog.h"
 //Class as the game engine.
 
 class Game
@@ -64,7 +65,7 @@ public:
 
 	bool npcMove = false;
 	//NPCS
-	
+	sf::Clock dogClock;
 	sf::Clock npcClock;
 	std::vector<sf::RectangleShape> npcs;
 	std::vector<sf::RectangleShape> npcsPath;
@@ -76,6 +77,13 @@ public:
 	Animation npc;
 	std::thread collissionThread;
 	Population humanity;
+	PopulationDog dogGR;
+	float npcDelta;
+	float npcDeltaSwitch = 0.077f;
+	float npcTimeHold;
+	float dogTimeHold;
+	float uTime;
+	float dayTime = 1.0;
 private:
 
 	//Variables	
@@ -89,17 +97,16 @@ private:
 	sf::VideoMode videoMode;
 	sf::Event ev;
 	sf::Clock timeShader;
-	float uTime;
-	float dayTime = 0.7;
+	sf::Clock npcDeltaClock;
+	
 	//Camera
 	sf::View view;
-	float vZoom = 1.0;
+	float vZoom = 0.8;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 1.8;
+	float zoomfactor = 0.8;
 	//Mouse Positions
-
-
+	
 	sf::Vector2i mousePosWindow;
 	sf::Vector2f mousePosView; 
 

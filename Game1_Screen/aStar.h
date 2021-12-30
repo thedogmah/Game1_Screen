@@ -64,11 +64,18 @@ public:
 	sNode* nodeEndBuffer = nullptr;
 	sNode* nodeStartBuffer = nullptr;
 
+
+	sf::Vector2f currentSteps;
+	sf::Vector2f prevSteps;
+
+		
 public:
 	virtual bool OnUserCreate();
 	
 	void init();
 	bool solve_AStar();
+	std::vector<paths> pathGangShit(std::vector<paths>);
+	paths isFacing(paths);
 
 
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "aStar.h"
+#include <math.h>
 //#include "Player.h"
 class Animation
 {
@@ -12,6 +13,10 @@ public:
 	
 	sf::Vector2i getLocality();
 	void getPath();
+	//getPath Variables which will tell animation update not to call the getPath function 
+	bool getPathCall = true;
+	int getPathCount = 0;
+	int lerpCount;
 //	Player player;
 	bool isNPC = true;
 	int ID; //unique ID for each animation created, particularly for poplation class.
@@ -22,12 +27,12 @@ public:
 	std::vector<aStar::paths> path;
 	sf::Vector2u imageCount; 
 	sf::Vector2u currentImage;
-	float switchTime;
+	float switchTime=0.28;
 	bool completed; // is GetPath function done filling in missing steps?
 	float npcTotalTime = 0.0f; //total time given independently from delta time.
-	float npcStepTime = 0.32f; //how fast to update coordinates from path to actual sprite position. (Is contrasted with delta time)
+	float npcStepTime = 0.2f; //how fast to update coordinates from path to actual sprite position. (Is contrasted with delta time)
 	float npcWalkSpeed = 0.0f;
-	float npcWalkSwitch = 0.35f;
+	float npcWalkSwitch = 0.20f;
 	enum eDirectionFacing { North, South, East, West } eFacing;
 //	enum {Moving ,Still, Sitting, Running } eAction;
 	
@@ -40,6 +45,7 @@ public:
 	aStar::paths prevSteps; // Update member function will record previous step and use this to determine a direction change.
 	aStar::paths currentSteps; // 'Update' member function will anticipate next step since this will me NPC enters a new grid space which may be resourceful knowledge in future
 	void Update(int row, float deltaTime, bool faceRight, bool faceDown, bool faceUp, bool still);
+	void UpdateNpc(int row, float deltaTime);
 private:
 
 	std::vector<aStar::paths>::iterator iteratorSteps;
