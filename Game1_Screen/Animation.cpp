@@ -23,7 +23,7 @@ Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switch
 
 Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<aStar::paths> path)
 {
-
+	//Constructor differs in that it takes a path, but not opted to use it myself so far.
 	this->path = path;
 	this->imageCount = imageCount;
 	this->switchTime = switchTime;
@@ -225,29 +225,21 @@ void Animation::UpdateNpc(int row, float deltaTime)
 	npcWalkSpeed += deltaTime;
 	npcTotalTime += deltaTime;
 
+	//If check passes, then this is npc or some enemy and not a player character, therefore, control is taken over by the class to animate and move.
 	if (this->path.size() > 0) {
 		
-	//	std::cout << "\nPath greater than 0\n";
-		if (currentCount != 0 && currentCount <= path.size()) //if its NOT the first step, meaning we have a previous step
+		if (currentCount != 0 && currentCount <= path.size())
 		{
 			if (lerpCount != 0) {
 				currentSteps.x = path[currentCount].x;
 				currentSteps.y = path[currentCount].y;
 				this->prevSteps.x = this->path[this->currentCount - 1].x;
 				this->prevSteps.y = this->path[this->currentCount - 1].y;
-				//	if (getPathCall == true)
-
-		//			{
+			
 				getPath();
-				////getPathCount++;
-				//				getPathCoubt
-				//			}
-				//			else
+			
 			}
-			//				getPathCount++;
-			//				if (getPathCount == 9)
-			//					getPathCall = tr
-					//	std::cout << "\nPrevious steps set\n";
+		
 
 		}
 
@@ -259,9 +251,10 @@ void Animation::UpdateNpc(int row, float deltaTime)
 					row = 2;
 
 
+		//After setting correctd row and taking time from loop, image is checked to move to next animation slide (For walking animation etc)
 		currentImage.y = row;
 		totalTime += deltaTime;
-		//npcWalkSwitch = 0.02;
+		
 		if (totalTime > switchTime)
 		{
 			totalTime -= switchTime;
@@ -274,8 +267,7 @@ void Animation::UpdateNpc(int row, float deltaTime)
 		}
 
 
-
-
+		//flips image dependant on the way it is facing.
 		uvRect.top = currentImage.y * uvRect.height;
 
 		if (eFacing == East)
@@ -295,8 +287,6 @@ void Animation::UpdateNpc(int row, float deltaTime)
 
 
 
-					//	actor.setTextureRect(uvRect);
-				//	actor.setPosition((this->path[this->currentCount].x * 90.0f - count), (this->path[this->currentCount].y * 90.0f - count));
 		if (lerpCount > 90 && currentCount <= path.size())
 		{
 			//	npcWalkSpeed = 0;
@@ -307,16 +297,16 @@ void Animation::UpdateNpc(int row, float deltaTime)
 		}
 		
 	}
-	//npcWalkSwitch -= 0.47;
-//	}
 
 
 }
-	//row = 0;
+	
 
 
 sf::Vector2i Animation::getLocality()
 {
+
+	//used for checking bounds on customer character and returning as vector 2i
 	sf::Vector2i locality;
 	int x, y;
 	x = static_cast<int>(this->actor.getPosition().x);

@@ -44,7 +44,6 @@ client.sPlayers.setScale(0.21, 0.21);
 		this->rectangle[i].setFillColor(sf::Color(235, 149, 13));
 	}
 
-
 	this->points = 0;
 	this->enemySpawnTimerMax = 1.f;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
@@ -57,27 +56,25 @@ client.sPlayers.setScale(0.21, 0.21);
 
 //void Game::initRain()
 
-
-
 void Game::initWindow()
 {
 	
 	this->videoMode.height = 1070;
 	this->videoMode.width = 1710;
 //	this->videoMode.getDesktopMode;
-	this->window = new sf::RenderWindow(this->videoMode, "Game: Text Engine", sf::Style::Titlebar | sf::Style::Close);
-	this->window->setFramerateLimit(70);
+	this->window = new sf::RenderWindow(this->videoMode, "The Better Verse", sf::Style::Titlebar | sf::Style::Close);
+	this->window->setFramerateLimit(144);
 
 	view.setCenter(3700, 900);
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
-	humanity.peopleAmount =300;
+	humanity.peopleAmount =30;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 1;
+	dogGR.peopleAmount = 7;
 	dogGR.populate();
 	dogGR.window = window;
 
@@ -99,7 +96,6 @@ void Game::initEnemies()
 void Game::initSprites()
 {
 	
-
 	iplayerTexture.loadFromFile("WomanWalking4.png");
 	iplayerTexture.createMaskFromColor(sf::Color::Black);
 	if (!playerTexture.loadFromImage(iplayerTexture))
@@ -107,110 +103,50 @@ void Game::initSprites()
 		std::cout << "image not loaded";
 	}
 	else
-		std::cout << " loadedAnimation";
+		std::cout << "Loaded female animation sprite\n";
 	player.actor.setTexture(&playerTexture);
 
+	////load second player textures
+	//iplayerTwoTexture.loadFromFile("WomanWalking2.png");
+	//iplayerTwoTexture.createMaskFromColor(sf::Color::Black);
+	//if (!playerTwoTexture.loadFromImage(iplayerTwoTexture))
+	//{
+	//	std::cout << "image not loaded";
+	//}
+	//else
+	//	std::cout << " loadedAnimation";
+	//playerTwo.actor.setTexture(&playerTwoTexture);
 
-	//load second player textures
-	iplayerTwoTexture.loadFromFile("WomanWalking2.png");
-	iplayerTwoTexture.createMaskFromColor(sf::Color::Black);
-	if (!playerTwoTexture.loadFromImage(iplayerTwoTexture))
-	{
-		std::cout << "image not loaded";
-	}
-	else
-		std::cout << " loadedAnimation";
-	playerTwo.actor.setTexture(&playerTwoTexture);
-	
-	//sf::Clock clock;
-	
-
-
-
+	//Load day/night shader(called water, change name to something relevant)
 	water.loadFromFile("sWater.txt", sf::Shader::Fragment);
 	water.setUniform("u_time", uTime);
 	water.setUniform("u_resolution", sf::Vector2f(1710.0, 1070.0));
 	water.setUniform("dayTime", dayTime);
 	water.setUniform("u_mouse", sf::Vector2f(sf::Mouse::getPosition()));
 
-	//load actor
-	actorTexture.loadFromFile("walkss.png");
-	sf::IntRect aMain(1, 1, 142 , 180);
-
 	
-	actorMain.setTexture(actorTexture);
-	actorMain.setTextureRect(aMain);
-	actorMain.setPosition(300, 300);
-	aMain.left += 146;
-	actorMain.setTextureRect(aMain);
-	image.loadFromFile("wo1.png");
-	image.createMaskFromColor(sf::Color::Black);
-	npc1.loadFromFile("wo1.png");
-	npc1.createMaskFromColor(sf::Color::Black);
-	texNpc1.loadFromImage(npc1);
-	sprNpc1.setTexture(texNpc1);
-	Char.loadFromImage(image);
+	
+	//Char.loadFromImage(image);
 	spChar.setTexture(Char);
-	//spChar.rotate(45.0f);
+	
+
+	//Load main background file (replace with tile system / resource manager
 	if (!bg.loadFromFile("RyanChar1.png"))
 	{
-		std::cout << "Couldn't load char_png texture" << std::endl;
+		std::cout << "Couldn't load background file RyanChar1png" << std::endl;
 	}
-
 	CharBG.setTexture(bg);
-	
-	// CharBG.setScale(1.8, 1.8); (uncomment to change size of background)
-	//if (!Char.loadFromFile("wo1.png"))
-	//{
-		//std::cout << "Couldn't load char_png texture" << std::endl;
-	//}
-	
-	//spChar.setTexture(Char);
-	CharBG.scale(1.0, 1.0);
+	CharBG.scale(1.0, 1.0); //Background /world size scaling.
 	spChar.scale(0.21, 0.21);
-	sprNpc1.scale(0.21, 0.21);
-	if (!Char2.loadFromFile("wo2.png"))
-	{
-		std::cout << "Couldn't load char_png texture" << std::endl;
-	}
 	
-	if (!Char3.loadFromFile("wo3.png"))
-	{
-		std::cout << "Couldn't load char_png texture" << std::endl;
-	}
-
-	if (!Char4.loadFromFile("wo4.png"))
-	{
-		std::cout << "Couldn't load char_png texture" << std::endl;
-	}
-	
-	sf::Texture Char2;
-	sf::Texture Char4;
 	//spChar.setTexture(Char2);
-	spChar.setPosition(4180, 1080);
+	spChar.setPosition(4180, 1080); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
+	//Current new char is rendered at same coordinates so makes no difference. Delete spChar or keep for a backup char.
 	
 }
 void Game::checkCollide()
 {
-	//sf::Vector2f posStop(spChar.getPosition().x, spChar.getPosition().y);
-	//if (spChar.getGlobalBounds().intersects(Rec.getGlobalBounds()))
-	//{
-	//	std::cout << "Collision with Character and Rec\n";
-	////	CharBG.setOrigin(CharBG.getGlobalBounds().height, CharBG.getGlobalBounds().width);
-	////	CharBG.setScale(-1.1, 1.1);
-	//	//window->draw(CharBG);
-	//	//CharBG.setOrigin(0, 0);
-	//	//view.rotate(180);
-	//	//spChar.rotate(180);
-	//	window->setView(view);
-	//	//spChar.setScale(-0.21, 0.21);
-	//
-	//	spChar.move(0, 0);
-	//}
 	
-	//sf::Vector2f XY = npc2.actor.getPosition();
-	//sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
-
 	for (auto &npc : humanity.people)
 		
 		npc.pathSearch.solve_AStar();
@@ -238,10 +174,9 @@ void Game::checkCollide()
 		}
 		
 }
-//Constructors / Destructors.
 Game::Game()
 {
-	
+	//Check all sections are doing the relevant things.
 	this->initVariables();
 	this->initNPC();
 	this->initWindow();
@@ -264,8 +199,7 @@ const bool Game::running() const
 
 void Game::initConnection()
 {
-
-	bool connect = false;
+		bool connect = false;
 	while (!connect)
 		if (client.socket.connect(client.ip, 2000) == sf::Socket::Done)
 		{
@@ -273,55 +207,37 @@ void Game::initConnection()
 			std::cout << "Connection made\n ";
 			std::cout << "Connected to server \n " << client.socket.getRemoteAddress();
 
-
 		}
 		else
 			std::cout << "probing for server\n " << sf::IpAddress::LocalHost << "3000\n";
 	}
 void Game::initNPC()
 {
-	if (!texNpc1.loadFromImage(iplayerTexture))
-	{
-		std::cout << "didn't load NPC1";
-	}
-	else std::cout << "\nloaded NPC texture";
-	//Animation npc(&texNpc1, sf::Vector2u(1, 1), 0.14f, routefind.path);
-	npc.actor.setSize(sf::Vector2f(97, 200));
-	//npc.eFacing = Animation::eDirectionFacing::East;
-	npc.switchTime = 0.2f;
-	npc.imageCount = sf::Vector2u(4, 4);
-	npc.currentImage.x = 0;
-	
-	//npc.npcStepTime = 0.14f;
-	//npc.actor.setTexture(&playerTexture);
-	//npc.actor.setTexture(&texNpc1);
-	npc.uvRect.width = texNpc1.getSize().x / float(npc.imageCount.x);
-	npc.uvRect.height = texNpc1.getSize().y / float(npc.imageCount.y);
-
-	
-	npc.actor.setTextureRect(npc.uvRect);
+//	if (!texNpc1.loadFromImage(iplayerTexture))
+//	{
+//		std::cout << "didn't load NPC1";
+//	}
+//	else std::cout << "\nloaded NPC texture";
+//	//Animation npc(&texNpc1, sf::Vector2u(1, 1), 0.14f, routefind.path);
+//	npc.actor.setSize(sf::Vector2f(97, 200));
+//	//npc.eFacing = Animation::eDirectionFacing::East;
+//	npc.switchTime = 0.2f;
+//	npc.imageCount = sf::Vector2u(4, 4);
+//	npc.currentImage.x = 0;
+//	
+//	//npc.npcStepTime = 0.14f;
+//	//npc.actor.setTexture(&playerTexture);
+//	//npc.actor.setTexture(&texNpc1);
+//	npc.uvRect.width = texNpc1.getSize().x / float(npc.imageCount.x);
+//	npc.uvRect.height = texNpc1.getSize().y / float(npc.imageCount.y);
+//	npc.actor.setTextureRect(npc.uvRect);
 
 	
 }
 void Game::spawnEnemy()
 {
 
-	/*
-	@return void
 
-	Spawns enemies and sets their colour and positions
-	-Sets a random position.
-	-Sets a random colouir.
-	-Adds enemy to the vector.
-	*/
-	this->enemy.setPosition(
-		static_cast<float>(rand() % static_cast<int>(this->window->getSize().x)),
-		0.f);
-	
-
-
-	this->enemy.setFillColor(sf::Color::Blue);
-	this->enemies.push_back(this->enemy);
 
 }
 
@@ -331,6 +247,7 @@ void Game::pollEvents()
 		switch (this->ev.type)
 		{
 			
+			//Takes text for chat client. Small delete key deletes current text (once player presses it then moves location by one pixel, it will delete).
 		case sf::Event::TextEntered:
 			if (ev.text.unicode < 128)
 			{
@@ -339,11 +256,8 @@ void Game::pollEvents()
 				chat.playerText.setPosition(spChar.getPosition().x, spChar.getPosition().y - 150);
 			}
 
-
-
-			//case sf::Event::Closed:
-			//	this->window->close();
-
+			case sf::Event::Closed:
+				this->window->close();
 
 			break;
 		case sf::Event::KeyPressed:
@@ -365,6 +279,8 @@ void Game::pollEvents()
 				location.y = spChar.getPosition().y;
 				std::cout << "\n x: " << spChar.getPosition().x << ", y: " << spChar.getPosition().y << "\n";
 				//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+				
+				//###Need to send packet less often.### Maybe on a delta time check.
 				std::string down = "Down ";
 				down += username;
 				client.sendingpacket << username << down << location.x << location.y << chat.playerInput.toAnsiString();
@@ -404,7 +320,7 @@ void Game::pollEvents()
 				faceUp = false;
 				faceDown = false;
 				faceRight = false;
-				//spChar.setTexture(Char2);
+				
 				spChar.move(-12, 0);
 				player.actor.move(-12, 0);
 				sf::Vector2i location;
@@ -434,14 +350,7 @@ void Game::pollEvents()
 				view.zoom(zoomfactor);
 				window->setView(view);
 			}
-			if (this->ev.key.code == sf::Keyboard::LControl)
-			{
-				if (npcMove)
-					npcMove = false;
-				else
-					npcMove = true;
-			}
-			
+				
 				
 			if (this->ev.key.code == sf::Keyboard::Up)
 			{
@@ -538,6 +447,15 @@ void Game::pollEvents()
 					gridPath = false;
 				else
 					gridPath = true;
+			
+			if (this->ev.key.code == sf::Keyboard::LControl)
+			{
+				if (npcMove)
+					npcMove = false;
+				else
+					npcMove = true;
+			}
+
 			break;
 			
 
@@ -588,12 +506,12 @@ void Game::pollEvents()
 			sf::Vector2i XY = sf::Mouse::getPosition(*window);
 			//int nSelectedNodeY = sf::Mouse::getPosition(window) ;
 
-			//std::cout << "\nPixels" << XY.x << ", " << XY.y << "";
+			
 			sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
 
 
-			//std::cout << "\nCoords" << worldPos.x << ", " << worldPos.y;
-			if (ev.type == sf::Event::MouseButtonPressed) // Use mouse to draw maze, shift and ctrl to place start and end
+			
+			if (ev.type == sf::Event::MouseButtonPressed) // 
 			{
 
 				//routefind.nodeEnd->x = (worldPos.x / 100);
@@ -609,7 +527,9 @@ void Game::pollEvents()
 							pathColor = false;
 						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
-					/*	for (auto npc : humanity.people)
+					
+						
+						/*	for (auto npc : humanity.people)
 						{
 							if (npc.actor.getGlobalBounds().contains(this->mousePosView))
 							{
@@ -624,6 +544,7 @@ void Game::pollEvents()
 									npcsPath.push_back(shape);
 
 									std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+									break; //end loop once drawn the one clicked, dont check other 999 potential npcs!
 								}
 							}
 						}*/
