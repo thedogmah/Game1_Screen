@@ -46,6 +46,8 @@ public:
 	aStar::paths currentSteps; // 'Update' member function will anticipate next step since this will me NPC enters a new grid space which may be resourceful knowledge in future
 	void Update(int row, float deltaTime, bool faceRight, bool faceDown, bool faceUp, bool still);
 	void UpdateNpc(int row, float deltaTime);
+	void UpdateTransport(int row, float deltaTime);
+
 private:
 
 	std::vector<aStar::paths>::iterator iteratorSteps;

@@ -287,7 +287,7 @@ void Animation::UpdateNpc(int row, float deltaTime)
 
 
 
-		if (lerpCount > 90 && currentCount <= path.size())
+		if (lerpCount > 99 && currentCount <= path.size())
 		{
 			//	npcWalkSpeed = 0;
 			actor.setPosition((this->path[this->currentCount].x * 100.0f), (this->path[this->currentCount].y * 100.0f));
@@ -318,6 +318,93 @@ sf::Vector2i Animation::getLocality()
 
 
 }
+
+void Animation::UpdateTransport(int row, float deltaTime)
+{
+
+	npcWalkSpeed += deltaTime;
+	npcTotalTime += deltaTime;
+
+	//If check passes, then this is npc or some enemy and not a player character, therefore, control is taken over by the class to animate and move.
+	if (this->path.size() > 0) {
+
+		if (currentCount != 0 && currentCount <= path.size())
+		{
+			if (lerpCount != 0) {
+				currentSteps.x = path[currentCount].x;
+				currentSteps.y = path[currentCount].y;
+				this->prevSteps.x = this->path[this->currentCount - 1].x;
+				this->prevSteps.y = this->path[this->currentCount - 1].y;
+
+				getPath();
+
+			}
+
+
+		}
+
+
+		if (eFacing == South)
+			row = 1;
+		else
+			if (eFacing == North)
+				row = 2;
+
+
+		//After setting correctd row and taking time from loop, image is checked to move to next animation slide (For walking animation etc)
+		currentImage.y = row;
+		totalTime += deltaTime;
+
+		if (totalTime > switchTime)
+		{
+			totalTime -= switchTime;
+			currentImage.x++;
+			if (currentImage.x >= imageCount.x)
+			{
+				currentImage.x = 0;
+			}
+
+		}
+
+
+		//flips image dependant on the way it is facing.
+		uvRect.top = currentImage.y * uvRect.height;
+
+		if (eFacing == East)
+		{
+			uvRect.left = currentImage.x * uvRect.width;
+			uvRect.width = abs(uvRect.width);
+		}
+		else //facing West
+		{
+			uvRect.left = (currentImage.x + 1) * abs(uvRect.width);
+			uvRect.width = -abs(uvRect.width);
+		}
+
+
+		pathCount = path.size();
+
+
+
+
+		if (lerpCount > 33 && currentCount <= path.size())
+		{
+			//	npcWalkSpeed = 0;
+			actor.setPosition((this->path[this->currentCount].x * 100.0f), (this->path[this->currentCount].y * 100.0f));
+			currentCount++;
+			lerpCount = 0;
+
+		}
+
+	}
+
+
+}
+
+
+
+
+
 
 void Animation::getPath()
 {

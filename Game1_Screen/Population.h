@@ -1,7 +1,7 @@
 #pragma once
 #include "Animation.h"
 #include "aStar.h"
-
+#include <algorithm>
 class Population
 {
 

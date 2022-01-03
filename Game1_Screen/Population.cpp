@@ -2,6 +2,8 @@
 
 Population::Population()
 {
+//	std::shared_ptr<sf::Texture> texture;
+	//texture->loadFromFile("WomanWalking4_2.png")
 	imgHuman.loadFromFile("WomanWalking4_2.png");
 
 
@@ -48,8 +50,8 @@ bool Population::populate()
 
 			//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
 			Human.ID = x;
-			int start = 780 + rand() % (750);
-			int end = 880 + rand() % (700);
+			int start = 780 + rand() % (2750);
+			int end = 880 + rand() % (2700);
 			//imgHuman.loadFromFile("WomanWalking4.png");
 
 			Human.pathSearch.nodeStart = &Human.pathSearch.nodes[start];
@@ -95,14 +97,16 @@ bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
 		if (this->rt.contains(person.actor.getPosition().x, person.actor.getPosition().y) )
 		window->draw(person.actor, &water);
 		if (person.currentCount >= person.path.size() - 1) {
-			person.pathSearch.nodeStartBuffer = person.pathSearch.nodeStart;
+			std::reverse(person.path.begin(), person.path.end());
+			
+			/*person.pathSearch.nodeStartBuffer = person.pathSearch.nodeStart;
 			person.pathSearch.nodeEndBuffer = person.pathSearch.nodeEnd;
 			person.pathSearch.nodeEnd = person.pathSearch.nodeStartBuffer;
-			person.pathSearch.nodeStart = person.pathSearch.nodeEndBuffer;
+			person.pathSearch.nodeStart = person.pathSearch.nodeEndBuffer;*/
 			person.currentCount = 0;
-			person.pathSearch.solve_AStar();
+			/*person.pathSearch.solve_AStar();
 			person.path.clear();
-			person.path = person.pathSearch.OnUserUpdate(0.2f);
+			person.path = person.pathSearch.OnUserUpdate(0.2f);*/
 		
 		}
 	}

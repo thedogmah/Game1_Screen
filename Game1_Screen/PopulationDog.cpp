@@ -39,8 +39,8 @@ bool PopulationDog::populate()
 
 			//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
 			Human.ID = x;
-			int start = 900 + rand() % (190);
-			int end = 900 + rand() % (190);
+			int start = 900 + rand() % (200);
+			int end = 900 + rand() % (200);
 			//imgHuman.loadFromFile("WomanWalking4.png");
 
 			Human.pathSearch.nodeStart = &Human.pathSearch.nodes[start];
@@ -86,14 +86,16 @@ bool PopulationDog::drawPeople(float dayTime, float uTime, float deltaTime)
 
 		window->draw(person.actor, &water);
 		if (person.currentCount >= person.path.size() - 1) {
-			person.pathSearch.nodeStartBuffer = person.pathSearch.nodeStart;
-			person.pathSearch.nodeEndBuffer = person.pathSearch.nodeEnd;
-			person.pathSearch.nodeEnd = person.pathSearch.nodeStartBuffer;
-			person.pathSearch.nodeStart = person.pathSearch.nodeEndBuffer;
+
+			std::reverse(person.path.begin(), person.path.end());
+		//	person.pathSearch.nodeStartBuffer = person.pathSearch.nodeStart;
+			//person.pathSearch.nodeEndBuffer = person.pathSearch.nodeEnd;
+			//person.pathSearch.nodeEnd = person.pathSearch.nodeStartBuffer;
+			//person.pathSearch.nodeStart = person.pathSearch.nodeEndBuffer;
 			person.currentCount = 0;
-			person.pathSearch.solve_AStar();
-			person.path.clear();
-			person.path = person.pathSearch.OnUserUpdate(0.2f);
+		//	person.pathSearch.solve_AStar();
+		//	person.path.clear();
+		//	person.path = person.pathSearch.OnUserUpdate(0.2f);
 
 		}
 	}

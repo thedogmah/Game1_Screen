@@ -3,7 +3,12 @@
 #include "clientside.h"
 #include "Player.h"
 #include "aStar.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui-SFML.h"
+
+
 using namespace sf;
+
 
 //weather variables
  //void sfmlconnect();
@@ -60,6 +65,7 @@ int main()
 		
 		//game.playerTwo.actor.setTextureRect(walkFront.uvRect);
 		game.render();
+
 		
 	}
 

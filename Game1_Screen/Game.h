@@ -15,6 +15,8 @@
 #include "Population.h"
 #include <thread>
 #include "PopulationDog.h"
+#include "PopulationDrone.h"
+#include "PopulationScooter.h"
 //Class as the game engine.
 
 class Game
@@ -52,7 +54,7 @@ public:
 	std::string username;
 
 	sf::Shader water;
-	
+	sf::Shader sFountain;
 	//animatedCharacter
 	
 	//player.setPosition(500.0f, 300.0f);
@@ -78,12 +80,26 @@ public:
 	std::thread collissionThread;
 	Population humanity;
 	PopulationDog dogGR;
+	PopulationDrone drones;
+	PopulationScooter scooters;
 	float npcDelta;
 	float npcDeltaSwitch = 0.077f;
 	float npcTimeHold;
 	float dogTimeHold;
+	float droneTimeHold;
+	float scooterTimeHold;
 	float uTime;
 	float dayTime = 1.0;
+	bool bRain = false;
+	bool bScooters = false;
+	bool bDrones = false;
+	bool bDogs = false;
+	bool bHumans = false;
+	sf::Clock clockImGui;
+
+	//player statistics
+	int experience = 0;
+	std::string exper="";
 private:
 
 	//Variables	
@@ -98,13 +114,14 @@ private:
 	sf::Event ev;
 	sf::Clock timeShader;
 	sf::Clock npcDeltaClock;
-	
+	sf::Clock shaderClock;
+	float fShaderClock;
 	//Camera
 	sf::View view;
 	float vZoom = 0.8;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 0.8;
+	float zoomfactor = 1.15;
 	//Mouse Positions
 	
 	sf::Vector2i mousePosWindow;
@@ -128,7 +145,9 @@ private:
 	
 
 	//Sprites
-	
+	sf::Texture texFountain;
+	sf::Sprite sprFountain;
+	sf::Texture noise;
 
 	//Actors
 	sf::Texture actorTexture;
@@ -169,7 +188,7 @@ private:
 	std::vector<sf::Text> ui;
 	std::vector<sf::Text> conversations;
 	//Private functions
-
+	
 	void initInterface();
 	void initVariables();
 	void initRain();

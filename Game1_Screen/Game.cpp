@@ -7,6 +7,8 @@
 #include "Player.h"
 #include "Population.h"
 #include <math.h>
+#include "imgui/imgui.h"
+#include "imgui/imgui-SFML.h"
 void Game::initInterface()
 {
 
@@ -33,6 +35,8 @@ void Game::initInterface()
 //Private member functions
 void Game::initVariables()
 {
+	clockImGui.restart(); 
+	fShaderClock = shaderClock.restart().asSeconds();
 	screenSize.x = 1200;
 	screenSize.y = 1600;
 	this->window = nullptr;
@@ -62,22 +66,30 @@ void Game::initWindow()
 	this->videoMode.height = 1070;
 	this->videoMode.width = 1710;
 //	this->videoMode.getDesktopMode;
-	this->window = new sf::RenderWindow(this->videoMode, "The Better Verse", sf::Style::Titlebar | sf::Style::Close);
-	this->window->setFramerateLimit(144);
+	this->window = new sf::RenderWindow(this->videoMode, "The Better Verse", sf::Style::Default);
+	ImGui::SFML::Init(*window);
+	this->window->setFramerateLimit(100);
 
-	view.setCenter(3700, 900);
+	view.setCenter(3700, 1260);
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
-	humanity.peopleAmount =30;
+	humanity.peopleAmount =240;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 7;
+	dogGR.peopleAmount = 20;
 	dogGR.populate();
 	dogGR.window = window;
 
+	drones.peopleAmount = 26;
+	drones.populate();
+	drones.window = window;
+
+	scooters.peopleAmount = 70;
+	scooters.populate();
+	scooters.window = window;
 }
 void Game::initEnemies()
 {
@@ -95,7 +107,16 @@ void Game::initEnemies()
 }	
 void Game::initSprites()
 {
-	
+	noise.loadFromFile("noise.png");
+	//test water shader
+	if (!texFountain.loadFromFile("water.jpg"))
+		std::cout << "Water for shader not loaded";
+
+	sprFountain.setTexture(texFountain);
+	sprFountain.setPosition(4700, 2100);
+//	sprFountain.setOrigin(0.5, 0.5);
+	sprFountain.setScale(0.65, 3);
+	//sprFountain.setRotation(90);
 	iplayerTexture.loadFromFile("WomanWalking4.png");
 	iplayerTexture.createMaskFromColor(sf::Color::Black);
 	if (!playerTexture.loadFromImage(iplayerTexture))
@@ -124,7 +145,15 @@ void Game::initSprites()
 	water.setUniform("dayTime", dayTime);
 	water.setUniform("u_mouse", sf::Vector2f(sf::Mouse::getPosition()));
 
-	
+	sFountain.loadFromFile("sFountain.txt", sf::Shader::Fragment);
+	sFountain.setUniform("iResolution", sf::Vector2f(1070,1710));
+	sFountain.setUniform("iTime", fShaderClock);
+	sFountain.setUniform("iChannel0", texFountain);
+	sFountain.setUniform("iChannel1", noise);
+	//sFountain.setUniform("");
+	sFountain.setUniform("iMouse", sf::Vector2f(sf::Mouse::getPosition()));
+	//sFountain.setUniform();
+	//sFountain.setUniform();
 	
 	//Char.loadFromImage(image);
 	spChar.setTexture(Char);
@@ -147,31 +176,37 @@ void Game::initSprites()
 void Game::checkCollide()
 {
 	
-	for (auto &npc : humanity.people)
+	for (auto& npc : scooters.people)
+	{
+		//	npc.pathSearch.solve_AStar();
+			//npc2.pathSearch.solve_AStar();
+			//for (auto &npc2 : humanity.people) {
+			//	sf::Vector2i XY = npc2.getLocality();
+			//	std::cout << "npc2 position: " << npc2.actor.getPosition().x << ", " << npc2.actor.getPosition().y << "\n";
+			//	sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
+				//std::cout << "converted world pos" << worldPos.x << ", " << worldPos.y << "\n";
+
+		if (npc.actor.getGlobalBounds().intersects(player.actor.getGlobalBounds()))//&& npc.ID != npc2.ID && npc.pathSearch.nodeEnd != nullptr)
+		{	experience += 1;
+		exper = std::to_string(experience);
+		return;
+		//std::cout << experience << " : " << exper;
+		//npc.pathSearch.nodes[0].bObstacle = true;
 		
-		npc.pathSearch.solve_AStar();
-		//npc2.pathSearch.solve_AStar();
-		for (auto &npc2 : humanity.people) {
-			sf::Vector2i XY = npc2.getLocality();
-		//	std::cout << "npc2 position: " << npc2.actor.getPosition().x << ", " << npc2.actor.getPosition().y << "\n";
-			sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
-			//std::cout << "converted world pos" << worldPos.x << ", " << worldPos.y << "\n";
+			//npc.pathSearch.solve_AStar();
 
-			if (npc.actor.getGlobalBounds().intersects(npc2.actor.getGlobalBounds()) )//&& npc.ID != npc2.ID && npc.pathSearch.nodeEnd != nullptr)
-				//npc.pathSearch.nodes[0].bObstacle = true;
-			{
-				//npc.pathSearch.solve_AStar();
-				
-			//	std::cout << "node is | " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].x << ", " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].y << " | ";
-				//std::cout << "node is | " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].x << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].y << " | ";
+		//	std::cout << "node is | " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].x << ", " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].y << " | ";
+			//std::cout << "node is | " << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].x << npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100) - 1].y << " | ";
 
-				npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100)].bObstacle = true;
-				//npc.pathSearch.solve_AStar();
-				//npc2.pathSearch.solve_AStar();
-				//npc.path = npc.pathSearch.OnUserUpdate(0.2f);
-				//npc2.path = npc2.pathSearch.OnUserUpdate(0.2f);
-			}
+			//npc.pathSearch.nodes[static_cast<int>((worldPos.y) / 100 * npc.pathSearch.nMapWidth + (worldPos.x) / 100)].bObstacle = true;
+			//npc.pathSearch.solve_AStar();
+			//npc2.pathSearch.solve_AStar();
+			//npc.path = npc.pathSearch.OnUserUpdate(0.2f);
+			//npc2.path = npc2.pathSearch.OnUserUpdate(0.2f);
+
 		}
+		
+	}
 		
 }
 Game::Game()
@@ -244,6 +279,7 @@ void Game::spawnEnemy()
 void Game::pollEvents()
 {
 	while (this->window->pollEvent(this->ev)) {
+		ImGui::SFML::ProcessEvent(ev);
 		switch (this->ev.type)
 		{
 			
@@ -256,16 +292,16 @@ void Game::pollEvents()
 				chat.playerText.setPosition(spChar.getPosition().x, spChar.getPosition().y - 150);
 			}
 
-			case sf::Event::Closed:
-				this->window->close();
+			/*case sf::Event::Closed:
+				this->window->close();*/
 
 			break;
 		case sf::Event::KeyPressed:
 
 			if (this->ev.key.code == sf::Keyboard::Delete)
 				chat.playerInput = "";
-			if (this->ev.key.code == sf::Keyboard::Escape)
-				this->window->close();
+			/*if (this->ev.key.code == sf::Keyboard::Escape)
+				this->window->close();*/
 			if (this->ev.key.code == sf::Keyboard::Down)
 			{
 				//spChar.setTexture(Char);
@@ -478,27 +514,25 @@ void Game::pollEvents()
 			break;
 		}
 
-		//case sf::Event::MouseMoved:
+		case sf::Event::MouseMoved:
 
-		//	for (auto npc : humanity.people)
-		//	{
-		//		if (npc.actor.getGlobalBounds().contains(this->mousePosView))
-		//		{
-		//			npcsPath.clear();
-		//			for (auto& a : npc.path)
-		//			{
-		//				sf::RectangleShape shape;
-		//				shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
-		//				shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
+			for (auto npc : humanity.people)
+				if (npc.actor.getGlobalBounds().contains(this->mousePosView))
+				{
+		npcsPath.clear();
+					for (auto& a : npc.path)
+				{
+						sf::RectangleShape shape;
+						shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
+						shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
 
-		//				shape.setFillColor(sf::Color::Green);
-		//				npcsPath.push_back(shape);
+					shape.setFillColor(sf::Color::Green);
+						npcsPath.push_back(shape);
 
-		//				//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
-		//			}
-		//		}
-		//	}
-
+						//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
+					}
+					break;
+				}
 		case sf::Event::MouseButtonPressed:
 
 			bool pathColor = false;
@@ -705,46 +739,46 @@ void Game::updateEnemies()
 void Game::renderRain()
 {
 
-	//if (part == 1) {
-	//	for (int i = 0; i < 300; i++) {
-	//		randomh = 1 + rand() % (15);
-	//		randomsp[i] = 15 + rand() % (28);
-	//		randomx = 2700 + rand() % (2200);
-	//		randomr = 0 + rand() % (45);
-	//		randomg = 30 + rand() % (35);
-	//		randomb = 210 + rand() % (45);
-	//		rectangle[i].setSize(sf::Vector2f(4, randomh));
-	//		rectangle[i].setPosition(randomx, -7);
-	//		rectangle[i].setFillColor(sf::Color(randomr, randomg, randomb));
+	if (part == 1) {
+		for (int i = 0; i < 300; i++) {
+			randomh = 1 + rand() % (15);
+			randomsp[i] = 15 + rand() % (28);
+			randomx = 2700 + rand() % (2200);
+			randomr = 0 + rand() % (45);
+			randomg = 30 + rand() % (35);
+			randomb = 210 + rand() % (45);
+		rectangle[i].setSize(sf::Vector2f(4, randomh));
+			rectangle[i].setPosition(randomx, -7);
+			rectangle[i].setFillColor(sf::Color(randomr, randomg, randomb));
 
 
 
-	//	}
-	//}
-	//for (int i = 0; i < 300; i++)
-	//{
-	//	this->window->draw(rectangle[i]);
-	//}
+		}
+	}
+	for (int i = 0; i < 300; i++)
+	{
+		this->window->draw(rectangle[i]);
+	}
 
-	//	for (int i = 0; i < 700; i++) {
-	//	if (rectangle[i].getPosition().y > 2000){
-	//		randomx = 2700 + rand() % (2500);
-	//		rectangle[i].setPosition(randomx, -5);
-	//		randomsp[i] = 15 + rand() % (28);
-	//		randomr = 0 + rand() % (45);
-	//		randomg = 30 + rand() % (35);
-	//		randomb = 210 + rand() % (45);
-	//	
-	//	}
+		for (int i = 0; i < 700; i++) {
+		if (rectangle[i].getPosition().y > 2000){
+			randomx = 2700 + rand() % (2500);
+			rectangle[i].setPosition(randomx, -5);
+			randomsp[i] = 15 + rand() % (28);
+			randomr = 0 + rand() % (45);
+			randomg = 30 + rand() % (35);
+			randomb = 210 + rand() % (45);
+		
+		}
 
-	//	}
+	}
 
-	//	for (int i = 0; i < 900; i++)
-	//	{
-	//		rectangle[i].move(sf::Vector2f(6, randomsp[i]));
-	//	}
+		for (int i = 0; i < 900; i++)
+		{
+			rectangle[i].move(sf::Vector2f(6, randomsp[i]));
+		}
 
-	//	part = 2;
+		part = 2;
 }
 void Game::renderEnemies()
 {
@@ -807,7 +841,10 @@ void Game::render()
 	this->renderEnemies();
 
 	this->renderInterface(*this->window);
-	this->renderRain();
+	if (bRain)
+	{
+		this->renderRain();
+	}
 	
 	//window->draw(spChar);
 	
@@ -827,13 +864,15 @@ void Game::render()
 	deltaTime = npcClock.restart().asSeconds();
 	npcDelta = npcDeltaClock.restart().asSeconds();
 	dogTimeHold = deltaTime;
+	droneTimeHold = deltaTime;
+	scooterTimeHold = deltaTime;
 	//npcTimeHold = npcClock.restart().asSeconds();
 	//std::cout << npcDeltaClock.getElapsedTime().asSeconds() << "\n";
 	//npc.Update(0, deltaTime, faceRight, faceDown, faceUp, still);
 	//std::thread cThread(&Game::checkCollide, this);
 	// Main thread waits for the new thread th to stop execution and as a result, its own execution gets blocked
 	//cThread.join();
-	//this->checkCollide();
+	this->checkCollide();
 	for (auto& person : humanity.people)
 	{
 		
@@ -845,7 +884,7 @@ void Game::render()
 	//	if(npcTimeHold >= npcDeltaSwitch){
 			switch (person.eFacing) {
 			case Animation::East:
-				person.actor.move(1.2, 0);
+				person.actor.move(1, 0);
 			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
 			person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
 			//	person.actor.setTextureRect(person.uvRect);
@@ -855,7 +894,7 @@ void Game::render()
 			break;
 			
 			case Animation::West:
-			person.actor.move(-1.2, 0);
+			person.actor.move(-1, 0);
 			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
 			person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
 		//	person.actor.setTextureRect(person.uvRect); 
@@ -865,7 +904,7 @@ void Game::render()
 			break;
 			
 			case Animation::North:
-			person.actor.move(0, -1.3);
+			person.actor.move(0, -1);
 		//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
 			person.lerpCount++;
 			//person.path = person.pathSearch.OnUserUpdate(0.2f);
@@ -875,7 +914,7 @@ void Game::render()
 			break;
 			
 			case Animation::South:
-			person.actor.move(0, 1.2);
+			person.actor.move(0, 1);
 			person.lerpCount++;
 			//person.path = person.pathSearch.OnUserUpdate(0.2f);
 			npcTimeHold -= npcDelta;
@@ -907,7 +946,7 @@ void Game::render()
 		//	if(npcTimeHold >= npcDeltaSwitch){
 		switch (dog.eFacing) {
 		case Animation::East:
-			dog.actor.move(1.2, 0);
+			dog.actor.move(1, 0);
 			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
 			dog.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
 			//	person.actor.setTextureRect(person.uvRect);
@@ -917,7 +956,7 @@ void Game::render()
 			break;
 
 		case Animation::West:
-			dog.actor.move(-1.2, 0);
+			dog.actor.move(-1, 0);
 			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
 			dog.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
 		//	person.actor.setTextureRect(person.uvRect); 
@@ -927,7 +966,7 @@ void Game::render()
 			break;
 
 		case Animation::North:
-			dog.actor.move(0, -1.3);
+			dog.actor.move(0, -1);
 			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
 			dog.lerpCount++;
 			//person.path = person.pathSearch.OnUserUpdate(0.2f);
@@ -937,7 +976,7 @@ void Game::render()
 			break;
 
 		case Animation::South:
-			dog.actor.move(0, 1.2);
+			dog.actor.move(0, 1);
 			dog.lerpCount++;
 			//person.path = person.pathSearch.OnUserUpdate(0.2f);
 			dogTimeHold = 0;
@@ -951,9 +990,132 @@ void Game::render()
 		dog.actor.setTextureRect(dog.uvRect);
 
 	}
-	
+
+
+	for (auto& dog : scooters.people)
+	{
+
+		//deltaTime = npcClock.restart().asSeconds();
+
+			//person.npcWalkSwitch = 0.2;
+
+		dogTimeHold += npcDelta;
+		//	if(npcTimeHold >= npcDeltaSwitch){
+		switch (dog.eFacing) {
+		case Animation::East:
+			dog.actor.move(3, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect);
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor,&water);
+			break;
+
+		case Animation::West:
+			dog.actor.move(-3, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+		//	person.actor.setTextureRect(person.uvRect); 
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor, &water);
+			break;
+
+		case Animation::North:
+			dog.actor.move(0, -3);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			dogTimeHold = 0;
+			//this->window->draw(person.actor, &water);
+		//	person.actor.setTextureRect(person.uvRect);
+			break;
+
+		case Animation::South:
+			dog.actor.move(0, 3);
+			dog.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect);
+			break;
+
+		}
+
+		//}
+		dog.UpdateTransport(0, deltaTime);
+		dog.actor.setTextureRect(dog.uvRect);
+
+	}
+
+
+	for (auto& dog : drones.people)
+	{
+
+		//deltaTime = npcClock.restart().asSeconds();
+
+			//person.npcWalkSwitch = 0.2;
+
+		dogTimeHold += npcDelta;
+		//	if(npcTimeHold >= npcDeltaSwitch){
+		switch (dog.eFacing) {
+		case Animation::East:
+			dog.actor.move(1, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect);
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor,&water);
+			break;
+
+		case Animation::West:
+			dog.actor.move(-1, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+		//	person.actor.setTextureRect(person.uvRect); 
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor, &water);
+			break;
+
+		case Animation::North:
+			dog.actor.move(0, -1);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			dogTimeHold = 0;
+			//this->window->draw(person.actor, &water);
+		//	person.actor.setTextureRect(person.uvRect);
+			break;
+
+		case Animation::South:
+			dog.actor.move(0, 1);
+			dog.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect);
+			break;
+
+		}
+
+		//}
+		dog.UpdateNpc(0, deltaTime);
+		dog.actor.setTextureRect(dog.uvRect);
+
+	}
+	if(bDrones)
+	drones.drawPeople(dayTime, uTime, droneTimeHold);
+	if(bScooters)
+	scooters.drawPeople(dayTime, uTime, scooterTimeHold);
+	if(bDogs)
 	dogGR.drawPeople(dayTime, uTime, dogTimeHold);
+	if(bHumans)
 	humanity.drawPeople(dayTime, uTime, npcDelta);
+
+	fShaderClock = shaderClock.getElapsedTime().asSeconds();
+	sFountain.setUniform("iTime", fShaderClock);
+	window->draw(sprFountain, &sFountain);
 	this->window->draw(player.actor, &water);
 	//for (auto a : routefind.path)
 	//{
@@ -1007,22 +1169,40 @@ void Game::render()
 	//window->draw(sprNpc1);
 	if (grid)
 	{
-		this->window->draw(routefind.vaGrid);
-		this->window->draw(routefind.vaLine);
+		this->window->draw(npc.pathSearch.vaGrid);
+		this->window->draw(npc.pathSearch.vaLine);
 	}
-	//if (gridPath)
-	//{
-	//	for (auto &npc : npcs)
-	//		this->window->draw(npc);
+	if (gridPath)
+	{
+		for (auto &npc : npcs)
+			this->window->draw(npc);
 
-	//}
-	//{
-	//	for (auto &npc : npcsPath)
-	//	this->window->draw(npc);
+	}
+	{
+		for (auto &npc : npcsPath)
+		this->window->draw(npc);
 	//	for(auto &npcs : humanity.people)
-		//this->window->draw(npcs.actor, &water);
+	//	this->window->draw(npcs.actor, &water);
 
-	//}
+	}
+	ImGui::SFML::Update(*window, clockImGui.restart());
+	static std::string strengh = "Strength";
+	ImGui::Begin("Nottingham Game Simulation");
+	ImGui::Checkbox("Rain", &bRain);
+	ImGui::Checkbox("Scooters", &bScooters);
+	ImGui::Checkbox("Drones", &bDrones);
+	ImGui::Checkbox("Dogs", &bDogs);
+	ImGui::Checkbox("Humans", &bHumans);
+	ImGui::Checkbox("Grid", &grid);
+	ImGui::SliderFloat("Sun Light ", &dayTime, 0.0f, 1.0f);
+	ImGui::Text("Experience (Based on scooter contact\nBut will later be based on missions\nand fighting etc.):");
+	ImGui::Text(exper.c_str());
+	{
+		
+	}
+
+	ImGui::End();
+	ImGui::SFML::Render(*window);
 	this->window->display(); //Tell app that window is done drawing.
 	
 	
