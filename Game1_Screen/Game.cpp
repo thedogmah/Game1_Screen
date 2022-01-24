@@ -55,41 +55,87 @@ client.sPlayers.setScale(0.21, 0.21);
 	this->mouseHeld = false;
 	this->health = 15;
 	this->endGame = false;
+
+
+	//initialise path collide vector
+	pathDataW.open("pathdata.txt");
+	if (pathDataW.is_open())
+	{
+		std::string line;
+		std::cout << std::endl;
+		while (std::getline(pathDataW, line))
+		{
+			//	std::cout << line;
+			for (auto digit : line)
+			{
+				vPathInts.push_back(digit);
+			}
+			vPathCollide.push_back(vPathInts);
+			vPathInts.clear();
+		}
+	}
+
+	for (int i = 0; i < 74; i++)
+	{
+		for (int j = 0; j < 129; j++)
+		{
+			if (vPathCollide[i][j] == '1') {
+				sf::RectangleShape dot;
+				dot.setPosition(sf::Vector2f(i * 100, j * 100));
+				dot.setSize(sf::Vector2f(10, 10));
+				dot.setFillColor(sf::Color::Yellow);
+				vPathVisualAid.push_back(dot);
+			}
+		}
+
+	}
+	//set circle (mouse hover signifier) variables
+	circle.setRadius(20);
+	circle.setOutlineColor(sf::Color::Red);
+	circle.setOutlineThickness(3);
+	circle.setFillColor(sf::Color::Blue);
+	circle.setScale(1.25, 0.25);
 	initSprites();
+
+	
 }
 
-//void Game::initRain()
 
 void Game::initWindow()
 {
 	
-	this->videoMode.height = 1070;
-	this->videoMode.width = 1710;
+	this->videoMode.height = 1800;
+	this->videoMode.width = 2600;
 //	this->videoMode.getDesktopMode;
 	this->window = new sf::RenderWindow(this->videoMode, "The Better Verse", sf::Style::Default);
 	ImGui::SFML::Init(*window);
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	this->window->setFramerateLimit(100);
 
 	view.setCenter(3700, 1260);
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
-	humanity.peopleAmount =240;
+	
+	humanity.peopleAmount =200;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 20;
+	dogGR.peopleAmount = 150;
 	dogGR.populate();
 	dogGR.window = window;
 
-	drones.peopleAmount = 26;
+	drones.peopleAmount = 90;
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 70;
+	scooters.peopleAmount = 200;
 	scooters.populate();
 	scooters.window = window;
+
+	
 }
 void Game::initEnemies()
 {
@@ -101,9 +147,6 @@ void Game::initEnemies()
 	//this->enemy.setOutlineColor(sf::Color::Blue);
 	//this->enemy.setOutlineThickness(1.f);
 
-	
-	
-
 }	
 void Game::initSprites()
 {
@@ -113,7 +156,7 @@ void Game::initSprites()
 		std::cout << "Water for shader not loaded";
 
 	sprFountain.setTexture(texFountain);
-	sprFountain.setPosition(4700, 2100);
+	sprFountain.setPosition(4700, 8100);
 //	sprFountain.setOrigin(0.5, 0.5);
 	sprFountain.setScale(0.65, 3);
 	//sprFountain.setRotation(90);
@@ -169,7 +212,7 @@ void Game::initSprites()
 	spChar.scale(0.21, 0.21);
 	
 	//spChar.setTexture(Char2);
-	spChar.setPosition(4180, 1080); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
+	spChar.setPosition(3180, 3980); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
 	//Current new char is rendered at same coordinates so makes no difference. Delete spChar or keep for a backup char.
 	
 }
@@ -246,6 +289,7 @@ void Game::initConnection()
 		else
 			std::cout << "probing for server\n " << sf::IpAddress::LocalHost << "3000\n";
 	}
+
 void Game::initNPC()
 {
 //	if (!texNpc1.loadFromImage(iplayerTexture))
@@ -280,6 +324,7 @@ void Game::pollEvents()
 {
 	while (this->window->pollEvent(this->ev)) {
 		ImGui::SFML::ProcessEvent(ev);
+		
 		switch (this->ev.type)
 		{
 			
@@ -313,7 +358,7 @@ void Game::pollEvents()
 				sf::Vector2i location;
 				location.x = spChar.getPosition().x;
 				location.y = spChar.getPosition().y;
-				std::cout << "\n x: " << spChar.getPosition().x << ", y: " << spChar.getPosition().y << "\n";
+				//std::cout << "\n x: " << spChar.getPosition().x << ", y: " << spChar.getPosition().y << "\n";
 				//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 				
 				//###Need to send packet less often.### Maybe on a delta time check.
@@ -514,27 +559,16 @@ void Game::pollEvents()
 			break;
 		}
 
+		
 		case sf::Event::MouseMoved:
-
-			for (auto npc : humanity.people)
-				if (npc.actor.getGlobalBounds().contains(this->mousePosView))
-				{
-		npcsPath.clear();
-					for (auto& a : npc.path)
-				{
-						sf::RectangleShape shape;
-						shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
-						shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
-
-					shape.setFillColor(sf::Color::Green);
-						npcsPath.push_back(shape);
-
-						//std::cout << "\nDrawn Node results at : " << a.x << ", " << a.y * 100 << " |  ";
-					}
-					break;
-				}
+		{
+		//
+			
+		
+			break;
+		}
 		case sf::Event::MouseButtonPressed:
-
+			
 			bool pathColor = false;
 			int nNodeSize = 100;
 			sf::Vector2i XY = sf::Mouse::getPosition(*window);
@@ -559,10 +593,25 @@ void Game::pollEvents()
 							pathColor = true;
 						else
 							pathColor = false;
+						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
 						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 					
+						pathUpdate(worldPos.x, worldPos.y);
 						
+
+						for (auto people : humanity.people) //vector of NPCS
+						{
+							if (people.actor.getGlobalBounds().contains(worldPos))
+							{
+
+
+								circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+								circleID = people.ID;
+								break;
+							}
+						}
+
 						/*	for (auto npc : humanity.people)
 						{
 							if (npc.actor.getGlobalBounds().contains(this->mousePosView))
@@ -570,6 +619,7 @@ void Game::pollEvents()
 								npcsPath.clear();
 								for (auto &a : npc.path)
 								{
+								//This code used to draw a grid for each players location // where they are walking to next.
 									sf::RectangleShape shape;
 									shape.setSize(sf::Vector2f(100 / 7, 100 / 7));
 									shape.setPosition(sf::Vector2f(a.x * 100, a.y * 100));
@@ -601,6 +651,8 @@ void Game::pollEvents()
 					}
 						if (ev.mouseButton.button == sf::Mouse::Right)
 						{
+
+
 							//npc.path.clear();
 							if (pathColor)
 								pathColor = true;
@@ -674,6 +726,7 @@ void Game::pollEvents()
 
 void Game::updateEnemies()
 {
+	circle.setPosition(humanity.people[circleID].actor.getPosition().x+20, humanity.people[circleID].actor.getPosition().y +200);
 	/*
 	
 		@return void
@@ -828,11 +881,7 @@ void Game::renderInterface(sf::RenderTarget& target)
 void Game::render()
 {
 
-	/* 
 	
-	//Renders the game objects.
-
-	*/
 
 	this->window->clear(); //Clear old frame
 	
@@ -1164,14 +1213,23 @@ void Game::render()
 	//this->window->draw(playerTwo.actor);
 	this->window->draw(userText);
 	window->draw(chat.playerText);
-	
+	window->draw(circle);
 	//Testing NPC animation.
 	//window->draw(sprNpc1);
 	if (grid)
 	{
 		this->window->draw(npc.pathSearch.vaGrid);
 		this->window->draw(npc.pathSearch.vaLine);
+	
 	}
+
+	if (bPathKey)
+		for (auto dot : vPathVisualAid)
+		{
+			this->window->draw(dot);
+		}
+
+		
 	if (gridPath)
 	{
 		for (auto &npc : npcs)
@@ -1189,10 +1247,33 @@ void Game::render()
 	static std::string strengh = "Strength";
 	ImGui::Begin("Nottingham Game Simulation");
 	ImGui::Checkbox("Rain", &bRain);
+	ImGui::Checkbox("Path Key [Yellow]", &bPathKey);
 	ImGui::Checkbox("Scooters", &bScooters);
 	ImGui::Checkbox("Drones", &bDrones);
 	ImGui::Checkbox("Dogs", &bDogs);
 	ImGui::Checkbox("Humans", &bHumans);
+	if (ImGui::Button("Reset Path File"))
+	{
+		pathReset();
+	}
+	if (ImGui::Button("Display Path File"))
+	{
+
+		
+		//display contents of vector of vector of chars (path file)
+		for (auto i : vPathCollide) {
+			for (auto j : i)
+			{
+				std::cout << j << ", ";
+			}
+			std::cout << std::endl;
+		}
+	}
+	if (ImGui::Button("Path Save"))
+	{
+		pathSave();
+	}
+	ImGui::Checkbox("Reset PathFinding", &resetPath); //{std::cout <<resetPath };
 	ImGui::Checkbox("Grid", &grid);
 	ImGui::SliderFloat("Sun Light ", &dayTime, 0.0f, 1.0f);
 	ImGui::Text("Experience (Based on scooter contact\nBut will later be based on missions\nand fighting etc.):");
@@ -1234,9 +1315,10 @@ void Game::login()
 {
 
 	std::cout << "\nPlease enter Character name: ";
-	username = "Jodie";
+	username = "Ryan";
 	userText.setString(username);
 }
+
 
 void Game::renderPlayers()
 {//renders play chat when online.
@@ -1295,4 +1377,113 @@ void Game::renderPlayers()
 		//client.vPlayers.clear();
 		return void();
 	
+}
+
+void Game::pathReset()
+{
+	pathDataW.open("pathdata.txt");
+	if (pathDataW.is_open())
+	{
+
+		for (int i = 0; i < 75; i++)
+		{
+			for (int j = 0; j < 130; j++)
+
+			{
+
+				pathDataW << 0;
+								
+				//routefind.nodes[j * 100 + i].bObstacle = false;
+				//std::cout << i << " " << j << std::endl;
+			}
+			pathDataW << "\n";
+			}
+		pathDataW.close();
+
+	}
+
+	for (auto &vector : vPathCollide)
+	{
+		for (auto &digit : vector)
+		{
+		
+			digit = '0';
+		}
+	}
+}
+
+void Game::pathUpdate(int x, int y)
+{
+	
+	std::cout << int(x/100) << ", " << int(y/100);
+	x = int(x / 100);
+	y = int(y / 100);
+	pathDataW.open("pathdata.txt");
+	if (pathDataW.is_open())
+	{
+		if (vPathCollide[x][y] == '1')
+		{
+			int loca = 0;
+			for (auto& dot : vPathVisualAid)
+			{
+				if (dot.getPosition().x == x * 100 && dot.getPosition().y == y * 100)
+				{
+					vPathVisualAid.erase(vPathVisualAid.begin() + loca);
+					//dot.setFillColor(sf::Color::Red);
+
+				}
+				loca++;
+			}
+
+			vPathCollide[x][y] = '0';
+		}
+		else
+		{
+			sf::RectangleShape dot;
+			dot.setPosition(sf::Vector2f(x * 100, y * 100));
+			dot.setSize(sf::Vector2f(10, 10));
+			dot.setFillColor(sf::Color::Yellow);
+			vPathVisualAid.push_back(dot);
+			vPathCollide[x][y] = '1';
+			
+		}
+		//pathDataW << "This is a line.\n";
+		//pathDataW << "This is another line.\n";
+		pathDataW.close();
+	}
+	
+	pathdata.open("pathdata.txt");
+	std::string line;
+	std::cout << std::endl;
+	while (std::getline(pathdata, line))
+	{
+	//	std::cout << line << std::endl;
+	}
+
+}
+
+
+
+void Game::pathSave()
+{
+	pathDataW.open("pathdata.txt");
+	if (pathDataW.is_open())
+	{
+		std::string line;
+		for (int i = 0; i < 75; i++)
+		{
+			for (int j = 0; j < 130; j++)
+
+			{
+
+				pathDataW << vPathCollide[i][j];
+
+				//routefind.nodes[j * 100 + i].bObstacle = false;
+				//std::cout << i << " " << j << std::endl;
+			}
+			pathDataW << "\n";
+		}
+		pathDataW.close();
+
+	}
 }

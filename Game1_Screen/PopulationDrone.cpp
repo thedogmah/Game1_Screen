@@ -43,8 +43,8 @@ bool PopulationDrone::populate()
 
 		//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
 		Human.ID = x;
-		int start = 50 + rand() % (780);
-		int end = 50 + rand() % (780);
+		int start = 50 + rand() % (5780);
+		int end = 50 + rand() % (5780);
 		//imgHuman.loadFromFile("WomanWalking4.png");
 
 		Human.pathSearch.nodeStart = &Human.pathSearch.nodes[start];

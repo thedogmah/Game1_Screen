@@ -46,20 +46,16 @@ bool Population::populate()
 		Human.uvRect.height = texHuman.getSize().y / float(Human.imageCount.y);
 		for (int x = 0; x < peopleAmount/*(this->peopleAmount)*/; x++) {
 
-			//
-
-			//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
+			
 			Human.ID = x;
-			int start = 780 + rand() % (2750);
-			int end = 880 + rand() % (2700);
-			//imgHuman.loadFromFile("WomanWalking4.png");
-
+			int start = 180 + rand() % (5750);
+			int end = 180 + rand() % (5700);
+			
 			Human.pathSearch.nodeStart = &Human.pathSearch.nodes[start];
 			Human.pathSearch.nodeEnd = &Human.pathSearch.nodes[end];//
-
 			Human.pathSearch.solve_AStar();
 			Human.path = Human.pathSearch.OnUserUpdate(0.2f);
-
+			
 			//std::cout << Human.imageCount.x << ", y image count is " << Human.imageCount.y;
 			people.push_back(Human);
 		}

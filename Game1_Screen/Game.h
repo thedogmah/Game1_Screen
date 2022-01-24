@@ -17,6 +17,8 @@
 #include "PopulationDog.h"
 #include "PopulationDrone.h"
 #include "PopulationScooter.h"
+#include <fstream>
+//#include <sstream>
 //Class as the game engine.
 
 class Game
@@ -25,7 +27,10 @@ public:
 	//packet movement string
 
 	aStar routefind;
-	
+	aStar setObstacles;
+	std::vector<std::vector<char>> vPathCollide; 
+	std::vector<char> vPathInts;
+
 	struct gsNode {
 
 		bool bObstacle = false;
@@ -95,6 +100,8 @@ public:
 	bool bDrones = false;
 	bool bDogs = false;
 	bool bHumans = false;
+	bool resetPath = false;
+	bool bPathKey = false;
 	sf::Clock clockImGui;
 
 	//player statistics
@@ -121,14 +128,19 @@ private:
 	float vZoom = 0.8;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 1.15;
+	float zoomfactor = 1;
 	//Mouse Positions
+
 	
 	sf::Vector2i mousePosWindow;
 	sf::Vector2f mousePosView; 
 
 
 	//Resources
+		//file stream for reading pathfinding file
+	
+	std::ifstream pathdata;
+	std::fstream pathDataW;
 	// Interface
 	sf::Font fontUI;
 
@@ -142,8 +154,9 @@ private:
 
 	//boundaries
 	sf::RectangleShape Rec;
-	
-
+	std::vector<sf::RectangleShape> vPathVisualAid;
+	sf::CircleShape circle; //mouse hover signifier
+	int circleID;
 	//Sprites
 	sf::Texture texFountain;
 	sf::Sprite sprFountain;
@@ -225,5 +238,9 @@ public:
 	void renderInterface(sf::RenderTarget &target);
 	void render();
 	void updateMousePositions();
+
+	void pathUpdate(int x,int y);
+	void pathReset();
+	void pathSave();
 };
 

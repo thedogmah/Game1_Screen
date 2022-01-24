@@ -39,8 +39,8 @@ bool PopulationDog::populate()
 
 			//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
 			Human.ID = x;
-			int start = 900 + rand() % (200);
-			int end = 900 + rand() % (200);
+			int start = 150 + rand() % (5400);
+			int end = 150 + rand() % (5400);
 			//imgHuman.loadFromFile("WomanWalking4.png");
 
 			Human.pathSearch.nodeStart = &Human.pathSearch.nodes[start];

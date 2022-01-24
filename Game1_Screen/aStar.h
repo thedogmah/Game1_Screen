@@ -72,6 +72,8 @@ public:
 public:
 	virtual bool OnUserCreate();
 	
+	bool checkObstacle(int, int);
+	
 	void init();
 	bool solve_AStar();
 	std::vector<paths> pathGangShit(std::vector<paths>);

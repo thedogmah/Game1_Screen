@@ -44,8 +44,8 @@ bool PopulationScooter::populate()
 
 		//Put this in a loop or create some map for all textures for when using different characters, not from the same file*
 		Human.ID = x;
-		int start = 750 + rand() % (1600);
-		int end = 750 + rand() % (1600);
+		int start = 150 + rand() % (4600);
+		int end = 150 + rand() % (4600);
 		//imgHuman.loadFromFile("WomanWalking4.png");
 
 		Human.pathSearch.nodeStart = &Human.pathSearch.nodes[start];

@@ -6,17 +6,12 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
 
-
 using namespace sf;
 
-
-//weather variables
- //void sfmlconnect();
-void multi();
+//void multi();
 int main()
 {
-	//sfmlconnect();
-	//multi();
+	
 
 //Init srand
 	std::srand(static_cast<unsigned>(time(NULL)));
@@ -43,9 +38,7 @@ int main()
 	while (game.running())
 	{
 		
-	//	std::cout << " " << float(fps);
-		//update
-		//lastTime = currentTime;
+	
 		deltaTime = clock.restart().asSeconds();
 		game.routefind.OnUserUpdate(0.05f);
 		
@@ -53,21 +46,16 @@ int main()
 	
 		
 		character.Update(0, deltaTime, game.faceRight, game.faceDown, game.faceUp, game.still);
-		game.humanity.drawPeople(game.dayTime, game.uTime, game.npcDelta);
-		game.dogGR.drawPeople(game.dayTime, game.uTime, game.npcDelta);
-		//walkFront.Update(1, deltaTime, game.faceRight);
-		
-		//render
-		//std::cout << game.spChar.getScale().x;
-		//game.spChar.setScale(1, 1);
-		//game.spChar.setTextureRect(character.uvRect);
+		//game.humanity.drawPeople(game.dayTime, game.uTime, game.npcDelta);
+		//game.dogGR.drawPeople(game.dayTime, game.uTime, game.npcDelta);
+	
 		game.player.actor.setTextureRect(character.uvRect);
 		
-		//game.playerTwo.actor.setTextureRect(walkFront.uvRect);
+	
 		game.render();
 
 		
 	}
-
+	ImGui::SFML::Shutdown();
 	
 }

@@ -16,7 +16,7 @@
 #include <list>
 
 aStar::aStar() {
-	this->nMapWidth = 75; this->nMapHeight = 75 ;
+	this->nMapWidth = 75; this->nMapHeight = 130 ;
 	this->init();
 		}
 	//m_sAppName = L"Path Finding";
@@ -63,36 +63,36 @@ aStar::aStar() {
 
 	void aStar::init()
 	{
-	//	vaGrid.setPrimitiveType(sf::Lines);
-	//	vaGrid.resize((nMapHeight * nMapWidth) * 2);
-	//	
-	//	vaLine.setPrimitiveType(sf::Lines);
-	//	vaLine.resize((nMapHeight * nMapWidth) * 2);
+		vaGrid.setPrimitiveType(sf::Lines);
+		vaGrid.resize((nMapHeight * nMapWidth) * 2);
+		
+		vaLine.setPrimitiveType(sf::Lines);
+		vaLine.resize((nMapHeight * nMapWidth) * 2);
 
 
-	//	int nNodeSize = 100;
-	//int nNodeBorder = 0;
-	//for (int x = 0; x < nMapHeight; ++x)
-	//{
-	//	sf::Vertex* line = &vaGrid[x * 2];
-	//	//	std::cout << nMapWidth << ", "<<  x <<", "<< y << "\n";
-	//	// define its 2/4 points 
-	//	line[0].position = sf::Vector2f(0, (x + 1) * nNodeSize);
-	//	line[1].position = sf::Vector2f(nMapWidth * nNodeSize, (x + 1) * nNodeSize);
-	//	line[0].color = sf::Color::Green;
-	//	line[1].color = sf::Color::Green;
+		int nNodeSize = 100;
+	int nNodeBorder = 0;
+	for (int x = 0; x < nMapHeight; ++x)
+	{
+		sf::Vertex* line = &vaGrid[x * 2];
+		//std::cout << nMapWidth << ", "<<  x <<", "<< y << "\n";
+	// define its 2/4 points 
+		line[0].position = sf::Vector2f(0, (x + 1) * nNodeSize);
+		line[1].position = sf::Vector2f(nMapWidth * nNodeSize, (x + 1) * nNodeSize);
+		line[0].color = sf::Color::Green;
+		line[1].color = sf::Color::Green;
 
 
-	//	for (int y = 0; y < nMapWidth; ++y) {
-	//		sf::Vertex* hLine = &vaLine[y * 2];
+		for (int y = 0; y < nMapWidth; ++y) {
+			sf::Vertex* hLine = &vaLine[y * 2];
 
-	//		hLine[0].position = sf::Vector2f(y * nNodeSize, 0);
-	//		hLine[1].position = sf::Vector2f(y * nNodeSize, nMapHeight * nNodeSize);
-	//		hLine[0].color = sf::Color::Green;
-	//		hLine[1].color = sf::Color::Green;
+			hLine[0].position = sf::Vector2f(y * nNodeSize, 0);
+			hLine[1].position = sf::Vector2f(y * nNodeSize, nMapHeight * nNodeSize);
+		hLine[0].color = sf::Color::Green;
+		hLine[1].color = sf::Color::Green;
 
 
-	//		sf::RectangleShape rectangle;
+	//	sf::RectangleShape rectangle;
 	//		rectangle.setSize(sf::Vector2f(nNodeSize, nNodeSize));
 	//		rectangle.setOutlineColor(sf::Color::Red);
 	//		rectangle.setOutlineThickness(5);
@@ -100,16 +100,48 @@ aStar::aStar() {
 
 	//	//	this->gridRecs.push_back(line);
 
-	//	}
-	//}
+		}
+	}
 				
 				
 
 		
 	}
 
+	bool aStar::checkObstacle(int x, int y)
+	{
+	
+	
+	}
+
 	 bool aStar::OnUserCreate()
 	{
+
+		 std::fstream pathDataW;
+		 std::vector<std::vector<char>> vPathCollide;
+		 std::vector<char> vPathInts;
+		 pathDataW.open("pathdata.txt");
+		 if (pathDataW.is_open())
+			
+			 {
+				 std::string line;
+				 std::cout << std::endl;
+				 while (std::getline(pathDataW, line))
+				 {
+					 //	std::cout << line;
+					 for (auto &digit : line)
+					 {
+						 vPathInts.push_back(digit);
+					 }
+					 vPathCollide.push_back(vPathInts);
+					 vPathInts.clear();
+				 }
+			 }
+
+		
+
+
+
 		nodes = new sNode[nMapWidth * nMapHeight];
 
 		for (int x = 0; x < nMapWidth; x++)
@@ -119,7 +151,10 @@ aStar::aStar() {
 			{
 				nodes[y * nMapWidth + x].x = x;
 				nodes[y * nMapWidth + x].y = y;
-				nodes[y * nMapWidth + x].bObstacle = false;
+				if (vPathCollide[x][y] == '1') 
+					nodes[y * nMapWidth + x].bObstacle = true;
+				else 
+					nodes[y * nMapWidth + x].bObstacle = false;
 				nodes[y * nMapWidth + x].bVisited = false;
 				nodes[y * nMapWidth + x].parent = nullptr;
 				//

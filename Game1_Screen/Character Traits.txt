@@ -1,0 +1,12 @@
+Age
+Star
+IQ
+Wealth
+Politics
+Sexuality
+Socials
+Marital Status
+Tech Savy
+Mind Health
+Body Health
+Soul Health
