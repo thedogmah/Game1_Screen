@@ -1,0 +1,11 @@
+Pawn
+	1 Point. Move Forwards Only.
+	On first move, can go up 2
+	If it moves to teh end it can be promoted, even if alreadty have 2 of the knights etc.
+	Pawns capture diagonally 1 square.
+	en pissant, if enemy pawn moves to moves and is side on with your pawn, on this move you can take diagonally.
+
+Knights and Bishops.
+	Minor Pieces,
+	worth 3 points.
+Bishop, forward backward diagonally on their own colour.

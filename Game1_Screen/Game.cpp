@@ -118,7 +118,7 @@ void Game::initWindow()
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
 	
-	humanity.peopleAmount =200;
+	humanity.peopleAmount =700;
 	humanity.populate();
 	
 	humanity.window = window;
@@ -131,7 +131,7 @@ void Game::initWindow()
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 200;
+	scooters.peopleAmount = 700;
 	scooters.populate();
 	scooters.window = window;
 
@@ -608,6 +608,7 @@ void Game::pollEvents()
 
 								circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 								circleID = people.ID;
+								std::cout << "\nYou have selected Human: " << people.ID << std::endl;
 								break;
 							}
 						}
