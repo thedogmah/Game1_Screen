@@ -9,8 +9,12 @@ Wokeness (lol)
 Marital Status
 Tech Savy
 Mind Health
+	Connections.
+	
 Body Health
 Soul Health
+
+
 
 Strength
 Health
@@ -28,3 +32,10 @@ Tendancy to Serious Crime
 Tendancy to Addiction
 
 what else??
+
+City Statistics:
+
+Mental Health
+City Status
+
+City World Status.

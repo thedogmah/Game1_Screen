@@ -18,6 +18,7 @@
 #include "PopulationDrone.h"
 #include "PopulationScooter.h"
 #include <fstream>
+#include "quadtree.h"
 //#include <sstream>
 //Class as the game engine.
 
@@ -84,6 +85,7 @@ public:
 	Animation npc;
 	std::thread collissionThread;
 	Population humanity;
+	Population humanityMaleGreen;
 	PopulationDog dogGR;
 	PopulationDrone drones;
 	PopulationScooter scooters;
@@ -96,12 +98,13 @@ public:
 	float uTime;
 	float dayTime = 1.0;
 	bool bRain = false;
-	bool bScooters = false;
+	bool bScooters = true;
 	bool bDrones = false;
 	bool bDogs = false;
-	bool bHumans = false;
+	bool bHumans = true;
 	bool resetPath = false;
 	bool bPathKey = false;
+	bool bQuadTree = false;
 	sf::Clock clockImGui;
 
 	//player statistics
@@ -139,8 +142,12 @@ private:
 	//Resources
 		//file stream for reading pathfinding file
 	
+	//Pathfinding / Collissions
 	std::ifstream pathdata;
 	std::fstream pathDataW;
+
+	Rectangle boundary; //is the boundary (sub part) of the quadtree
+	QuadTree qt; //will act as the parent node / base of tree / father / root node.
 	// Interface
 	sf::Font fontUI;
 
@@ -210,6 +217,11 @@ private:
 	void initSprites();
 	void initConnection();
 	void initNPC();
+	std::string npcMarried(Animation person);
+	std::string npcSexuality(Animation person);
+	std::string npcCareer(Animation person);
+	std::string npcVibe(Animation person);
+	std::string npcReligion(Animation person);
 	void checkCollide();
 public:
 	void initClient(sf::TcpSocket* rsocket);

@@ -48,6 +48,22 @@ bool Population::populate()
 
 			
 			Human.ID = x;
+			Human.intelligence = 1 + rand() % (160); ;
+			Human.sexuality  =  rand() % (13); 
+			Human.married = rand() % (4);
+			Human.mindHealth = 1 + rand() % (100); 
+			Human.bodyHealth = 1 + rand() % (100);
+			Human.soulHealth = 1 + rand() % (100);
+			Human.influencer = 1 + rand() % (100);
+			Human.career = 1 + rand() % (30);
+			Human.crime = 1 + rand() % (100);
+			Human.instinct = 1 + rand() % (100);
+			Human.anxiety = 1 + rand() % (100);
+			Human.depression = 1 + rand() % (100);
+			Human.wealth = 1 + rand() % (100);
+			Human.vibe = 1 + rand() % (15);
+			Human.spirituality = 1 + rand() % (100);
+			Human.religion =  rand() % (15);
 			int start = 180 + rand() % (5750);
 			int end = 180 + rand() % (5700);
 			

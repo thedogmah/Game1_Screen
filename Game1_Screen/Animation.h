@@ -19,7 +19,26 @@ public:
 	int lerpCount;
 //	Player player;
 	bool isNPC = true;
-	int ID; //unique ID for each animation created, particularly for poplation class.
+	//	character bio
+
+	int ID; //unique ID for each animation created, particularly for poplation class. Will link NPC with bio data / database
+	int intelligence;
+	int IQ;
+	int sexuality;
+	int married;
+	int mindHealth;
+	int bodyHealth;
+	int soulHealth;
+	int influencer;
+	int career;
+	int crime;
+	int instinct;
+	int anxiety;
+	int depression;
+	int wealth;
+	int vibe;
+	int religion;
+	int spirituality;
 	sf::RectangleShape actor;	//Rectangle will display NPC image.
 	sf::IntRect uvRect;
 	aStar pathSearch;

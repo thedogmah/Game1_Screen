@@ -170,6 +170,7 @@
     <ClCompile Include="PopulationDog.cpp" />
     <ClCompile Include="PopulationDrone.cpp" />
     <ClCompile Include="PopulationScooter.cpp" />
+    <ClCompile Include="quadtree.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +196,7 @@
     <ClInclude Include="PopulationDog.h" />
     <ClInclude Include="PopulationDrone.h" />
     <ClInclude Include="PopulationScooter.h" />
+    <ClInclude Include="quadtree.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\char.png" />

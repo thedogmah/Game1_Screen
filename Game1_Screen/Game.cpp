@@ -9,6 +9,7 @@
 #include <math.h>
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
+#include "quadtree.h"
 void Game::initInterface()
 {
 
@@ -43,10 +44,10 @@ void Game::initVariables()
 //resizing Players across server.
 client.sPlayers.setScale(0.21, 0.21);
 	// fill rectangle colours for rain
-	for (int i = 0; i < 500; i++)
+	/*for (int i = 0; i < 500; i++)
 	{
 		this->rectangle[i].setFillColor(sf::Color(235, 149, 13));
-	}
+	}*/
 
 	this->points = 0;
 	this->enemySpawnTimerMax = 1.f;
@@ -56,8 +57,21 @@ client.sPlayers.setScale(0.21, 0.21);
 	this->health = 15;
 	this->endGame = false;
 
-
-	//initialise path collide vector
+	//Initialise quadtree rectangle boundary
+	boundary.h = 3500;
+	boundary.w = 3500;
+	boundary.x = 1000;
+	boundary.y = 1000;
+	Point p(10, 10);
+	qt.boundary = boundary;
+	qt.capacity = 2;
+	for (int i = 0; i < 100; i++) {
+		p.x = 1+rand() % (2500);
+		p.y = 1 + rand() % (2000);
+		qt.insert(p);
+	}
+	
+	//Initialise path collide vector
 	pathDataW.open("pathdata.txt");
 	if (pathDataW.is_open())
 	{
@@ -117,21 +131,34 @@ void Game::initWindow()
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
+	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
+
+		std::cout << "Green Protagonist not loaded";
+	humanityMaleGreen.peopleAmount = 450;
 	
-	humanity.peopleAmount =700;
+	 
+		
+		
+		
+	humanityMaleGreen.populate();
+//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
+	humanityMaleGreen.window = window;
+	humanityMaleGreen.createBounds();
+
+	humanity.peopleAmount =200;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 150;
+	dogGR.peopleAmount = 130;
 	dogGR.populate();
 	dogGR.window = window;
 
-	drones.peopleAmount = 90;
+	drones.peopleAmount = 119;
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 700;
+	scooters.peopleAmount = 200;
 	scooters.populate();
 	scooters.window = window;
 
@@ -251,6 +278,204 @@ void Game::checkCollide()
 		
 	}
 		
+}
+std::string Game::npcMarried(Animation person)
+{
+	switch (person.married)
+	{
+	case 0:
+		return "Single";
+	case 1:
+		return "Married";
+	case 2:
+		return "Polyamory";
+	case 3:
+		return "Undisclosed";
+	}
+}
+
+std::string Game::npcReligion(Animation person)
+{
+	switch (person.religion)
+	{
+	case 0:
+		return "Christian";
+	case 1:
+		return "Athiest";
+	case 2:
+		return "Agnostic";
+	case 3:
+		return "Muslim";
+	case 4:
+		return "Hindu";
+	case 5:
+		return "Sikh";
+	case 6:
+		return "Judaism";
+	case 7:
+		return "Buddhism";
+	case 8:
+		return "Mormon";
+	case 9:
+		return "Jehovah Witness";
+	case 10:
+		return "Catholic";
+	case 11:
+		return "Christian";
+	case 12:
+		return "Catholic";
+	case 13:
+		return "Christian";
+	case 14:
+		return "Spirituality";
+	}
+}
+
+std::string Game::npcVibe(Animation person)
+{
+	switch (person.vibe)
+	{
+	case 0:
+		return "Wholesome";
+	case 1:
+		return "Pure";
+	case 2:
+		return "Creepster";
+	case 3:
+		return "Angry";
+	case 4:
+		return "Warm";
+	case 5:
+		return "Confused";
+	case 6:
+		return "Flirty";
+	case 7:
+		return "Joyful";
+	case 8:
+		return "Sad";
+	case 9:
+		return "Defensive";
+	case 10:
+		return "Intimidating";
+	case 11:
+		return "Friendly";
+	case 12:
+		return "Peaceful";
+	case 13:
+		return "Chill";
+	case 14:
+		return "Quiet";
+	case 15:
+		return "Positive";
+	}
+
+}
+std::string Game::npcCareer(Animation person)
+{
+	switch (person.career)
+	{
+	case 0:
+		return "Manager";
+
+	case 1:
+		return "Project Manager";
+	case 2:
+		return "Teacher";
+	case 3:
+		return "Director";
+	case 4:
+		return "Accountant";
+	case 5:
+		return "Consultant";
+	case 6:
+		return "Administrator";
+	case 7:
+		return "Solicitor";
+	case 8:
+		return "Account Manager";
+	case 9:
+		return "PA";
+	case 10:
+		return "Office Manager";
+	case 11:
+		return "Analyst";
+	case 12:
+		return "Engineer";
+	case 13:
+		return "Sales Manager";
+	case 14:
+		return "Doctor";
+	case 15:
+		return "Software Engineer";
+	case 16:
+		return "Business Analyst";
+	case 17:
+		return "Managing Director";
+	case 18:
+		return "Personal Assistant";
+	case 19:
+		return "Marketing Manager";
+	case 20:
+		return "Secretary";
+	case 21:
+		return "Graphic Designer";
+	case 22:
+		return "Lecturer";
+	case 23:
+		return "Architect";
+	case 24:
+		return "HR Manager";
+	case 25:
+		return "Buyer";
+	case 26:
+		return "Driver";
+	case 27:
+		return "Plumber";
+	case 28:
+		return "Researcher";
+	case 29:
+		return "Journalist";
+	case 30:
+		return "Graduate";
+
+	}
+}
+std::string Game::npcSexuality(Animation person)
+{
+	switch (person.sexuality)
+	{
+	case 0:
+		return "Straight";
+	case 1:
+		return "Bisexual";
+	case 2:
+		return "Homosexual";
+	case 3:
+		return "Curious";
+	case 4:
+		return "Asexual";
+	case 5:
+		return "Straight";
+	case 6:
+		return "Bisexual";
+	case 7:
+		return "Undisclosed";
+	case 8:
+		return "Straight";
+	case 9:
+		return "Straight";
+	case 10:
+		return "Straight";
+	case 11:
+		return "Straight";
+	case 12:
+		return "Straight";
+	case 13:
+		return "Bisexual";
+	}
+}
+void Game::initClient(sf::TcpSocket* rsocket)
+{
 }
 Game::Game()
 {
@@ -563,7 +788,31 @@ void Game::pollEvents()
 		case sf::Event::MouseMoved:
 		{
 		//
-			
+			sf::Vector2i XY = sf::Mouse::getPosition(*window);
+			//int nSelectedNodeY = sf::Mouse::getPosition(window) ;
+
+
+			sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
+			//for (auto &people : humanity.people) //vector of NPCS
+			//{
+			//	if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+			//	{
+
+
+			//		circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+			//		circleID = people.ID;
+			//		std::cout << "\nThis is Human number: " << people.ID << '\n' << "There IQ is: " << people.intelligence << ".\nThere sexuality is: " << people.sexuality <<
+			//			"There marital status is: " << people.married << ".\nThere mind health is: " << people.mindHealth << ".\nThere body health is: " << people.bodyHealth;
+			//		/*Human.intelligence = 1 + rand() % (160); 
+			//		Human.sexuality = 0 + rand() % (2);
+			//		Human.married = 0 + rand() % (1);
+			//		Human.mindHealth = 1 + rand() % (100);
+			//		Human.bodyHealth = 1 + rand() % (100);
+			//		Human.soulHealth = 1 + rand() % (100);
+			//		Human.influencer = 1 +*/
+			//		break;
+			//	}
+			//}
 		
 			break;
 		}
@@ -584,34 +833,60 @@ void Game::pollEvents()
 
 				//routefind.nodeEnd->x = (worldPos.x / 100);
 				// routefind.nodeEnd->y =( worldPos.y / 100);
-				 std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+				// std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
 
+					//	Point p(worldPos.x, worldPos.y);
+					//	qt.insert(p);
 						if (!pathColor)
 							pathColor = true;
 						else
 							pathColor = false;
 						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
-						std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
-						std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
+						//std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
+						//std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 					
-						pathUpdate(worldPos.x, worldPos.y);
-						
-
-						for (auto people : humanity.people) //vector of NPCS
+						for (auto& people : humanity.people) //vector of NPCS
 						{
-							if (people.actor.getGlobalBounds().contains(worldPos))
+							if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
 							{
+								
 
 
 								circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 								circleID = people.ID;
-								std::cout << "\nYou have selected Human: " << people.ID << std::endl;
+								system("cls");
+								std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+									"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+									"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
+								/*Human.intelligence = 1 + rand() % (160);
+								Human.sexuality = 0 + rand() % (2);
+								Human.married = 0 + rand() % (1);
+								Human.mindHealth = 1 + rand() % (100);
+								Human.bodyHealth = 1 + rand() % (100);
+								Human.soulHealth = 1 + rand() % (100);
+								Human.influencer = 1 +*/
 								break;
 							}
 						}
+						
+						pathUpdate(worldPos.x, worldPos.y);
+						
+
+						//for (auto &people : humanity.people) //vector of NPCS
+						//{
+						//	if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+						//	{
+
+
+						//		circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+						//		circleID = people.ID;
+						//		std::cout << "\nYou have selected Human: " << people.ID << "\N";
+						//		break;
+						//	}
+						//}
 
 						/*	for (auto npc : humanity.people)
 						{
@@ -641,8 +916,8 @@ void Game::pollEvents()
 						npc.path.clear();
 						npc.currentCount = 0;
 						routefind.solve_AStar();
-						std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
-						std::cout << "\nPath (starting at the end) is: ";
+						//std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
+						//std::cout << "\nPath (starting at the end) is: ";
 						if (npcMove) {
 							//	humanity.aStarPath.nodeStart = &humanity.aStarPath.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
 							//	humanity.aStarPath.solve_AStar();
@@ -980,10 +1255,90 @@ void Game::render()
 	//person.actor.setTextureRect(person.uvRect);
 		person.actor.setTextureRect(person.uvRect);
 	}
+		
+	for (auto& person : humanityMaleGreen.people)
+	{
 
-	
+		//deltaTime = npcClock.restart().asSeconds();
 
+		//person.npcWalkSwitch = 0.2;
+
+		npcTimeHold += npcDelta;
+		//	if(npcTimeHold >= npcDeltaSwitch){
+		switch (person.eFacing) {
+		case Animation::East:
+			person.actor.move(1, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect);
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor,&water);
+			break;
+
+		case Animation::West:
+			person.actor.move(-1, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+		//	person.actor.setTextureRect(person.uvRect); 
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor, &water);
+			break;
+
+		case Animation::North:
+			person.actor.move(0, -1);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			npcTimeHold -= npcDelta;
+			//this->window->draw(person.actor, &water);
+		//	person.actor.setTextureRect(person.uvRect);
+			break;
+
+		case Animation::South:
+			person.actor.move(0, 1);
+			person.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect);
+			break;
+
+
+		}
+
+		//}
+		humanityMaleGreen.createBounds();
+		person.UpdateNpc(0, npcDelta);
+		//person.actor.setTextureRect(person.uvRect);
+		person.actor.setTextureRect(person.uvRect);
+	}
+
+
+	Point point;
 	
+	for (auto& dot : scooters.people)
+	{
+		//Point point;
+		point.x = dot.actor.getPosition().x + (dot.actor.getSize().x / 2);
+		point.y = dot.actor.getPosition().y+ (dot.actor.getSize().y /2);
+		qt.insert(point);
+	}
+
+	//for (int i = 0; i <= 6; i++)
+	//	for (int j = 0; j <= 6; j++)
+	//	{
+	//		point.x = 1 + rand() % (2500);
+	//		point.y = 1 + rand() % (2000);
+	//		qt.insert(point);
+	//	}
+	//for (int i = 0; i <= 4; i++)
+	//	
+	//	{
+	//	qt.points.erase(qt.points.begin());
+	//	}
+
+	//std::cout << qt.points.size();
 
 	for (auto& dog : dogGR.people)
 	{
@@ -1160,9 +1515,13 @@ void Game::render()
 	scooters.drawPeople(dayTime, uTime, scooterTimeHold);
 	if(bDogs)
 	dogGR.drawPeople(dayTime, uTime, dogTimeHold);
-	if(bHumans)
-	humanity.drawPeople(dayTime, uTime, npcDelta);
+	if (bHumans)
+	{
+		humanityMaleGreen.drawPeople(dayTime, uTime, npcDelta);
+		humanity.drawPeople(dayTime, uTime, npcDelta);
 
+		
+	}
 	fShaderClock = shaderClock.getElapsedTime().asSeconds();
 	sFountain.setUniform("iTime", fShaderClock);
 	window->draw(sprFountain, &sFountain);
@@ -1244,10 +1603,19 @@ void Game::render()
 	//	this->window->draw(npcs.actor, &water);
 
 	}
+
+	if (bQuadTree)
+	{
+		qt.show(*window);
+	}
+	qt.cleanseTree();
+	//qt.points.clear();
+
 	ImGui::SFML::Update(*window, clockImGui.restart());
 	static std::string strengh = "Strength";
 	ImGui::Begin("Nottingham Game Simulation");
 	ImGui::Checkbox("Rain", &bRain);
+
 	ImGui::Checkbox("Path Key [Yellow]", &bPathKey);
 	ImGui::Checkbox("Scooters", &bScooters);
 	ImGui::Checkbox("Drones", &bDrones);
@@ -1275,6 +1643,7 @@ void Game::render()
 		pathSave();
 	}
 	ImGui::Checkbox("Reset PathFinding", &resetPath); //{std::cout <<resetPath };
+	ImGui::Checkbox("Quad Tree", &bQuadTree);
 	ImGui::Checkbox("Grid", &grid);
 	ImGui::SliderFloat("Sun Light ", &dayTime, 0.0f, 1.0f);
 	ImGui::Text("Experience (Based on scooter contact\nBut will later be based on missions\nand fighting etc.):");
@@ -1283,6 +1652,11 @@ void Game::render()
 		
 	}
 
+	ImGui::Begin("Character Statistics");
+	ImGui::Text("Select a character to view stats.");
+
+
+	ImGui::Text(exper.c_str());
 	ImGui::End();
 	ImGui::SFML::Render(*window);
 	this->window->display(); //Tell app that window is done drawing.
@@ -1416,7 +1790,7 @@ void Game::pathReset()
 void Game::pathUpdate(int x, int y)
 {
 	
-	std::cout << int(x/100) << ", " << int(y/100);
+	//std::cout << int(x/100) << ", " << int(y/100);
 	x = int(x / 100);
 	y = int(y / 100);
 	pathDataW.open("pathdata.txt");
