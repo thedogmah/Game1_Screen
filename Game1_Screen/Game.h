@@ -86,9 +86,12 @@ public:
 	std::thread collissionThread;
 	Population humanity;
 	Population humanityMaleGreen;
+	Population humanityMaleSandyJacket;
+	Population humanityMaleWhiteJacket;
 	PopulationDog dogGR;
 	PopulationDrone drones;
 	PopulationScooter scooters;
+	PopulationScooter scootersManSandyJacket;
 	float npcDelta;
 	float npcDeltaSwitch = 0.077f;
 	float npcTimeHold;

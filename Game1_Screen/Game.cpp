@@ -134,7 +134,7 @@ void Game::initWindow()
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 450;
+	humanityMaleGreen.peopleAmount = 180;
 	
 	 
 		
@@ -145,23 +145,54 @@ void Game::initWindow()
 	humanityMaleGreen.window = window;
 	humanityMaleGreen.createBounds();
 
-	humanity.peopleAmount =200;
+
+	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
+
+		std::cout << "Green Protagonist not loaded";
+	humanityMaleSandyJacket.peopleAmount = 180;
+
+		humanityMaleSandyJacket.populate();
+//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
+	humanityMaleSandyJacket.window = window;
+	humanityMaleSandyJacket.createBounds();
+
+
+	if (!humanityMaleWhiteJacket.imgHuman.loadFromFile("protagonistwhitejacket.png"))
+
+		std::cout << "Green Protagonist not loaded";
+	sf::Color customBlue(255, 0, 0);
+	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color(255,0,0));
+	humanityMaleWhiteJacket.peopleAmount = 200;
+	
+	humanityMaleWhiteJacket.populate();
+	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
+	humanityMaleWhiteJacket.window = window;
+	humanityMaleWhiteJacket.createBounds();
+
+
+	humanity.peopleAmount =170;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 130;
+	dogGR.peopleAmount = 40;
 	dogGR.populate();
 	dogGR.window = window;
 
-	drones.peopleAmount = 119;
+	drones.peopleAmount = 200;
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 200;
+	scooters.peopleAmount = 190;
 	scooters.populate();
 	scooters.window = window;
 
+
+	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
+		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
+	scootersManSandyJacket.peopleAmount = 150;
+	scootersManSandyJacket.populate();
+	scootersManSandyJacket.window = window;
 	
 }
 void Game::initEnemies()
@@ -618,7 +649,21 @@ void Game::pollEvents()
 				window->setView(view);
 			}
 
-			
+			if (this->ev.type == sf::Event::JoystickMoved)
+			{
+				if (this->ev.joystickMove.axis == sf::Joystick::X)
+				{
+					std::cout << "X axis moved!" << std::endl;
+					std::cout << "joystick id: " << ev.joystickMove.joystickId << std::endl;
+					std::cout << "new position: " << ev.joystickMove.position << std::endl;
+				}
+				if (this->ev.joystickMove.axis == sf::Joystick::Y || this->ev.joystickMove.axis == sf::Joystick::R)
+				{
+					std::cout << "X axis moved!" << std::endl;
+					std::cout << "joystick id: " << ev.joystickMove.joystickId << std::endl;
+					std::cout << "new position: " << ev.joystickMove.position << std::endl;
+				}
+			}
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
 
@@ -847,7 +892,7 @@ void Game::pollEvents()
 						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
 						//std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 						//std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
-					
+						bool found = false;
 						for (auto& people : humanity.people) //vector of NPCS
 						{
 							if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
@@ -868,10 +913,64 @@ void Game::pollEvents()
 								Human.bodyHealth = 1 + rand() % (100);
 								Human.soulHealth = 1 + rand() % (100);
 								Human.influencer = 1 +*/
+								found = true;
 								break;
 							}
 						}
+				
+							for (auto& people : humanityMaleGreen.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+
+
+
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									system("cls");
+									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									found = true;
+									break;
+								}
+							}
 						
+
+						
+							for (auto& people : humanityMaleSandyJacket.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+
+
+
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									system("cls");
+									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									found = true;
+									break;
+								}
+							}
+						
+
 						pathUpdate(worldPos.x, worldPos.y);
 						
 
@@ -1315,6 +1414,124 @@ void Game::render()
 	}
 
 
+
+		//}
+		for (auto& person : humanityMaleWhiteJacket.people)
+	{
+
+		//deltaTime = npcClock.restart().asSeconds();
+
+		//person.npcWalkSwitch = 0.2;
+
+		npcTimeHold += npcDelta;
+		//	if(npcTimeHold >= npcDeltaSwitch){
+		switch (person.eFacing) {
+		case Animation::East:
+			person.actor.move(1, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect);
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor,&water);
+			break;
+
+		case Animation::West:
+			person.actor.move(-1, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+		//	person.actor.setTextureRect(person.uvRect); 
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor, &water);
+			break;
+
+		case Animation::North:
+			person.actor.move(0, -1);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			person.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			npcTimeHold -= npcDelta;
+			//this->window->draw(person.actor, &water);
+		//	person.actor.setTextureRect(person.uvRect);
+			break;
+
+		case Animation::South:
+			person.actor.move(0, 1);
+			person.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			npcTimeHold -= npcDelta;
+			//person.actor.setTextureRect(person.uvRect);
+			break;
+
+
+		}
+
+		//}
+		humanityMaleWhiteJacket.createBounds();
+		person.UpdateNpc(0, npcDelta);
+		//person.actor.setTextureRect(person.uvRect);
+		person.actor.setTextureRect(person.uvRect);
+		}
+
+		for (auto& person : humanityMaleSandyJacket.people)
+		{
+
+			//deltaTime = npcClock.restart().asSeconds();
+
+			//person.npcWalkSwitch = 0.2;
+
+			npcTimeHold += npcDelta;
+			//	if(npcTimeHold >= npcDeltaSwitch){
+			switch (person.eFacing) {
+			case Animation::East:
+				person.actor.move(1, 0);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect);
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect); 
+				//this->window->draw(person.actor,&water);
+				break;
+
+			case Animation::West:
+				person.actor.move(-1, 0);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect); 
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect); 
+				//this->window->draw(person.actor, &water);
+				break;
+
+			case Animation::North:
+				person.actor.move(0, -1);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++;
+				//person.path = person.pathSearch.OnUserUpdate(0.2f);
+				npcTimeHold -= npcDelta;
+				//this->window->draw(person.actor, &water);
+			//	person.actor.setTextureRect(person.uvRect);
+				break;
+
+			case Animation::South:
+				person.actor.move(0, 1);
+				person.lerpCount++;
+				//person.path = person.pathSearch.OnUserUpdate(0.2f);
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect);
+				break;
+
+
+			}
+
+			//}
+			humanityMaleSandyJacket.createBounds();
+			person.UpdateNpc(0, npcDelta);
+			//person.actor.setTextureRect(person.uvRect);
+			person.actor.setTextureRect(person.uvRect);
+		}
+
 	Point point;
 	
 	for (auto& dot : scooters.people)
@@ -1453,6 +1670,62 @@ void Game::render()
 
 	}
 
+	for (auto& dog : scootersManSandyJacket.people)
+	{
+
+		//deltaTime = npcClock.restart().asSeconds();
+
+			//person.npcWalkSwitch = 0.2;
+
+		dogTimeHold += npcDelta;
+		//	if(npcTimeHold >= npcDeltaSwitch){
+		switch (dog.eFacing) {
+		case Animation::East:
+			dog.actor.move(3, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect);
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor,&water);
+			break;
+
+		case Animation::West:
+			dog.actor.move(-3, 0);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+		//	person.actor.setTextureRect(person.uvRect); 
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect); 
+			//this->window->draw(person.actor, &water);
+			break;
+
+		case Animation::North:
+			dog.actor.move(0, -3);
+			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+			dog.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			dogTimeHold = 0;
+			//this->window->draw(person.actor, &water);
+		//	person.actor.setTextureRect(person.uvRect);
+			break;
+
+		case Animation::South:
+			dog.actor.move(0, 3);
+			dog.lerpCount++;
+			//person.path = person.pathSearch.OnUserUpdate(0.2f);
+			dogTimeHold = 0;
+			//person.actor.setTextureRect(person.uvRect);
+			break;
+
+		}
+
+		//}
+		dog.UpdateTransport(0, deltaTime);
+		dog.actor.setTextureRect(dog.uvRect);
+
+	}
+
 
 	for (auto& dog : drones.people)
 	{
@@ -1513,13 +1786,15 @@ void Game::render()
 	drones.drawPeople(dayTime, uTime, droneTimeHold);
 	if(bScooters)
 	scooters.drawPeople(dayTime, uTime, scooterTimeHold);
+	scootersManSandyJacket.drawPeople(dayTime, uTime, scooterTimeHold);
 	if(bDogs)
 	dogGR.drawPeople(dayTime, uTime, dogTimeHold);
 	if (bHumans)
 	{
+	humanityMaleWhiteJacket.drawPeople(dayTime, uTime, npcDelta);
+		humanityMaleSandyJacket.drawPeople(dayTime, uTime, npcDelta);
 		humanityMaleGreen.drawPeople(dayTime, uTime, npcDelta);
 		humanity.drawPeople(dayTime, uTime, npcDelta);
-
 		
 	}
 	fShaderClock = shaderClock.getElapsedTime().asSeconds();

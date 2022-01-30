@@ -105,8 +105,8 @@ bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
 		//person.actor.setTextureRect(person.uvRect);
 	//	std::cout << person.path.size() << "\n";
 	//	std::cout << person.npcTotalTime << "| total < step > " << person.npcStepTime<< "\n";
-
-		if (this->rt.contains(person.actor.getPosition().x, person.actor.getPosition().y) )
+		//UNCOMMENT OUT TO ONLY DRAW PERSON WHEN VISIBLE (BETTER PERFORMANCE)
+		//if (this->rt.contains(person.actor.getPosition().x, person.actor.getPosition().y) )
 		window->draw(person.actor, &water);
 		if (person.currentCount >= person.path.size() - 1) {
 			std::reverse(person.path.begin(), person.path.end());
@@ -128,9 +128,9 @@ bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
 void Population::createBounds()
 {
 
-	this->rt.left = this->window->getView().getCenter().x - this->window->getSize().x / 2.f - 100;
-	this->rt.top = this->window->getView().getCenter().y - this->window->getSize().y / 2.f - 250;
+	this->rt.left = this->window->getView().getCenter().x - this->window->getSize().x / 2.f ;
+	this->rt.top = this->window->getView().getCenter().y - (this->window->getSize().y +200) ;
 	this->rt.width = this->window->getSize().x + 100;
-	this->rt.height = this->window->getSize().y + 250;
+	this->rt.height = this->window->getSize().y + 2500;
 
 }
