@@ -134,7 +134,7 @@ void Game::initWindow()
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 180;
+	humanityMaleGreen.peopleAmount = 110;
 	
 	 
 		
@@ -149,7 +149,7 @@ void Game::initWindow()
 	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleSandyJacket.peopleAmount = 180;
+	humanityMaleSandyJacket.peopleAmount = 110;
 
 		humanityMaleSandyJacket.populate();
 //	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -162,7 +162,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color(255,0,0));
-	humanityMaleWhiteJacket.peopleAmount = 200;
+	humanityMaleWhiteJacket.peopleAmount = 100;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -170,30 +170,45 @@ void Game::initWindow()
 	humanityMaleWhiteJacket.createBounds();
 
 
-	humanity.peopleAmount =170;
+	humanity.peopleAmount =95;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 40;
+	dogGR.peopleAmount = 20;
 	dogGR.populate();
 	dogGR.window = window;
 
-	drones.peopleAmount = 200;
+	drones.peopleAmount = 40;
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 190;
+	scooters.peopleAmount = 95;
 	scooters.populate();
 	scooters.window = window;
 
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 150;
+	scootersManSandyJacket.peopleAmount = 80;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
+
+	//snug grey coat woman population
+	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
+		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
+	humanityWomanSnugGrey.peopleAmount = 90;
+	humanityWomanSnugGrey.populate();
+	humanityWomanSnugGrey.window = window;
+	humanityWomanSnugGrey.createBounds();
+	//snug black coat woman population
+	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
+		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
+	humanityWomanSnugBlack.peopleAmount = 90;
+	humanityWomanSnugBlack.populate();
+	humanityWomanSnugBlack.window = window;
+	humanityWomanSnugBlack.createBounds();
 }
 void Game::initEnemies()
 {
@@ -276,7 +291,78 @@ void Game::initSprites()
 }
 void Game::checkCollide()
 {
-	
+	if (bVibeInstinctSwitch) {
+		for (auto& humans : humanityMaleGreen.people) {
+			if (player.vibeInstinct.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y))
+			{
+				VibeText.setCharacterSize(14);
+				VibeText.setString(sf::String(npcVibe(humans)));
+				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
+				VibeText.setFont(fontUI);
+				window->draw(VibeText);
+				//	std::cout << "Vibe instinct collide with Male Green\n";
+			}
+		}
+		for (auto& humans : humanityMaleSandyJacket.people) {
+			if (player.vibeInstinct.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y))
+			{
+				VibeText.setCharacterSize(14);
+				VibeText.setString(sf::String(npcVibe(humans)));
+				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
+				VibeText.setFont(fontUI);
+				window->draw(VibeText);
+				//	std::cout << "Vibe instinct collide with Sandy Jacket Male Green\n";
+			}
+		}
+
+		for (auto& humans : humanityMaleWhiteJacket.people) {
+			if (player.vibeInstinct.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y))
+			{
+				VibeText.setCharacterSize(14);
+				VibeText.setString(sf::String(npcVibe(humans)));
+				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
+				VibeText.setFont(fontUI);
+				window->draw(VibeText);
+				//	std::cout << "Vibe instinct collide with White Jacket Male Green\n";
+			}
+		}
+
+		for (auto& humans : humanityWomanSnugBlack.people) {
+			if (player.vibeInstinct.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y))
+			{
+				VibeText.setCharacterSize(14);
+				VibeText.setString(sf::String(npcVibe(humans)));
+				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
+				VibeText.setFont(fontUI);
+				window->draw(VibeText);
+				//	std::cout << "Vibe instinct collide with Woman, snug black Jacket\n";
+			}
+		}
+
+		for (auto& humans : humanityWomanSnugGrey.people) {
+			if (player.vibeInstinct.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y))
+			{
+				VibeText.setCharacterSize(14);
+				VibeText.setString(sf::String(npcVibe(humans)));
+				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
+				VibeText.setFont(fontUI);
+				window->draw(VibeText);
+				//	std::cout << "Vibe instinct collide with Woman, Snug Gret Jacket\n";
+			}
+		}
+
+		for (auto& humans : humanity.people) {
+			if (player.vibeInstinct.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y))
+			{
+				VibeText.setCharacterSize(14);
+				VibeText.setString(sf::String(npcVibe(humans)));
+				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
+				VibeText.setFont(fontUI);
+				window->draw(VibeText);
+				//	std::cout << "Vibe instinct collide with Woman, Snug Gret Jacket\n";
+			}
+		}
+	}
 	for (auto& npc : scooters.people)
 	{
 		//	npc.pathSearch.solve_AStar();
@@ -922,12 +1008,47 @@ void Game::pollEvents()
 							{
 								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
 								{
+									if (people.stopAnimate == true)
+									{//people.StopNpc();
+										people.stopAnimate = false;
+										people.stopMove = false;
+										//	people.currentImage.x = 3;
+										//	people.currentImage.y = 0;
+										//	// people.UpdateNpc(0, 0.2f);
+										//	if (people.eFacing == people.East)
+										//	{
+										//		people.uvRect.left = people.currentImage.x * people.uvRect.width;
+										//		people.uvRect.width = abs(people.uvRect.width);
+										//	}
+										//	else //facing West
+										//	{
+										//		people.uvRect.left = (people.currentImage.x + 1) * abs(people.uvRect.width);
+										//		people.uvRect.width = -abs(people.uvRect.width);
+										//	}
 
+											people.actor.setTextureRect(people.uvRect);
+											this->window->draw(people.actor, &water);
+										//}
+									}
+									else
+										people.stopAnimate = true;
+									
+									system("cls");
+									//people.pathSearch.path.clear();
+									//people.pathSearch.OnUserCreate();
+									//people.currentCount = 0;
+									people.pathSearch.nodeStart = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
+								//	people.pathSearch.nodeEnd = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
+									std::cout << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].x << ", " << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].y;
 
+									people.pathSearch.solve_AStar();
 
+									//people.pathSearch.nodes.
+									people.pathSearch.path = people.pathSearch.OnUserUpdate(0.2f);
+									
 									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 									circleID = people.ID;
-									system("cls");
+									
 									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
 										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
@@ -1297,9 +1418,15 @@ void Game::render()
 	// Main thread waits for the new thread th to stop execution and as a result, its own execution gets blocked
 	//cThread.join();
 	this->checkCollide();
+
+
+	//drawers players vibe circle if imgui checked.
+	if(bvibeInstinctsDraw)
+	window->draw(player.vibeInstinct);
+	
 	for (auto& person : humanity.people)
 	{
-		
+	
 		//deltaTime = npcClock.restart().asSeconds();
 
 		//person.npcWalkSwitch = 0.2;
@@ -1357,63 +1484,63 @@ void Game::render()
 		
 	for (auto& person : humanityMaleGreen.people)
 	{
+		if (!person.stopMove) {
+			//deltaTime = npcClock.restart().asSeconds();
 
-		//deltaTime = npcClock.restart().asSeconds();
+			//person.npcWalkSwitch = 0.2;
 
-		//person.npcWalkSwitch = 0.2;
+			npcTimeHold += npcDelta;
+			//	if(npcTimeHold >= npcDeltaSwitch){
+			switch (person.eFacing) {
+			case Animation::East:
+				person.actor.move(1, 0);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect);
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect); 
+				//this->window->draw(person.actor,&water);
+				break;
 
-		npcTimeHold += npcDelta;
-		//	if(npcTimeHold >= npcDeltaSwitch){
-		switch (person.eFacing) {
-		case Animation::East:
-			person.actor.move(1, 0);
-			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
-			person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+			case Animation::West:
+				person.actor.move(-1, 0);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect); 
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect); 
+				//this->window->draw(person.actor, &water);
+				break;
+
+			case Animation::North:
+				person.actor.move(0, -1);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++;
+				//person.path = person.pathSearch.OnUserUpdate(0.2f);
+				npcTimeHold -= npcDelta;
+				//this->window->draw(person.actor, &water);
 			//	person.actor.setTextureRect(person.uvRect);
-			npcTimeHold -= npcDelta;
-			//person.actor.setTextureRect(person.uvRect); 
-			//this->window->draw(person.actor,&water);
-			break;
+				break;
 
-		case Animation::West:
-			person.actor.move(-1, 0);
-			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
-			person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
-		//	person.actor.setTextureRect(person.uvRect); 
-			npcTimeHold -= npcDelta;
-			//person.actor.setTextureRect(person.uvRect); 
-			//this->window->draw(person.actor, &water);
-			break;
+			case Animation::South:
+				person.actor.move(0, 1);
+				person.lerpCount++;
+				//person.path = person.pathSearch.OnUserUpdate(0.2f);
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect);
+				break;
 
-		case Animation::North:
-			person.actor.move(0, -1);
-			//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
-			person.lerpCount++;
-			//person.path = person.pathSearch.OnUserUpdate(0.2f);
-			npcTimeHold -= npcDelta;
-			//this->window->draw(person.actor, &water);
-		//	person.actor.setTextureRect(person.uvRect);
-			break;
 
-		case Animation::South:
-			person.actor.move(0, 1);
-			person.lerpCount++;
-			//person.path = person.pathSearch.OnUserUpdate(0.2f);
-			npcTimeHold -= npcDelta;
+			}
+
+			//}
+			humanityMaleGreen.createBounds();
+			person.UpdateNpc(0, npcDelta);
 			//person.actor.setTextureRect(person.uvRect);
-			break;
-
-
+			person.actor.setTextureRect(person.uvRect);
 		}
 
-		//}
-		humanityMaleGreen.createBounds();
-		person.UpdateNpc(0, npcDelta);
-		//person.actor.setTextureRect(person.uvRect);
-		person.actor.setTextureRect(person.uvRect);
 	}
-
-
 
 		//}
 		for (auto& person : humanityMaleWhiteJacket.people)
@@ -1531,6 +1658,130 @@ void Game::render()
 			//person.actor.setTextureRect(person.uvRect);
 			person.actor.setTextureRect(person.uvRect);
 		}
+
+
+		for (auto& person : humanityWomanSnugGrey.people)
+		{
+
+			//deltaTime = npcClock.restart().asSeconds();
+
+			//person.npcWalkSwitch = 0.2;
+
+			npcTimeHold += npcDelta;
+			//	if(npcTimeHold >= npcDeltaSwitch){
+			switch (person.eFacing) {
+			case Animation::East:
+				person.actor.move(1, 0);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect);
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect); 
+				//this->window->draw(person.actor,&water);
+				break;
+
+			case Animation::West:
+				person.actor.move(-1, 0);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect); 
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect); 
+				//this->window->draw(person.actor, &water);
+				break;
+
+			case Animation::North:
+				person.actor.move(0, -1);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++;
+				//person.path = person.pathSearch.OnUserUpdate(0.2f);
+				npcTimeHold -= npcDelta;
+				//this->window->draw(person.actor, &water);
+			//	person.actor.setTextureRect(person.uvRect);
+				break;
+
+			case Animation::South:
+				person.actor.move(0, 1);
+				person.lerpCount++;
+				//person.path = person.pathSearch.OnUserUpdate(0.2f);
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect);
+				break;
+
+
+			}
+
+			//}
+			humanityWomanSnugGrey.createBounds();
+			person.UpdateNpc(0, npcDelta);
+			//person.actor.setTextureRect(person.uvRect);
+			person.actor.setTextureRect(person.uvRect);
+		}
+
+
+
+
+		for (auto& person : humanityWomanSnugBlack.people)
+		{
+
+			//deltaTime = npcClock.restart().asSeconds();
+
+			//person.npcWalkSwitch = 0.2;
+
+			npcTimeHold += npcDelta;
+			//	if(npcTimeHold >= npcDeltaSwitch){
+			switch (person.eFacing) {
+			case Animation::East:
+				person.actor.move(1, 0);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect);
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect); 
+				//this->window->draw(person.actor,&water);
+				break;
+
+			case Animation::West:
+				person.actor.move(-1, 0);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+			//	person.actor.setTextureRect(person.uvRect); 
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect); 
+				//this->window->draw(person.actor, &water);
+				break;
+
+			case Animation::North:
+				person.actor.move(0, -1);
+				//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+				person.lerpCount++;
+				//person.path = person.pathSearch.OnUserUpdate(0.2f);
+				npcTimeHold -= npcDelta;
+				//this->window->draw(person.actor, &water);
+			//	person.actor.setTextureRect(person.uvRect);
+				break;
+
+			case Animation::South:
+				person.actor.move(0, 1);
+				person.lerpCount++;
+				//person.path = person.pathSearch.OnUserUpdate(0.2f);
+				npcTimeHold -= npcDelta;
+				//person.actor.setTextureRect(person.uvRect);
+				break;
+
+
+			}
+
+			//}
+			humanityWomanSnugBlack.createBounds();
+			person.UpdateNpc(0, npcDelta);
+			//person.actor.setTextureRect(person.uvRect);
+			person.actor.setTextureRect(person.uvRect);
+		}
+
+
+
+
 
 	Point point;
 	
@@ -1795,11 +2046,17 @@ void Game::render()
 		humanityMaleSandyJacket.drawPeople(dayTime, uTime, npcDelta);
 		humanityMaleGreen.drawPeople(dayTime, uTime, npcDelta);
 		humanity.drawPeople(dayTime, uTime, npcDelta);
-		
+		humanityWomanSnugGrey.drawPeople(dayTime, uTime, npcDelta);
+		humanityWomanSnugBlack.drawPeople(dayTime, uTime, npcDelta);
 	}
 	fShaderClock = shaderClock.getElapsedTime().asSeconds();
 	sFountain.setUniform("iTime", fShaderClock);
 	window->draw(sprFountain, &sFountain);
+	
+	//If Vibe Switch is turned on in the GUI, update instinct circle.
+	if(bVibeInstinctSwitch)
+		player.Update();
+	
 	this->window->draw(player.actor, &water);
 	//for (auto a : routefind.path)
 	//{
@@ -1927,11 +2184,12 @@ void Game::render()
 		
 	}
 
-	ImGui::Begin("Character Statistics");
-	ImGui::Text("Select a character to view stats.");
+	ImGui::Begin("Character Skills");
+	ImGui::Checkbox("Activate Vibe Instincts", &bVibeInstinctSwitch);
+	ImGui::Checkbox("Draw Instincts", & bvibeInstinctsDraw);
+	ImGui::Text("Warning, using instincts will drain energy");
 
-
-	ImGui::Text(exper.c_str());
+	//ImGui::Text(exper.c_str());
 	ImGui::End();
 	ImGui::SFML::Render(*window);
 	this->window->display(); //Tell app that window is done drawing.

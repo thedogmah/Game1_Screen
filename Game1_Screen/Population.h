@@ -29,7 +29,7 @@ public:
 	sf::Shader water;
 	bool textureSwitch = true;
 	virtual bool populate();
-	
+	bool moved = false;
 	virtual bool drawPeople(float, float, float);
 	aStar aStarPath;
 

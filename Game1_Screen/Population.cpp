@@ -63,6 +63,7 @@ bool Population::populate()
 			Human.wealth = 1 + rand() % (100);
 			Human.vibe = 1 + rand() % (15);
 			Human.spirituality = 1 + rand() % (100);
+			Human.spirituality = 1 + rand() % (100);
 			Human.religion =  rand() % (15);
 			int start = 180 + rand() % (5750);
 			int end = 180 + rand() % (5700);
@@ -71,7 +72,9 @@ bool Population::populate()
 			Human.pathSearch.nodeEnd = &Human.pathSearch.nodes[end];//
 			Human.pathSearch.solve_AStar();
 			Human.path = Human.pathSearch.OnUserUpdate(0.2f);
-			
+			Human.currentImage.x = rand() % 4;
+			Human.currentImage.y = rand() % 4;
+			std::cout << Human.currentImage.x << " and y :" << Human.currentImage.y << '\n';
 			//std::cout << Human.imageCount.x << ", y image count is " << Human.imageCount.y;
 			people.push_back(Human);
 		}
@@ -116,6 +119,11 @@ bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
 			person.pathSearch.nodeEnd = person.pathSearch.nodeStartBuffer;
 			person.pathSearch.nodeStart = person.pathSearch.nodeEndBuffer;*/
 			person.currentCount = 0;
+		/*	if (person.moved)
+			{
+				person.actor.move(10+ rand() % (80), 10+ rand() % (80));
+				person.moved = true;
+			}*/
 			/*person.pathSearch.solve_AStar();
 			person.path.clear();
 			person.path = person.pathSearch.OnUserUpdate(0.2f);*/

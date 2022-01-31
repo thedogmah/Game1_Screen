@@ -8,9 +8,17 @@
 class Player
 {
 public:
-	
+	struct vibes {
+		int x;
+		int y;
+		int vibe;
+
+	};
+	vibes vibe;
+	std::vector<vibes> vInstinctVibes;
 	sf::RectangleShape actor;
 	Player();
-
+	void Update();
+	sf::CircleShape vibeInstinct;
 };
 

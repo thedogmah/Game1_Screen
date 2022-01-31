@@ -39,6 +39,13 @@ public:
 	int vibe;
 	int religion;
 	int spirituality;
+	//population class will offset each person once randomly below bool 'moved'
+	bool moved = false;
+	int offsetX = 0;
+	int offsetY = 0;
+	int offsetStep = 0;
+	bool stopAnimate = false; 
+	bool stopMove = false;//have they been stopped.
 	sf::RectangleShape actor;	//Rectangle will display NPC image.
 	sf::IntRect uvRect;
 	aStar pathSearch;
@@ -66,6 +73,8 @@ public:
 	void Update(int row, float deltaTime, bool faceRight, bool faceDown, bool faceUp, bool still);
 	void UpdateNpc(int row, float deltaTime);
 	void UpdateTransport(int row, float deltaTime);
+	void StopNpc();
+
 
 private:
 

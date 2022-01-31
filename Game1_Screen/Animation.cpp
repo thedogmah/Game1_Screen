@@ -10,6 +10,7 @@ Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switch
 {
 	
 	
+	
 	this->imageCount = imageCount;
 	this->switchTime = switchTime;
 	totalTime = 0.0f;
@@ -217,6 +218,30 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 	
 	//std::cout << "\n\nEnd of animate npc function, still is: " << still; 
 }
+
+void Animation::StopNpc()
+
+{
+	//set animation to standing still image
+	currentImage.x = 3;
+
+		//flips image dependant on the way it is facing.
+		uvRect.top = currentImage.y * uvRect.height;
+
+		if (eFacing == East)
+		{
+			uvRect.left = currentImage.x * uvRect.width;
+			uvRect.width = abs(uvRect.width);
+		}
+		else //facing West
+		{
+			uvRect.left = (currentImage.x + 1) * abs(uvRect.width);
+			uvRect.width = -abs(uvRect.width);
+		}
+
+		
+}
+
 void Animation::UpdateNpc(int row, float deltaTime)
 {
 
@@ -250,12 +275,13 @@ void Animation::UpdateNpc(int row, float deltaTime)
 
 
 		//After setting correctd row and taking time from loop, image is checked to move to next animation slide (For walking animation etc)
-		currentImage.y = row;
+		
+			currentImage.y = row;
 		totalTime += deltaTime;
 		
 		if (totalTime > switchTime)
 		{
-			totalTime -= switchTime;
+			totalTime -= totalTime;
 			currentImage.x++;
 			if (currentImage.x >= imageCount.x)
 			{
@@ -264,31 +290,49 @@ void Animation::UpdateNpc(int row, float deltaTime)
 
 		}
 
-
-		//flips image dependant on the way it is facing.
-		uvRect.top = currentImage.y * uvRect.height;
-
-		if (eFacing == East)
+		if (this->stopAnimate == true)
 		{
-			uvRect.left = currentImage.x * uvRect.width;
-			uvRect.width = abs(uvRect.width);
-		}
-		else //facing West
-		{
-			uvRect.left = (currentImage.x + 1) * abs(uvRect.width);
-			uvRect.width = -abs(uvRect.width);
-		}
+			currentImage.x = 3;
+			currentImage.y = 3;
 
+		}
+			//flips image depenant on the way it is facing.
+			uvRect.top = currentImage.y * uvRect.height;
 
+			if (eFacing == East)
+			{
+				uvRect.left = currentImage.x * uvRect.width;
+				uvRect.width = abs(uvRect.width);
+			}
+			else //facing West
+			{
+				uvRect.left = (currentImage.x + 1) * abs(uvRect.width);
+				uvRect.width = -abs(uvRect.width);
+			}
+			
+		
 		pathCount = path.size();
 
+		if (this->stopAnimate == true)
+		{
+			this->stopMove = true;
+			return;
 
+		}
 
 
 		if (lerpCount > 99 && currentCount <= path.size())
 		{
+
 			//	npcWalkSpeed = 0;
-			actor.setPosition((this->path[this->currentCount].x * 100.0f), (this->path[this->currentCount].y * 100.0f));
+			actor.setPosition((this->path[this->currentCount].x * 100.0f +this->offsetX), (this->path[this->currentCount].y * 100.0f +this->offsetY));
+			if (this->moved == false)
+			{
+				this->offsetX = rand() % 200 + (-100);
+				this->offsetY = rand() % 200 + (-100);
+				this->offsetStep = rand() % 3;
+				this->moved = true;
+			}
 			currentCount++;
 			lerpCount = 0;
 			

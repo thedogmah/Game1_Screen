@@ -76,7 +76,7 @@ public:
 	
 	void init();
 	bool solve_AStar();
-	std::vector<paths> pathGangShit(std::vector<paths>);
+	//std::vector<paths> pathGangShit(std::vector<paths>);
 	paths isFacing(paths);
 
 

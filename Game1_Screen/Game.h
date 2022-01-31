@@ -88,6 +88,12 @@ public:
 	Population humanityMaleGreen;
 	Population humanityMaleSandyJacket;
 	Population humanityMaleWhiteJacket;
+	Population humanityWomanSnugGrey;
+	Population humanityWomanSnugBlack;
+//npcVibeText (used in collission function)
+	sf::Text VibeText;
+	bool bVibeInstinctSwitch;
+	bool bvibeInstinctsDraw;
 	PopulationDog dogGR;
 	PopulationDrone drones;
 	PopulationScooter scooters;
@@ -102,7 +108,7 @@ public:
 	float dayTime = 1.0;
 	bool bRain = false;
 	bool bScooters = true;
-	bool bDrones = false;
+	bool bDrones = true;
 	bool bDogs = false;
 	bool bHumans = true;
 	bool resetPath = false;
@@ -134,7 +140,7 @@ private:
 	float vZoom = 0.8;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 1;
+	float zoomfactor = 1.10;
 	//Mouse Positions
 
 	
