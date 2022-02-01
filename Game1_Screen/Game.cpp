@@ -633,96 +633,138 @@ const bool Game::running() const
 
 void Game::npcLookingGlass(Animation npc)
 {
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 105));
 	//ImGui::SFML::Update(*window, clockImGui.restart());
 	ImGui::Begin("Character Looking Glass");
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 105));
 	//ImGui::SameLine(163);
 	ImGui::Text("Human Number ");
 	ImGui::SameLine(98);
 	std::string label = std::to_string(static_cast<int>(npc.ID));
 	ImGui::Text(label.c_str());
 //	ImGui::SameLine(171);
+
+	sf::Sprite character;
+	character.setTexture(*npc.actor.getTexture());
+	npc.uvRect.left = 0;
+	npc.uvRect.width = npc.actor.getSize().x * 2;
+	character.setTextureRect(npc.uvRect);
+	ImGui::Image(character);
 	ImGui::Text("Their Vibe is ");
 	ImGui::SameLine(107);
 	label = npcVibe(npc);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
-	
+	ImGui::PopStyleColor(1);
 	ImGui::Text("Their career is ");
 	ImGui::SameLine(121);
 	label = npcCareer(npc);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
+	
 
 	ImGui::Text("Their influencer reach is ");
 	ImGui::SameLine(189);
 	label = std::to_string(npc.influencer);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their personal wealth is ");
 	ImGui::SameLine(182);
 	label = std::to_string(npc.wealth);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their IQ is ");
 	ImGui::SameLine(90);
 	label = std::to_string(npc.intelligence);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their sexuality is ");
 	ImGui::SameLine(141);
 	label = npcSexuality(npc);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their marital status is ");
 	ImGui::SameLine(177);
 	label = npcMarried(npc);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their mind health is ");
 	ImGui::SameLine(158);
 	label = std::to_string(npc.mindHealth);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their body health is ");
 	ImGui::SameLine(158);
 	label = std::to_string(npc.bodyHealth);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their soul health is ");
 	ImGui::SameLine(158);
 	label = std::to_string(npc.soulHealth);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their tendancies are");
 	ImGui::Text("Crime:");
 	ImGui::SameLine(55);
 	label = std::to_string(npc.crime);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 	ImGui::Text("Depression:");
-	ImGui::SameLine(89);
+	ImGui::SameLine(90);
 	label = std::to_string(npc.depression);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 	ImGui::Text("Anxiety:");
 	ImGui::SameLine(69);
 	label = std::to_string(npc.anxiety);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their instinct level is ");
 	ImGui::SameLine(177);
 	label = std::to_string(npc.instinct);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 
 	ImGui::Text("Their belief system is ");
 	ImGui::SameLine(170);
 	label = npcReligion(npc);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 	ImGui::Text("Their spirituality level is ");
 	ImGui::SameLine(204);
 	label = std::to_string(npc.spirituality);
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
+	ImGui::PopStyleColor(1);
 	/*ImGui::Text("There Vibe is ");
 	ImGui::SameLine(107);
 	label = npcVibe(npc);
 	ImGui::Text(label.c_str());*/
-
+	ImGui::PopStyleColor(2);
+	
 	ImGui::End();
 	
 	
@@ -2272,6 +2314,7 @@ void Game::render()
 
 	ImGui::SFML::Update(*window, clockImGui.restart());
 	static std::string strengh = "Strength";
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 55));
 	ImGui::Begin("Nottingham Game Simulation");
 	ImGui::Checkbox("Rain", &bRain);
 
@@ -2315,7 +2358,7 @@ void Game::render()
 		npcLookingGlass(spy);
 		// use similar function for multiple select?
 	}
-	
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 55));
 	ImGui::Begin("Character Stats");
 	
 	
@@ -2376,7 +2419,7 @@ void Game::render()
 
 	
 
-	ImGui::PopStyleColor(5);
+	ImGui::PopStyleColor(7);
 	//ImGui::
 	//ImGui::Text(exper.c_str());
 	//ImGui::DrawRect(sf::FloatRect(sf::Vector2f(3000., 7000.), (sf::Vector2f(300., 700.))), sf::Color::Blue);
