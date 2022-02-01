@@ -38,7 +38,7 @@ void Game::initVariables()
 {
 	clockImGui.restart(); 
 	fShaderClock = shaderClock.restart().asSeconds();
-	screenSize.x = 1200;
+	screenSize.x = 1600;
 	screenSize.y = 1600;
 	this->window = nullptr;
 //resizing Players across server.
@@ -291,7 +291,8 @@ void Game::initSprites()
 }
 void Game::checkCollide()
 {
-	if (bVibeInstinctSwitch) {
+	player.vVibesText.clear();
+	if (player.bVibeInstinctSwitch) {
 		for (auto& humans : humanityMaleGreen.people) {
 			if (player.vibeInstinct.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y))
 			{
@@ -299,8 +300,11 @@ void Game::checkCollide()
 				VibeText.setString(sf::String(npcVibe(humans)));
 				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
 				VibeText.setFont(fontUI);
-				window->draw(VibeText);
+				player.vibeCatch(VibeText.getString());
+				player.vVibesText.push_back(VibeText);
+				//window->draw(VibeText);
 				//	std::cout << "Vibe instinct collide with Male Green\n";
+				player.profile.powerVibeInstinct -= player.profile.powerVibeInstinctTolerance;
 			}
 		}
 		for (auto& humans : humanityMaleSandyJacket.people) {
@@ -310,7 +314,9 @@ void Game::checkCollide()
 				VibeText.setString(sf::String(npcVibe(humans)));
 				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
 				VibeText.setFont(fontUI);
-				window->draw(VibeText);
+				player.vibeCatch(VibeText.getString());
+				player.vVibesText.push_back(VibeText);
+			//	window->draw(VibeText);
 				//	std::cout << "Vibe instinct collide with Sandy Jacket Male Green\n";
 			}
 		}
@@ -322,7 +328,9 @@ void Game::checkCollide()
 				VibeText.setString(sf::String(npcVibe(humans)));
 				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
 				VibeText.setFont(fontUI);
-				window->draw(VibeText);
+				//window->draw(VibeText);
+				player.vibeCatch(VibeText.getString());
+				player.vVibesText.push_back(VibeText);
 				//	std::cout << "Vibe instinct collide with White Jacket Male Green\n";
 			}
 		}
@@ -334,7 +342,9 @@ void Game::checkCollide()
 				VibeText.setString(sf::String(npcVibe(humans)));
 				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
 				VibeText.setFont(fontUI);
-				window->draw(VibeText);
+				player.vibeCatch(VibeText.getString());
+				player.vVibesText.push_back(VibeText);
+				//window->draw(VibeText);
 				//	std::cout << "Vibe instinct collide with Woman, snug black Jacket\n";
 			}
 		}
@@ -346,7 +356,9 @@ void Game::checkCollide()
 				VibeText.setString(sf::String(npcVibe(humans)));
 				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
 				VibeText.setFont(fontUI);
-				window->draw(VibeText);
+				player.vibeCatch(VibeText.getString());
+				player.vVibesText.push_back(VibeText);
+				//window->draw(VibeText);
 				//	std::cout << "Vibe instinct collide with Woman, Snug Gret Jacket\n";
 			}
 		}
@@ -358,7 +370,9 @@ void Game::checkCollide()
 				VibeText.setString(sf::String(npcVibe(humans)));
 				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
 				VibeText.setFont(fontUI);
-				window->draw(VibeText);
+				player.vibeCatch(VibeText.getString());
+				player.vVibesText.push_back(VibeText);
+				//window->draw(VibeText);
 				//	std::cout << "Vibe instinct collide with Woman, Snug Gret Jacket\n";
 			}
 		}
@@ -978,7 +992,7 @@ void Game::pollEvents()
 						routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
 						//std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 						//std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
-						bool found = false;
+					//	bool found = false;
 						for (auto& people : humanity.people) //vector of NPCS
 						{
 							if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
@@ -999,7 +1013,7 @@ void Game::pollEvents()
 								Human.bodyHealth = 1 + rand() % (100);
 								Human.soulHealth = 1 + rand() % (100);
 								Human.influencer = 1 +*/
-								found = true;
+								//found = true;
 								break;
 							}
 						}
@@ -1026,8 +1040,8 @@ void Game::pollEvents()
 										//		people.uvRect.width = -abs(people.uvRect.width);
 										//	}
 
-											people.actor.setTextureRect(people.uvRect);
-											this->window->draw(people.actor, &water);
+											//people.actor.setTextureRect(people.uvRect);
+											//this->window->draw(people.actor, &water);
 										//}
 									}
 									else
@@ -1037,17 +1051,17 @@ void Game::pollEvents()
 									//people.pathSearch.path.clear();
 									//people.pathSearch.OnUserCreate();
 									//people.currentCount = 0;
-									people.pathSearch.nodeStart = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
+									//people.pathSearch.nodeStart = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
 								//	people.pathSearch.nodeEnd = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
-									std::cout << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].x << ", " << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].y;
+							//		std::cout << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].x << ", " << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].y;
 
-									people.pathSearch.solve_AStar();
+								//	people.pathSearch.solve_AStar();
 
 									//people.pathSearch.nodes.
-									people.pathSearch.path = people.pathSearch.OnUserUpdate(0.2f);
+								//	people.pathSearch.path = people.pathSearch.OnUserUpdate(0.2f);
 									
-									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-									circleID = people.ID;
+								//	circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+								//	circleID = people.ID;
 									
 									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
@@ -1059,7 +1073,7 @@ void Game::pollEvents()
 									Human.bodyHealth = 1 + rand() % (100);
 									Human.soulHealth = 1 + rand() % (100);
 									Human.influencer = 1 +*/
-									found = true;
+									//found = true;
 									break;
 								}
 							}
@@ -1086,7 +1100,7 @@ void Game::pollEvents()
 									Human.bodyHealth = 1 + rand() % (100);
 									Human.soulHealth = 1 + rand() % (100);
 									Human.influencer = 1 +*/
-									found = true;
+								//	found = true;
 									break;
 								}
 							}
@@ -1421,7 +1435,7 @@ void Game::render()
 
 
 	//drawers players vibe circle if imgui checked.
-	if(bvibeInstinctsDraw)
+	if(player.bvibeInstinctsDraw)
 	window->draw(player.vibeInstinct);
 	
 	for (auto& person : humanity.people)
@@ -2054,7 +2068,7 @@ void Game::render()
 	window->draw(sprFountain, &sFountain);
 	
 	//If Vibe Switch is turned on in the GUI, update instinct circle.
-	if(bVibeInstinctSwitch)
+	if(player.bVibeInstinctSwitch)
 		player.Update();
 	
 	this->window->draw(player.actor, &water);
@@ -2106,6 +2120,11 @@ void Game::render()
 	this->window->draw(userText);
 	window->draw(chat.playerText);
 	window->draw(circle);
+	for (auto& vibe : player.vVibesText)
+	{
+		window->draw(vibe);
+	}
+	
 	//Testing NPC animation.
 	//window->draw(sprNpc1);
 	if (grid)
@@ -2183,14 +2202,74 @@ void Game::render()
 	{
 		
 	}
+	
 
-	ImGui::Begin("Character Skills");
-	ImGui::Checkbox("Activate Vibe Instincts", &bVibeInstinctSwitch);
-	ImGui::Checkbox("Draw Instincts", & bvibeInstinctsDraw);
-	ImGui::Text("Warning, using instincts will drain energy");
+	ImGui::Begin("Character Stats");
+	
+	
+	
+	ImGui::Text("Character Wellness");
 
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 250, 110, 175));
+	ImGui::ProgressBar(player.profile.soulhealth / 100, ImVec2(150, 15), "Soul Health");
+	//ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 250, 110, 175));
+	ImGui::ProgressBar(player.profile.mindhealth / 100, ImVec2(150, 15), "Mind Health");
+	
+	ImGui::ProgressBar(player.profile.bodyhealth / 100, ImVec2(150, 15), "Body Health");
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(150, 140, 250, 175));
+	ImGui::Checkbox("Activate Vibe Instincts", &player.bVibeInstinctSwitch);
+	ImGui::Checkbox("Draw Instincts", &player.bvibeInstinctsDraw);
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(150, 100, 80, 175));
+	
+	ImGui::ProgressBar(player.profile.powerVibeInstinct / 100, ImVec2(150, 15), "Vibe Instinct: ");
+	ImGui::SameLine(163);
+	std::string labelinstinct = std::to_string(static_cast<int>(player.profile.powerVibeInstinct));
+	ImGui::Text(labelinstinct.c_str());
+	ImGui::SameLine(171); ImGui::Text("  / 100");
+	
+	
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 90, 250, 175));
+	
+	ImGui::ProgressBar(player.profile.anxiety/100, ImVec2(150, 15), "Anxiety");
+	ImGui::SameLine(163);
+	labelinstinct = std::to_string(static_cast<int>(player.profile.anxiety));
+	ImGui::Text(labelinstinct.c_str());
+	ImGui::SameLine(171); ImGui::Text("  / 100");
+	
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 90, 250, 175));
+	ImGui::ProgressBar(player.profile.rest/100, ImVec2(150, 15), "Rest");
+	ImGui::SameLine(163);
+	labelinstinct = std::to_string(static_cast<int>(player.profile.rest));
+	ImGui::Text(labelinstinct.c_str());
+	ImGui::SameLine(171); ImGui::Text("  / 100");
+
+	ImGui::ProgressBar(player.profile.social / 100, ImVec2(150, 15), "Social");
+	ImGui::SameLine(163);
+	labelinstinct = std::to_string(static_cast<int>(player.profile.social));
+	ImGui::Text(labelinstinct.c_str());
+	ImGui::SameLine(171); ImGui::Text("  / 100");
+
+	ImGui::ProgressBar(player.profile.hunger / 100, ImVec2(150, 15), "Style");
+	ImGui::SameLine(163);
+	labelinstinct = std::to_string(static_cast<int>(player.profile.style));
+	ImGui::Text(labelinstinct.c_str());
+	ImGui::SameLine(171); ImGui::Text("  / 100");
+
+	ImGui::ProgressBar(player.profile.style / 100, ImVec2(150, 15), "Hunger");
+	ImGui::SameLine(163);
+	labelinstinct = std::to_string(static_cast<int>(player.profile.hunger));
+	ImGui::Text(labelinstinct.c_str());
+	ImGui::SameLine(171); ImGui::Text("  / 100");
+
+
+	
+
+	ImGui::PopStyleColor(5);
+	//ImGui::
 	//ImGui::Text(exper.c_str());
 	ImGui::End();
+	ImGui::DrawRect(sf::FloatRect(sf::Vector2f(3000., 7000.), (sf::Vector2f(300., 700.))), sf::Color::Blue);
+
 	ImGui::SFML::Render(*window);
 	this->window->display(); //Tell app that window is done drawing.
 	

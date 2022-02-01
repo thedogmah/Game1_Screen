@@ -1,5 +1,5 @@
 #pragma once
-#include <SFML/Window.hpp>
+#include <SFML/Window.hpp>g
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
@@ -92,8 +92,7 @@ public:
 	Population humanityWomanSnugBlack;
 //npcVibeText (used in collission function)
 	sf::Text VibeText;
-	bool bVibeInstinctSwitch;
-	bool bvibeInstinctsDraw;
+
 	PopulationDog dogGR;
 	PopulationDrone drones;
 	PopulationScooter scooters;
@@ -140,7 +139,7 @@ private:
 	float vZoom = 0.8;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 1.10;
+	float zoomfactor = 1.0;
 	//Mouse Positions
 
 	

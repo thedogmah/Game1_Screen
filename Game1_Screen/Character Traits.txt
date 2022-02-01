@@ -14,8 +14,16 @@ Mind Health
 Body Health
 Soul Health
 
+LOVE LANGUAGES. + Catching vibes, when people like your vibe and gives u energy.
 
 
+Start and stop on characters.
+Law of attraction. 
+Draw people similar to yourself when you have a vibe on.
+Vibe on status.
+
+Having Anxiety Mode and Fear Mode etc.
+impacting interactions and movement and visibility
 Strength
 Health
 Hunger
@@ -27,7 +35,7 @@ Anxiety.
 Depression.
 
 
-Tendancy to Petty Crime
+Tendancy to Petty Crime7
 Tendancy to Serious Crime
 Tendancy to Addiction
 
@@ -39,3 +47,37 @@ Mental Health
 City Status
 
 City World Status.
+
+NPC vibe list
+case 0:
+		return "Wholesome";
+	case 1:
+		return "Pure";
+	case 2:
+		return "Creepster";
+	case 3:
+		return "Angry";
+	case 4:
+		return "Warm";
+	case 5:
+		return "Confused";
+	case 6:
+		return "Flirty";
+	case 7:
+		return "Joyful";
+	case 8:
+		return "Sad";
+	case 9:
+		return "Defensive";
+	case 10:
+		return "Intimidating";
+	case 11:
+		return "Friendly";
+	case 12:
+		return "Peaceful";
+	case 13:
+		return "Chill";
+	case 14:
+		return "Quiet";
+	case 15:
+		return "Positive";
