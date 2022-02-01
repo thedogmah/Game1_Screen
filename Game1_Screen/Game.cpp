@@ -631,6 +631,108 @@ const bool Game::running() const
 	return this->window->isOpen();
 }
 
+void Game::npcLookingGlass(Animation npc)
+{
+	//ImGui::SFML::Update(*window, clockImGui.restart());
+	ImGui::Begin("Character Looking Glass");
+	//ImGui::SameLine(163);
+	ImGui::Text("Human Number ");
+	ImGui::SameLine(98);
+	std::string label = std::to_string(static_cast<int>(npc.ID));
+	ImGui::Text(label.c_str());
+//	ImGui::SameLine(171);
+	ImGui::Text("Their Vibe is ");
+	ImGui::SameLine(107);
+	label = npcVibe(npc);
+	ImGui::Text(label.c_str());
+	
+	ImGui::Text("Their career is ");
+	ImGui::SameLine(121);
+	label = npcCareer(npc);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their influencer reach is ");
+	ImGui::SameLine(189);
+	label = std::to_string(npc.influencer);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their personal wealth is ");
+	ImGui::SameLine(182);
+	label = std::to_string(npc.wealth);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their IQ is ");
+	ImGui::SameLine(90);
+	label = std::to_string(npc.intelligence);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their sexuality is ");
+	ImGui::SameLine(141);
+	label = npcSexuality(npc);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their marital status is ");
+	ImGui::SameLine(177);
+	label = npcMarried(npc);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their mind health is ");
+	ImGui::SameLine(158);
+	label = std::to_string(npc.mindHealth);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their body health is ");
+	ImGui::SameLine(158);
+	label = std::to_string(npc.bodyHealth);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their soul health is ");
+	ImGui::SameLine(158);
+	label = std::to_string(npc.soulHealth);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their tendancies are");
+	ImGui::Text("Crime:");
+	ImGui::SameLine(55);
+	label = std::to_string(npc.crime);
+	ImGui::Text(label.c_str());
+	ImGui::Text("Depression:");
+	ImGui::SameLine(89);
+	label = std::to_string(npc.depression);
+	ImGui::Text(label.c_str());
+	ImGui::Text("Anxiety:");
+	ImGui::SameLine(69);
+	label = std::to_string(npc.anxiety);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their instinct level is ");
+	ImGui::SameLine(177);
+	label = std::to_string(npc.instinct);
+	ImGui::Text(label.c_str());
+
+	ImGui::Text("Their belief system is ");
+	ImGui::SameLine(170);
+	label = npcReligion(npc);
+	ImGui::Text(label.c_str());
+	ImGui::Text("Their spirituality level is ");
+	ImGui::SameLine(204);
+	label = std::to_string(npc.spirituality);
+	ImGui::Text(label.c_str());
+	/*ImGui::Text("There Vibe is ");
+	ImGui::SameLine(107);
+	label = npcVibe(npc);
+	ImGui::Text(label.c_str());*/
+
+	ImGui::End();
+	
+	
+	//	"\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+	//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+	//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+
+
+}
+
 void Game::initConnection()
 {
 		bool connect = false;
@@ -1006,6 +1108,8 @@ void Game::pollEvents()
 								std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 									"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
 									"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
+								vNPCLookingGlass.clear();
+								vNPCLookingGlass.push_back(people);
 								/*Human.intelligence = 1 + rand() % (160);
 								Human.sexuality = 0 + rand() % (2);
 								Human.married = 0 + rand() % (1);
@@ -1074,6 +1178,8 @@ void Game::pollEvents()
 									Human.soulHealth = 1 + rand() % (100);
 									Human.influencer = 1 +*/
 									//found = true;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
 									break;
 								}
 							}
@@ -1101,6 +1207,8 @@ void Game::pollEvents()
 									Human.soulHealth = 1 + rand() % (100);
 									Human.influencer = 1 +*/
 								//	found = true;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
 									break;
 								}
 							}
@@ -2203,7 +2311,11 @@ void Game::render()
 		
 	}
 	
-
+	for (auto& spy : vNPCLookingGlass) {
+		npcLookingGlass(spy);
+		// use similar function for multiple select?
+	}
+	
 	ImGui::Begin("Character Stats");
 	
 	
@@ -2225,7 +2337,7 @@ void Game::render()
 	ImGui::SameLine(163);
 	std::string labelinstinct = std::to_string(static_cast<int>(player.profile.powerVibeInstinct));
 	ImGui::Text(labelinstinct.c_str());
-	ImGui::SameLine(171); ImGui::Text("  / 100");
+	ImGui::SameLine(171); ImGui::Text("  /100");
 	
 	
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 90, 250, 175));
@@ -2234,32 +2346,32 @@ void Game::render()
 	ImGui::SameLine(163);
 	labelinstinct = std::to_string(static_cast<int>(player.profile.anxiety));
 	ImGui::Text(labelinstinct.c_str());
-	ImGui::SameLine(171); ImGui::Text("  / 100");
+	ImGui::SameLine(171); ImGui::Text("  /100");
 	
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 90, 250, 175));
 	ImGui::ProgressBar(player.profile.rest/100, ImVec2(150, 15), "Rest");
 	ImGui::SameLine(163);
 	labelinstinct = std::to_string(static_cast<int>(player.profile.rest));
 	ImGui::Text(labelinstinct.c_str());
-	ImGui::SameLine(171); ImGui::Text("  / 100");
+	ImGui::SameLine(171); ImGui::Text("  /100");
 
 	ImGui::ProgressBar(player.profile.social / 100, ImVec2(150, 15), "Social");
 	ImGui::SameLine(163);
 	labelinstinct = std::to_string(static_cast<int>(player.profile.social));
 	ImGui::Text(labelinstinct.c_str());
-	ImGui::SameLine(171); ImGui::Text("  / 100");
+	ImGui::SameLine(171); ImGui::Text("  /100");
 
 	ImGui::ProgressBar(player.profile.hunger / 100, ImVec2(150, 15), "Style");
 	ImGui::SameLine(163);
 	labelinstinct = std::to_string(static_cast<int>(player.profile.style));
 	ImGui::Text(labelinstinct.c_str());
-	ImGui::SameLine(171); ImGui::Text("  / 100");
+	ImGui::SameLine(171); ImGui::Text("  /100");
 
 	ImGui::ProgressBar(player.profile.style / 100, ImVec2(150, 15), "Hunger");
 	ImGui::SameLine(163);
 	labelinstinct = std::to_string(static_cast<int>(player.profile.hunger));
 	ImGui::Text(labelinstinct.c_str());
-	ImGui::SameLine(171); ImGui::Text("  / 100");
+	ImGui::SameLine(171); ImGui::Text("  /100");
 
 
 	
@@ -2267,8 +2379,9 @@ void Game::render()
 	ImGui::PopStyleColor(5);
 	//ImGui::
 	//ImGui::Text(exper.c_str());
+	//ImGui::DrawRect(sf::FloatRect(sf::Vector2f(3000., 7000.), (sf::Vector2f(300., 700.))), sf::Color::Blue);
 	ImGui::End();
-	ImGui::DrawRect(sf::FloatRect(sf::Vector2f(3000., 7000.), (sf::Vector2f(300., 700.))), sf::Color::Blue);
+	
 
 	ImGui::SFML::Render(*window);
 	this->window->display(); //Tell app that window is done drawing.

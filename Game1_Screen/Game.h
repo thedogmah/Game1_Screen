@@ -225,6 +225,8 @@ private:
 	void initSprites();
 	void initConnection();
 	void initNPC();
+	void npcLookingGlass(Animation npc);
+	std::vector<Animation> vNPCLookingGlass;
 	std::string npcMarried(Animation person);
 	std::string npcSexuality(Animation person);
 	std::string npcCareer(Animation person);

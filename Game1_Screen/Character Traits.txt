@@ -48,6 +48,9 @@ City Status
 
 City World Status.
 
+Class system
+Have to level to be able to read certain classes.
+
 NPC vibe list
 case 0:
 		return "Wholesome";
