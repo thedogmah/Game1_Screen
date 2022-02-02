@@ -110,7 +110,7 @@ bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
 	//	std::cout << person.npcTotalTime << "| total < step > " << person.npcStepTime<< "\n";
 		//UNCOMMENT OUT TO ONLY DRAW PERSON WHEN VISIBLE (BETTER PERFORMANCE)
 		//if (this->rt.contains(person.actor.getPosition().x, person.actor.getPosition().y) )
-		window->draw(person.actor, &water);
+		//window->draw(person.actor, &water);
 		if (person.currentCount >= person.path.size() - 1) {
 			std::reverse(person.path.begin(), person.path.end());
 			

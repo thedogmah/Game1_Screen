@@ -19,6 +19,7 @@
 #include "PopulationScooter.h"
 #include <fstream>
 #include "quadtree.h"
+#include <sstream>
 //#include <sstream>
 //Class as the game engine.
 
@@ -43,6 +44,13 @@ public:
 		std::vector<gsNode*> vecNeighbours;
 		gsNode* parent;
 
+	};
+
+	struct sAsset {
+
+		float x = 0.;
+		float y = 0.;
+		int ID = 0;
 	};
 
 
@@ -112,9 +120,12 @@ public:
 	bool bHumans = true;
 	bool resetPath = false;
 	bool bPathKey = false;
+	bool bAssetOneKey = false;
 	bool bQuadTree = false;
 	sf::Clock clockImGui;
 
+
+	
 	//player statistics
 	int experience = 0;
 	std::string exper="";
@@ -125,6 +136,8 @@ private:
 	//UI
 	
 	//Window
+	sf::ContextSettings settings;
+	
 	sf::Vector2i screenSize ;
 	sf::RenderWindow* window;
 	
@@ -136,10 +149,13 @@ private:
 	float fShaderClock;
 	//Camera
 	sf::View view;
-	float vZoom = 0.8;
+	sf::View followView;
+	bool bNpcFollow = false;
+	Animation *vNpcFollowPointer = nullptr;
+	float vZoom = 1	;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 1.0;
+	float zoomfactor = 1;
 	//Mouse Positions
 
 	
@@ -149,11 +165,23 @@ private:
 
 	//Resources
 		//file stream for reading pathfinding file
-	
+	std::vector<sf::RectangleShape> vRectShapeDataVector;
 	//Pathfinding / Collissions
 	std::ifstream pathdata;
 	std::fstream pathDataW;
 
+	//treeAsset resources
+	std::fstream assetDataW;
+	std::string sAssetTree="hi";
+	std::fstream oss;
+	std::stringstream iss;
+	std::string asset;
+	std::vector<sAsset> vStructAssets;
+	sAsset sTreeAsset;
+	sf::Image imgTreeAsset;
+	sf::Texture texTreeAsset;
+	sf::Sprite sprTreeAsset;
+	sf::RectangleShape rectTree;
 	Rectangle boundary; //is the boundary (sub part) of the quadtree
 	QuadTree qt; //will act as the parent node / base of tree / father / root node.
 	// Interface
@@ -170,6 +198,7 @@ private:
 	//boundaries
 	sf::RectangleShape Rec;
 	std::vector<sf::RectangleShape> vPathVisualAid;
+	std::vector<sf::RectangleShape> vAssetVisualAid;
 	sf::CircleShape circle; //mouse hover signifier
 	int circleID;
 	//Sprites
@@ -259,10 +288,12 @@ public:
 	void renderPlayers();
 	void renderInterface(sf::RenderTarget &target);
 	void render();
+	void renderAssets();
 	void updateMousePositions();
 
 	void pathUpdate(int x,int y);
 	void pathReset();
 	void pathSave();
+	void treeAssetSave();
 };
 

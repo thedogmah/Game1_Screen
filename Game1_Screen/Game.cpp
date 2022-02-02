@@ -36,13 +36,14 @@ void Game::initInterface()
 //Private member functions
 void Game::initVariables()
 {
-	clockImGui.restart(); 
+	clockImGui.restart();
 	fShaderClock = shaderClock.restart().asSeconds();
 	screenSize.x = 1600;
 	screenSize.y = 1600;
+	settings.antialiasingLevel = 16.0;
 	this->window = nullptr;
-//resizing Players across server.
-client.sPlayers.setScale(0.21, 0.21);
+	//resizing Players across server.
+	client.sPlayers.setScale(0.21, 0.21);
 	// fill rectangle colours for rain
 	/*for (int i = 0; i < 500; i++)
 	{
@@ -66,11 +67,11 @@ client.sPlayers.setScale(0.21, 0.21);
 	qt.boundary = boundary;
 	qt.capacity = 2;
 	for (int i = 0; i < 100; i++) {
-		p.x = 1+rand() % (2500);
+		p.x = 1 + rand() % (2500);
 		p.y = 1 + rand() % (2000);
 		qt.insert(p);
 	}
-	
+
 	//Initialise path collide vector
 	pathDataW.open("pathdata.txt");
 	if (pathDataW.is_open())
@@ -111,6 +112,56 @@ client.sPlayers.setScale(0.21, 0.21);
 	circle.setScale(1.25, 0.25);
 	initSprites();
 
+	if (!imgTreeAsset.loadFromFile("treebare.png"))
+		std::cout << "Not loaded (tree asset)" << '\n';
+	imgTreeAsset.createMaskFromColor(sf::Color::White, 255);
+
+	texTreeAsset.loadFromImage(imgTreeAsset);
+	rectTree.setTexture(&texTreeAsset);
+	rectTree.setSize(sf::Vector2f(imgTreeAsset.getSize()));
+	sprTreeAsset.setTexture(texTreeAsset);
+	//Read treeAsset file into vector
+	assetDataW.open("treedata.txt");
+	if (assetDataW.is_open())
+	{
+		int loop = 0;
+		std::cout << "Tree file open\n";
+		while (std::getline(assetDataW, sAssetTree))
+		{
+
+			std::stringstream oss(sAssetTree);
+			while (oss >> asset)
+
+			{
+				//oss >> asset;
+
+
+				std::cout << "Substring: " << asset << ", ";
+				//sTreeAsset.x = std::stof(asset);//	std::cout << line << std::endl;}
+				if (loop % 2 == 0) {
+					sTreeAsset.ID = loop;
+					sTreeAsset.x = std::stof(asset);
+					std::cout << sTreeAsset.x << '\n';
+				}
+				else
+				{
+					sTreeAsset.y = std::stof(asset);
+					std::cout << sTreeAsset.y << '\n';
+				}
+				loop++;
+				if (loop % 2 == 0) {
+					sTreeAsset.ID = loop / 2;
+					vStructAssets.push_back(sTreeAsset);
+					
+				}
+			}
+			//if (loop % 2 == 0)
+
+
+
+		}
+		assetDataW.close();
+	}
 	
 }
 
@@ -121,7 +172,7 @@ void Game::initWindow()
 	this->videoMode.height = 1800;
 	this->videoMode.width = 2600;
 //	this->videoMode.getDesktopMode;
-	this->window = new sf::RenderWindow(this->videoMode, "The Better Verse", sf::Style::Default);
+	this->window = new sf::RenderWindow(this->videoMode, "The Better Verse", sf::Style::Default, settings);
 	ImGui::SFML::Init(*window);
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -130,11 +181,14 @@ void Game::initWindow()
 	view.setCenter(3700, 1260);
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
+	
+	followView.zoom(1.5);
+	followView.setViewport(sf::FloatRect(0, 0, 1, 1));
 	this->window->setView(view);
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 110;
+	humanityMaleGreen.peopleAmount = 70;
 	
 	 
 		
@@ -162,7 +216,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color(255,0,0));
-	humanityMaleWhiteJacket.peopleAmount = 100;
+	humanityMaleWhiteJacket.peopleAmount = 60;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -183,14 +237,14 @@ void Game::initWindow()
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 95;
+	scooters.peopleAmount = 75;
 	scooters.populate();
 	scooters.window = window;
 
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 80;
+	scootersManSandyJacket.peopleAmount = 70;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
@@ -198,7 +252,7 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 90;
+	humanityWomanSnugGrey.peopleAmount = 60;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
@@ -842,13 +896,14 @@ void Game::pollEvents()
 
 			break;
 		case sf::Event::KeyPressed:
-
+			
 			if (this->ev.key.code == sf::Keyboard::Delete)
 				chat.playerInput = "";
 			/*if (this->ev.key.code == sf::Keyboard::Escape)
 				this->window->close();*/
 			if (this->ev.key.code == sf::Keyboard::Down)
-			{
+			{//stops follow npc
+				bNpcFollow = false;
 				//spChar.setTexture(Char);
 				still = false;
 				faceRight = false;
@@ -910,7 +965,7 @@ void Game::pollEvents()
 			}
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
-
+				bNpcFollow = false;
 				still = false;
 				faceUp = false;
 				faceDown = false;
@@ -949,6 +1004,7 @@ void Game::pollEvents()
 				
 			if (this->ev.key.code == sf::Keyboard::Up)
 			{
+				bNpcFollow = false;
 				player.actor.move(0, -12);
 				//spChar.setTexture(Char3);
 				still = false;
@@ -985,6 +1041,9 @@ void Game::pollEvents()
 				window->setView(view);
 			}	if (this->ev.key.code == sf::Keyboard::Right)
 			{
+
+				//stops following npc if seleced to follow
+				bNpcFollow = false;
 				still = false;
 				faceDown = false;
 				faceUp = false;
@@ -1065,7 +1124,7 @@ void Game::pollEvents()
 		case sf::Event::MouseWheelMoved:
 		{
 			vZoom = 1.0;
-			vZoom -= 0.05 * ev.mouseWheel.delta;
+			vZoom -= 0.02 * ev.mouseWheel.delta;
 			//std::cout << vZoom <<std::endl; //uncomment to display zoom level to console
 			view.zoom(vZoom);
 			window->setView(view);
@@ -1146,11 +1205,11 @@ void Game::pollEvents()
 
 								circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 								circleID = people.ID;
-								system("cls");
+							/*	system("cls");
 								std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 									"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
 									"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
-								vNPCLookingGlass.clear();
+							*/	vNPCLookingGlass.clear();
 								vNPCLookingGlass.push_back(people);
 								/*Human.intelligence = 1 + rand() % (160);
 								Human.sexuality = 0 + rand() % (2);
@@ -1160,6 +1219,11 @@ void Game::pollEvents()
 								Human.soulHealth = 1 + rand() % (100);
 								Human.influencer = 1 +*/
 								//found = true;
+								followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+								
+								this->window->setView(followView);
+								vNpcFollowPointer = &people;
+								bNpcFollow = true;
 								break;
 							}
 						}
@@ -1168,6 +1232,7 @@ void Game::pollEvents()
 							{
 								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
 								{
+
 									if (people.stopAnimate == true)
 									{//people.StopNpc();
 										people.stopAnimate = false;
@@ -1193,7 +1258,7 @@ void Game::pollEvents()
 									else
 										people.stopAnimate = true;
 									
-									system("cls");
+									//system("cls");
 									//people.pathSearch.path.clear();
 									//people.pathSearch.OnUserCreate();
 									//people.currentCount = 0;
@@ -1222,6 +1287,11 @@ void Game::pollEvents()
 									//found = true;
 									vNPCLookingGlass.clear();
 									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
 									break;
 								}
 							}
@@ -1237,24 +1307,92 @@ void Game::pollEvents()
 
 									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 									circleID = people.ID;
-									system("cls");
-									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
-										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
-										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
-									/*Human.intelligence = 1 + rand() % (160);
-									Human.sexuality = 0 + rand() % (2);
+									//system("cls");
+									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+									//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									///*Human.intelligence = 1 + rand() % (160);
+									/*Human.sexuality = 0 + rand() % (2);
 									Human.married = 0 + rand() % (1);
 									Human.mindHealth = 1 + rand() % (100);
 									Human.bodyHealth = 1 + rand() % (100);
 									Human.soulHealth = 1 + rand() % (100);
-									Human.influencer = 1 +*/
+									Human.influencer = 1 + */
 								//	found = true;
 									vNPCLookingGlass.clear();
 									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
 									break;
 								}
 							}
 						
+							for (auto& people : scooters.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+
+
+
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									//system("cls");
+									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+									//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									///*Human.intelligence = 1 + rand() % (160);
+									/*Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 + */
+									//	found = true;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									break;
+								}
+							}
+
+							for (auto& people : scootersManSandyJacket.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+
+
+
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									//system("cls");
+									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+									//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									///*Human.intelligence = 1 + rand() % (160);
+									/*Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 + */
+									//	found = true;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									break;
+								}
+							}
 
 						pathUpdate(worldPos.x, worldPos.y);
 						
@@ -1541,10 +1679,17 @@ void Game::renderInterface(sf::RenderTarget& target)
 void Game::render()
 {
 
+	//std::cout << bNpcFollow;
 	
-
 	this->window->clear(); //Clear old frame
+	if (bNpcFollow)
+	{
+		followView.setCenter(vNpcFollowPointer->actor.getPosition().x, vNpcFollowPointer->actor.getPosition().y);
 	
+		//followView.setRotation(180.);
+		//followView.setViewport(sf::FloatRect(0, 0, 1, 1));
+		window->setView(followView);
+	}
 	//Draw game objects
 	window->draw(CharBG,&water);
 	this->renderEnemies();
@@ -1555,6 +1700,11 @@ void Game::render()
 		this->renderRain();
 	}
 	
+
+	else
+	{
+		//window->setView(view);
+	}
 	//window->draw(spChar);
 	
 	//window->draw(actorMain);
@@ -1590,7 +1740,7 @@ void Game::render()
 	
 	for (auto& person : humanity.people)
 	{
-	
+		vRectShapeDataVector.push_back(person.actor);
 		//deltaTime = npcClock.restart().asSeconds();
 
 		//person.npcWalkSwitch = 0.2;
@@ -1648,6 +1798,7 @@ void Game::render()
 		
 	for (auto& person : humanityMaleGreen.people)
 	{
+		vRectShapeDataVector.push_back(person.actor);
 		if (!person.stopMove) {
 			//deltaTime = npcClock.restart().asSeconds();
 
@@ -1709,7 +1860,7 @@ void Game::render()
 		//}
 		for (auto& person : humanityMaleWhiteJacket.people)
 	{
-
+			vRectShapeDataVector.push_back(person.actor);
 		//deltaTime = npcClock.restart().asSeconds();
 
 		//person.npcWalkSwitch = 0.2;
@@ -1767,7 +1918,7 @@ void Game::render()
 
 		for (auto& person : humanityMaleSandyJacket.people)
 		{
-
+			vRectShapeDataVector.push_back(person.actor);
 			//deltaTime = npcClock.restart().asSeconds();
 
 			//person.npcWalkSwitch = 0.2;
@@ -1826,7 +1977,7 @@ void Game::render()
 
 		for (auto& person : humanityWomanSnugGrey.people)
 		{
-
+			vRectShapeDataVector.push_back(person.actor);
 			//deltaTime = npcClock.restart().asSeconds();
 
 			//person.npcWalkSwitch = 0.2;
@@ -1887,7 +2038,7 @@ void Game::render()
 
 		for (auto& person : humanityWomanSnugBlack.people)
 		{
-
+			vRectShapeDataVector.push_back(person.actor);
 			//deltaTime = npcClock.restart().asSeconds();
 
 			//person.npcWalkSwitch = 0.2;
@@ -1974,7 +2125,7 @@ void Game::render()
 
 	for (auto& dog : dogGR.people)
 	{
-
+		vRectShapeDataVector.push_back(dog.actor);
 	//deltaTime = npcClock.restart().asSeconds();
 
 		//person.npcWalkSwitch = 0.2;
@@ -2031,7 +2182,7 @@ void Game::render()
 
 	for (auto& dog : scooters.people)
 	{
-
+		vRectShapeDataVector.push_back(dog.actor);
 		//deltaTime = npcClock.restart().asSeconds();
 
 			//person.npcWalkSwitch = 0.2;
@@ -2087,7 +2238,7 @@ void Game::render()
 
 	for (auto& dog : scootersManSandyJacket.people)
 	{
-
+		vRectShapeDataVector.push_back(dog.actor);
 		//deltaTime = npcClock.restart().asSeconds();
 
 			//person.npcWalkSwitch = 0.2;
@@ -2144,7 +2295,7 @@ void Game::render()
 
 	for (auto& dog : drones.people)
 	{
-
+		vRectShapeDataVector.push_back(dog.actor);
 		//deltaTime = npcClock.restart().asSeconds();
 
 			//person.npcWalkSwitch = 0.2;
@@ -2220,8 +2371,15 @@ void Game::render()
 	//If Vibe Switch is turned on in the GUI, update instinct circle.
 	if(player.bVibeInstinctSwitch)
 		player.Update();
+	vRectShapeDataVector.push_back(player.actor);
 	
-	this->window->draw(player.actor, &water);
+	//rendering assets will order assets and add to vector.
+	renderAssets();
+	std::sort(vRectShapeDataVector.begin(), vRectShapeDataVector.end(), [](sf::RectangleShape a, sf::RectangleShape b) {return a.getPosition().y+a.getSize().y < b.getPosition().y+b.getSize().y; });
+	for (auto& npcs : vRectShapeDataVector)
+		this->window->draw(npcs);
+	vRectShapeDataVector.clear();
+	//this->window->draw(player.actor, &water);
 	//for (auto a : routefind.path)
 	//{
 	//	sf::RectangleShape shape;
@@ -2277,6 +2435,7 @@ void Game::render()
 	
 	//Testing NPC animation.
 	//window->draw(sprNpc1);
+	
 	if (grid)
 	{
 		this->window->draw(npc.pathSearch.vaGrid);
@@ -2290,7 +2449,12 @@ void Game::render()
 			this->window->draw(dot);
 		}
 
-		
+	if (bAssetOneKey)
+		for (auto dot : vAssetVisualAid)
+		{
+			this->window->draw(dot);
+		}
+
 	if (gridPath)
 	{
 		for (auto &npc : npcs)
@@ -2319,6 +2483,7 @@ void Game::render()
 	ImGui::Checkbox("Rain", &bRain);
 
 	ImGui::Checkbox("Path Key [Yellow]", &bPathKey);
+	ImGui::Checkbox("Tree Asset Key [Green]", &bAssetOneKey);
 	ImGui::Checkbox("Scooters", &bScooters);
 	ImGui::Checkbox("Drones", &bDrones);
 	ImGui::Checkbox("Dogs", &bDogs);
@@ -2343,6 +2508,10 @@ void Game::render()
 	if (ImGui::Button("Path Save"))
 	{
 		pathSave();
+	}
+	if (ImGui::Button("Tree Path Save"))
+	{
+		treeAssetSave();
 	}
 	ImGui::Checkbox("Reset PathFinding", &resetPath); //{std::cout <<resetPath };
 	ImGui::Checkbox("Quad Tree", &bQuadTree);
@@ -2557,55 +2726,140 @@ void Game::pathReset()
 
 void Game::pathUpdate(int x, int y)
 {
-	
-	//std::cout << int(x/100) << ", " << int(y/100);
-	x = int(x / 100);
-	y = int(y / 100);
-	pathDataW.open("pathdata.txt");
-	if (pathDataW.is_open())
-	{
-		if (vPathCollide[x][y] == '1')
+	if (bPathKey) {
+		bAssetOneKey = false;
+		//std::cout << int(x/100) << ", " << int(y/100);
+		x = int(x / 100);
+		y = int(y / 100);
+		pathDataW.open("pathdata.txt");
+		if (pathDataW.is_open())
 		{
-			int loca = 0;
-			for (auto& dot : vPathVisualAid)
+			if (vPathCollide[x][y] == '1')
 			{
-				if (dot.getPosition().x == x * 100 && dot.getPosition().y == y * 100)
+				int loca = 0;
+				for (auto& dot : vPathVisualAid)
 				{
-					vPathVisualAid.erase(vPathVisualAid.begin() + loca);
-					//dot.setFillColor(sf::Color::Red);
+					if (dot.getPosition().x == x * 100 && dot.getPosition().y == y * 100)
+					{
+						vPathVisualAid.erase(vPathVisualAid.begin() + loca);
+						//dot.setFillColor(sf::Color::Red);
+
+					}
+					loca++;
+				}
+
+				vPathCollide[x][y] = '0';
+			}
+			else
+			{
+				sf::RectangleShape dot;
+				dot.setPosition(sf::Vector2f(x * 100, y * 100));
+				dot.setSize(sf::Vector2f(10, 10));
+				dot.setFillColor(sf::Color::Yellow);
+				vPathVisualAid.push_back(dot);
+				vPathCollide[x][y] = '1';
+
+			}
+			//pathDataW << "This is a line.\n";
+			//pathDataW << "This is another line.\n";
+			pathDataW.close();
+		}
+
+		pathdata.open("pathdata.txt");
+		std::string line;
+		std::cout << std::endl;
+		while (std::getline(pathdata, line))
+		{
+			//	std::cout << line << std::endl;
+		}
+	}
+
+
+	if (bAssetOneKey)
+	{
+	//variable switch to check for finding, and deleting tree		
+		bool found = false;
+		int del=0;
+		bool aidFound = false;
+		int aidDel = 0;
+		//delete tree from vector based on struct x and y
+		for (auto& tree : vStructAssets) {
+			
+			if (tree.x >= x-25 && tree.x<= x+25 && tree.y >= y - 25 && tree.y <= y + 25)
+			{
+				found = true;
+				std::cout << "found tree at this location. Removing\n";
+				for (auto& vAid : vAssetVisualAid) {
+					
+					if (vAid.getPosition().x >= x - 25 && vAid.getPosition().x <= x +25 && vAid.getPosition().y >= y - 25 && vAid.getPosition().y <= y + 25)
+					{
+						aidFound = true;
+						std::cout << "found Green node. Removing\n";
+					}
+					if (aidFound == true)break;
+					aidDel++;
+				}
+				if (aidFound)vAssetVisualAid.erase(vAssetVisualAid.begin() + aidDel);
+			}
+			if (found == true) break;
+			del++;
+		}
+
+		if (found) {
+				vStructAssets.erase(vStructAssets.begin() + del);
+			
+			return;
+		}
+		bPathKey = false;
+		bAssetOneKey = true;
+		//	assetDataW.open("treedata.txt");
+
+		sAsset tree;
+		tree.x = x;
+		tree.y = y;
+		tree.ID = (vStructAssets.size() + 1);
+		vStructAssets.push_back(tree);
+
+		
+		for (auto& tree : vStructAssets)
+		{
+			Rec.setPosition(tree.x, tree.y);
+			Rec.setFillColor(sf::Color::Green);
+			Rec.setSize(sf::Vector2f(25., 25.));
+		
+			vAssetVisualAid.push_back(Rec);
+		}
+	}
+				/*if (dot.getPosition().x == x * 100 && dot.getPosition().y == y * 100)
+				{
+					vAssetVisualAid.erase(vPathVisualAid.begin() + loca);
+					dot.setFillColor(sf::Color::Red);
 
 				}
-				loca++;
-			}
-
-			vPathCollide[x][y] = '0';
-		}
-		else
-		{
-			sf::RectangleShape dot;
-			dot.setPosition(sf::Vector2f(x * 100, y * 100));
-			dot.setSize(sf::Vector2f(10, 10));
-			dot.setFillColor(sf::Color::Yellow);
-			vPathVisualAid.push_back(dot);
-			vPathCollide[x][y] = '1';
+				loca++;*/
 			
-		}
-		//pathDataW << "This is a line.\n";
-		//pathDataW << "This is another line.\n";
-		pathDataW.close();
-	}
+
+			//vPathCollide[x][y] = '0';
+
+
+		//	{
+		//		sf::RectangleShape dot;
+		//		dot.setPosition(sf::Vector2f(x * 100, y * 100));
+		//		dot.setSize(sf::Vector2f(10, 10));
+		//		dot.setFillColor(sf::Color::Yellow);
+		////		vPathVisualAid.push_back(dot);
+		////		vPathCollide[x][y] = '1';
+
+		//	}
+		//	//pathDataW << "This is a line.\n";
+		//	//pathDataW << "This is another line.\n";
+			//assetDataW.close();
+		
+
+
 	
-	pathdata.open("pathdata.txt");
-	std::string line;
-	std::cout << std::endl;
-	while (std::getline(pathdata, line))
-	{
-	//	std::cout << line << std::endl;
-	}
 
 }
-
-
 
 void Game::pathSave()
 {
@@ -2627,6 +2881,48 @@ void Game::pathSave()
 			pathDataW << "\n";
 		}
 		pathDataW.close();
+
+	}
+}
+
+
+void Game::treeAssetSave()
+{
+	assetDataW.open("treedata.txt");
+	if (assetDataW.is_open())
+	{
+		std::string line;
+		for (auto &line : vStructAssets)
+		{
+			
+				assetDataW << line.x << " ";
+				assetDataW << line.y << " ";
+				assetDataW << line.ID << '\n';
+
+								//routefind.nodes[j * 100 + i].bObstacle = false;
+				//std::cout << i << " " << j << std::endl;
+			}
+		assetDataW << "\n";
+		}
+	assetDataW.close();
+
+	
+}
+
+void Game::renderAssets()
+{
+	
+	
+	for (auto& tree : vStructAssets)
+	{
+		rectTree.setPosition(tree.x, tree.y);
+
+		vRectShapeDataVector.push_back(rectTree);
+//		sprTreeAsset.setPosition(tree.x, tree.y);
+		
+		
+		
+		//this->window->draw(sprTreeAsset);
 
 	}
 }

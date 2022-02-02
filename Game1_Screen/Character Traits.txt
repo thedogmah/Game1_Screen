@@ -51,6 +51,12 @@ City World Status.
 Class system
 Have to level to be able to read certain classes.
 
+Different vibes, will give you difference access to differnece places.
+
+When interacting with so many people in a small area. / Circle. 
+Interact and crete vibes.
+
+
 NPC vibe list
 case 0:
 		return "Wholesome";
