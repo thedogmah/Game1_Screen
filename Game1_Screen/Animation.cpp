@@ -251,9 +251,10 @@ void Animation::UpdateNpc(int row, float deltaTime)
 	//If check passes, then this is npc or some enemy and not a player character, therefore, control is taken over by the class to animate and move.
 	if (this->path.size() > 0) {
 		
-		if (currentCount != 0 && currentCount <= path.size())
+		if (currentCount != 0 && currentCount < path.size())
 		{
 			if (lerpCount != 0) {
+			//	std::cout << path[currentCount].x;
 				currentSteps.x = path[currentCount].x;
 				currentSteps.y = path[currentCount].y;
 				this->prevSteps.x = this->path[this->currentCount - 1].x;
@@ -321,7 +322,7 @@ void Animation::UpdateNpc(int row, float deltaTime)
 		}
 
 
-		if (lerpCount > 99 && currentCount <= path.size())
+		if (lerpCount > 99 && currentCount < path.size())
 		{
 
 			//	npcWalkSpeed = 0;

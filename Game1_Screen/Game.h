@@ -1,5 +1,5 @@
 #pragma once
-#include <SFML/Window.hpp>g
+#include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
@@ -98,6 +98,8 @@ public:
 	Population humanityMaleWhiteJacket;
 	Population humanityWomanSnugGrey;
 	Population humanityWomanSnugBlack;
+
+	Animation *popCircleLocator =nullptr; //pointer to individual who should be 'wearing' 'NPC selected' circle.
 //npcVibeText (used in collission function)
 	sf::Text VibeText;
 

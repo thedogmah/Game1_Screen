@@ -46,7 +46,7 @@ bool Population::populate()
 		Human.uvRect.height = texHuman.getSize().y / float(Human.imageCount.y);
 		for (int x = 0; x < peopleAmount/*(this->peopleAmount)*/; x++) {
 
-			
+			Human.actor.setTexture(&texHuman);
 			Human.ID = x;
 			Human.intelligence = 1 + rand() % (160); ;
 			Human.sexuality  =  rand() % (13); 
@@ -63,7 +63,6 @@ bool Population::populate()
 			Human.wealth = 1 + rand() % (100);
 			Human.vibe = 1 + rand() % (15);
 			Human.spirituality = 1 + rand() % (100);
-			Human.spirituality = 1 + rand() % (100);
 			Human.religion =  rand() % (15);
 			int start = 180 + rand() % (5750);
 			int end = 180 + rand() % (5700);
@@ -74,7 +73,7 @@ bool Population::populate()
 			Human.path = Human.pathSearch.OnUserUpdate(0.2f);
 			Human.currentImage.x = rand() % 4;
 			Human.currentImage.y = rand() % 4;
-			std::cout << Human.currentImage.x << " and y :" << Human.currentImage.y << '\n';
+		//	std::cout << Human.currentImage.x << " and y :" << Human.currentImage.y << '\n';
 			//std::cout << Human.imageCount.x << ", y image count is " << Human.imageCount.y;
 			people.push_back(Human);
 		}

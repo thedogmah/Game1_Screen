@@ -111,7 +111,7 @@ aStar::aStar() {
 	bool aStar::checkObstacle(int x, int y)
 	{
 	
-	
+		return true;
 	}
 
 	 bool aStar::OnUserCreate()

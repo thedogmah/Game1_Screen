@@ -10,6 +10,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
 #include "quadtree.h"
+	
 void Game::initInterface()
 {
 
@@ -81,7 +82,7 @@ void Game::initVariables()
 		while (std::getline(pathDataW, line))
 		{
 			//	std::cout << line;
-			for (auto digit : line)
+			for (auto &digit : line)
 			{
 				vPathInts.push_back(digit);
 			}
@@ -687,17 +688,19 @@ const bool Game::running() const
 
 void Game::npcLookingGlass(Animation npc)
 {
+	std::cout << "start of looking glass imgui\n";
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 105));
 	//ImGui::SFML::Update(*window, clockImGui.restart());
 	ImGui::Begin("Character Looking Glass");
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 105));
-	//ImGui::SameLine(163);
+	
+	ImGui::PopStyleColor(1);
+	ImGui::SameLine(163);
 	ImGui::Text("Human Number ");
 	ImGui::SameLine(98);
 	std::string label = std::to_string(static_cast<int>(npc.ID));
 	ImGui::Text(label.c_str());
 //	ImGui::SameLine(171);
-
+	
 	sf::Sprite character;
 	character.setTexture(*npc.actor.getTexture());
 	npc.uvRect.left = 0;
@@ -717,7 +720,7 @@ void Game::npcLookingGlass(Animation npc)
 	ImGui::Text(label.c_str());
 	ImGui::PopStyleColor(1);
 	
-
+	//std::cout << "mid looking glass imgui\n";
 	ImGui::Text("Their influencer reach is ");
 	ImGui::SameLine(189);
 	label = std::to_string(npc.influencer);
@@ -745,7 +748,7 @@ void Game::npcLookingGlass(Animation npc)
 	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
 	ImGui::PopStyleColor(1);
-
+	std::cout << "midend of imgui looking glass\n";
 	ImGui::Text("Their marital status is ");
 	ImGui::SameLine(177);
 	label = npcMarried(npc);
@@ -786,7 +789,7 @@ void Game::npcLookingGlass(Animation npc)
 	label = std::to_string(npc.depression);
 	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
-	ImGui::PopStyleColor(1);
+ImGui::PopStyleColor(1);
 	ImGui::Text("Anxiety:");
 	ImGui::SameLine(69);
 	label = std::to_string(npc.anxiety);
@@ -800,7 +803,7 @@ void Game::npcLookingGlass(Animation npc)
 	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9, 0.9, 0.5, 1.0));
 	ImGui::Text(label.c_str());
 	ImGui::PopStyleColor(1);
-
+	std::cout << "midendend of looking lass (instinct)\n";
 	ImGui::Text("Their belief system is ");
 	ImGui::SameLine(170);
 	label = npcReligion(npc);
@@ -817,10 +820,10 @@ void Game::npcLookingGlass(Animation npc)
 	ImGui::SameLine(107);
 	label = npcVibe(npc);
 	ImGui::Text(label.c_str());*/
-	ImGui::PopStyleColor(2);
-	
+	//ImGui::PopStyleColor(17);
+	std::cout << "end of looking glassn";
 	ImGui::End();
-	
+	std::cout << "very end of looking glass functions\n";
 	
 	//	"\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 	//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
@@ -832,7 +835,7 @@ void Game::npcLookingGlass(Animation npc)
 void Game::initConnection()
 {
 		bool connect = false;
-	while (!connect)
+	//while (!connect)
 		if (client.socket.connect(client.ip, 2000) == sf::Socket::Done)
 		{
 			connect = true;
@@ -840,8 +843,8 @@ void Game::initConnection()
 			std::cout << "Connected to server \n " << client.socket.getRemoteAddress();
 
 		}
-		else
-			std::cout << "probing for server\n " << sf::IpAddress::LocalHost << "3000\n";
+	//	else
+			std::cout << "probing for server\n / Connection needed to be established to run = false (edit InitConnection fuinction in game.cpp to change) " << sf::IpAddress::LocalHost << "3000\n";
 	}
 
 void Game::initNPC()
@@ -1205,6 +1208,7 @@ void Game::pollEvents()
 
 								circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 								circleID = people.ID;
+								popCircleLocator = &people;
 							/*	system("cls");
 								std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 									"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
@@ -1271,9 +1275,9 @@ void Game::pollEvents()
 									//people.pathSearch.nodes.
 								//	people.pathSearch.path = people.pathSearch.OnUserUpdate(0.2f);
 									
-								//	circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-								//	circleID = people.ID;
-									
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									popCircleLocator = &people;
 									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
 										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
@@ -1307,6 +1311,7 @@ void Game::pollEvents()
 
 									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 									circleID = people.ID;
+									popCircleLocator = &people;
 									//system("cls");
 									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
@@ -1339,6 +1344,7 @@ void Game::pollEvents()
 
 									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 									circleID = people.ID;
+									popCircleLocator = &people;
 									//system("cls");
 									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
@@ -1371,6 +1377,7 @@ void Game::pollEvents()
 
 									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
 									circleID = people.ID;
+									popCircleLocator = &people;
 									//system("cls");
 									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
@@ -1523,8 +1530,12 @@ void Game::pollEvents()
 	//}
 
 void Game::updateEnemies()
-{
-	circle.setPosition(humanity.people[circleID].actor.getPosition().x+20, humanity.people[circleID].actor.getPosition().y +200);
+{//
+	if (popCircleLocator)
+	{
+		circle.setPosition(popCircleLocator->actor.getPosition().x + 20, popCircleLocator->actor.getPosition().y + 200);
+		std::cout << popCircleLocator->actor.getPosition().x + 20 << ", " << popCircleLocator->actor.getPosition().y + 200;
+	}
 	/*
 	
 		@return void
@@ -2475,7 +2486,7 @@ void Game::render()
 	}
 	qt.cleanseTree();
 	//qt.points.clear();
-
+	std::cout << "begin of render pop functions\n";
 	ImGui::SFML::Update(*window, clockImGui.restart());
 	static std::string strengh = "Strength";
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 55));
@@ -2527,9 +2538,12 @@ void Game::render()
 		npcLookingGlass(spy);
 		// use similar function for multiple select?
 	}
+
+	ImGui::End();
+	ImGui::PopStyleColor(1);
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 55));
 	ImGui::Begin("Character Stats");
-	
+	ImGui::PopStyleColor(1);
 	
 	
 	ImGui::Text("Character Wellness");
@@ -2538,14 +2552,17 @@ void Game::render()
 	ImGui::ProgressBar(player.profile.soulhealth / 100, ImVec2(150, 15), "Soul Health");
 	//ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 250, 110, 175));
 	ImGui::ProgressBar(player.profile.mindhealth / 100, ImVec2(150, 15), "Mind Health");
-	
+	ImGui::PopStyleColor(1);
 	ImGui::ProgressBar(player.profile.bodyhealth / 100, ImVec2(150, 15), "Body Health");
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(150, 140, 250, 175));
 	ImGui::Checkbox("Activate Vibe Instincts", &player.bVibeInstinctSwitch);
+	ImGui::PopStyleColor(1);
 	ImGui::Checkbox("Draw Instincts", &player.bvibeInstinctsDraw);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(150, 100, 80, 175));
 	
 	ImGui::ProgressBar(player.profile.powerVibeInstinct / 100, ImVec2(150, 15), "Vibe Instinct: ");
+	
+	ImGui::PopStyleColor(1); 
 	ImGui::SameLine(163);
 	std::string labelinstinct = std::to_string(static_cast<int>(player.profile.powerVibeInstinct));
 	ImGui::Text(labelinstinct.c_str());
@@ -2555,6 +2572,7 @@ void Game::render()
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 90, 250, 175));
 	
 	ImGui::ProgressBar(player.profile.anxiety/100, ImVec2(150, 15), "Anxiety");
+	ImGui::PopStyleColor(1);
 	ImGui::SameLine(163);
 	labelinstinct = std::to_string(static_cast<int>(player.profile.anxiety));
 	ImGui::Text(labelinstinct.c_str());
@@ -2562,6 +2580,7 @@ void Game::render()
 	
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::ImColor(50, 90, 250, 175));
 	ImGui::ProgressBar(player.profile.rest/100, ImVec2(150, 15), "Rest");
+	ImGui::PopStyleColor(1);
 	ImGui::SameLine(163);
 	labelinstinct = std::to_string(static_cast<int>(player.profile.rest));
 	ImGui::Text(labelinstinct.c_str());
@@ -2588,12 +2607,12 @@ void Game::render()
 
 	
 
-	ImGui::PopStyleColor(7);
+//	ImGui::PopStyleColor(1);
 	//ImGui::
 	//ImGui::Text(exper.c_str());
 	//ImGui::DrawRect(sf::FloatRect(sf::Vector2f(3000., 7000.), (sf::Vector2f(300., 700.))), sf::Color::Blue);
 	ImGui::End();
-	
+	std::cout << "just before imgui sfml render\n";
 
 	ImGui::SFML::Render(*window);
 	this->window->display(); //Tell app that window is done drawing.
