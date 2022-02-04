@@ -371,7 +371,7 @@ void Animation::UpdateTransport(int row, float deltaTime)
 	//If check passes, then this is npc or some enemy and not a player character, therefore, control is taken over by the class to animate and move.
 	if (this->path.size() > 0) {
 
-		if (currentCount != 0 && currentCount <= path.size())
+		if (currentCount != 0 && currentCount < path.size())
 		{
 			if (lerpCount != 0) {
 				currentSteps.x = path[currentCount].x;
@@ -430,7 +430,7 @@ void Animation::UpdateTransport(int row, float deltaTime)
 
 
 
-		if (lerpCount > 33 && currentCount <= path.size())
+		if (lerpCount > 33 && currentCount < path.size())
 		{
 			//	npcWalkSpeed = 0;
 			actor.setPosition((this->path[this->currentCount].x * 100.0f), (this->path[this->currentCount].y * 100.0f));

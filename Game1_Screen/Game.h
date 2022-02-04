@@ -47,10 +47,11 @@ public:
 	};
 
 	struct sAsset {
-
+		
 		float x = 0.;
 		float y = 0.;
 		int ID = 0;
+		int assetID=0;
 	};
 
 
@@ -152,14 +153,18 @@ private:
 	//Camera
 	sf::View view;
 	sf::View followView;
+	sf::View flyingView;
 	bool bNpcFollow = false;
+	bool bDroneFollow = false;
+	bool bufferDroneSwitch = false;
 	Animation *vNpcFollowPointer = nullptr;
+	Animation* droneFollowPointer = nullptr;
 	float vZoom = 1	;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 1;
+	float zoomfactor = 1.1;
 	//Mouse Positions
-
+	bool viewDrawTwice = false;
 	
 	sf::Vector2i mousePosWindow;
 	sf::Vector2f mousePosView; 
@@ -184,6 +189,19 @@ private:
 	sf::Texture texTreeAsset;
 	sf::Sprite sprTreeAsset;
 	sf::RectangleShape rectTree;
+	sf::Image imgTramBus;
+	sf::Texture texTramBus;
+	sf::Sprite sprTramBus;
+	sf::RectangleShape recTramBus;
+	sf::Image imgTramBus2;
+	sf::Texture texTramBus2;
+	sf::Sprite sprTramBus2;
+	sf::RectangleShape recTramBus2;
+
+	sf::Image imgTrees;
+	sf::Texture texTrees;
+	sf::RectangleShape recTrees;
+	//sf::RectangleShape rectTree;
 	Rectangle boundary; //is the boundary (sub part) of the quadtree
 	QuadTree qt; //will act as the parent node / base of tree / father / root node.
 	// Interface

@@ -45,7 +45,7 @@ public:
 	};
 
 	//bools for vibes
-	bool bVibeInstinctSwitch = true;
+	bool bVibeInstinctSwitch = false;
 	bool bvibeInstinctsDraw;
 
 	vibes vibe;

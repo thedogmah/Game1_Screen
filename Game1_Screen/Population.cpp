@@ -41,12 +41,12 @@ bool Population::populate()
 		Human.actor.setPosition(4500.0f, 1000.0f);
 		Human.pathSearch.OnUserCreate();
 		Human.imageCount = sf::Vector2u(4, 4);
-
+		
 		Human.uvRect.width = texHuman.getSize().x / float(Human.imageCount.x);
 		Human.uvRect.height = texHuman.getSize().y / float(Human.imageCount.y);
 		for (int x = 0; x < peopleAmount/*(this->peopleAmount)*/; x++) {
 
-			Human.actor.setTexture(&texHuman);
+			//Human.actor.setTexture(&texHuman);
 			Human.ID = x;
 			Human.intelligence = 1 + rand() % (160); ;
 			Human.sexuality  =  rand() % (13); 
@@ -76,6 +76,7 @@ bool Population::populate()
 		//	std::cout << Human.currentImage.x << " and y :" << Human.currentImage.y << '\n';
 			//std::cout << Human.imageCount.x << ", y image count is " << Human.imageCount.y;
 			people.push_back(Human);
+			std::cout << Human.actor.getTexture();
 		}
 	
 	return true;

@@ -84,7 +84,7 @@ bool PopulationDog::drawPeople(float dayTime, float uTime, float deltaTime)
 		//	std::cout << person.path.size() << "\n";
 		//	std::cout << person.npcTotalTime << "| total < step > " << person.npcStepTime<< "\n";
 
-		window->draw(person.actor, &water);
+		//window->draw(person.actor, &water);
 		if (person.currentCount >= person.path.size() - 1) {
 
 			std::reverse(person.path.begin(), person.path.end());
