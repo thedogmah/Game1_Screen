@@ -45,7 +45,8 @@ public:
 	int offsetY = 0;
 	int offsetStep = 0;
 	bool stopAnimate = false; 
-	bool stopMove = false;//have they been stopped.
+	bool stopMove = false;
+	bool stopOverride = false;//have they been stopped.
 	sf::RectangleShape actor;	//Rectangle will display NPC image.
 	sf::IntRect uvRect;
 	aStar pathSearch;

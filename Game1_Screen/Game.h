@@ -20,19 +20,23 @@
 #include <fstream>
 #include "quadtree.h"
 #include <sstream>
+#include "jediEngine.h"
+
+#include "Animation.h"
 //#include <sstream>
 //Class as the game engine.
+class socialEngine;
 
 class Game
 {
 public:
 	//packet movement string
-
+	socialEngine *socialengine;
 	aStar routefind;
 	aStar setObstacles;
 	std::vector<std::vector<char>> vPathCollide; 
 	std::vector<char> vPathInts;
-
+	Animation* currentNpc;
 	struct gsNode {
 
 		bool bObstacle = false;
@@ -54,7 +58,8 @@ public:
 		int assetID=0;
 	};
 
-
+	jediEngine jediengine;
+	
 	std::string movement;
 	Player player;
 	Player playerTwo;
@@ -177,9 +182,12 @@ private:
 	std::ifstream pathdata;
 	std::fstream pathDataW;
 
+	char* textinput;
+	char* textinputbuff;
 	//treeAsset resources
+	//std::ostream assetDataO;
 	std::fstream assetDataW;
-	std::string sAssetTree="hi";
+	std::string sAssetTree;
 	std::fstream oss;
 	std::stringstream iss;
 	std::string asset;
@@ -310,10 +318,13 @@ public:
 	void render();
 	void renderAssets();
 	void updateMousePositions();
-
+	
+	void AssetUpdate(int x, int y);
 	void pathUpdate(int x,int y);
 	void pathReset();
 	void pathSave();
 	void treeAssetSave();
+
+	void interact();
 };
 

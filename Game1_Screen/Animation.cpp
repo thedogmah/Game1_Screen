@@ -244,7 +244,8 @@ void Animation::StopNpc()
 
 void Animation::UpdateNpc(int row, float deltaTime)
 {
-
+	if (this->stopOverride == true)
+		return;
 	npcWalkSpeed += deltaTime;
 	npcTotalTime += deltaTime;
 

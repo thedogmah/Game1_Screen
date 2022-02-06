@@ -76,8 +76,7 @@ bool Population::populate()
 		//	std::cout << Human.currentImage.x << " and y :" << Human.currentImage.y << '\n';
 			//std::cout << Human.imageCount.x << ", y image count is " << Human.imageCount.y;
 			people.push_back(Human);
-			std::cout << Human.actor.getTexture();
-		}
+			}
 	
 	return true;
 }

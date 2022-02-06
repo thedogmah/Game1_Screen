@@ -8,11 +8,7 @@
 
 using namespace sf;
 
-void* operator new (size_t size)
-{
-//	std::cout << "Allocating " << size <<" bytes\n";
-	return malloc(size);
-}
+
 
 //void multi();
 int main()

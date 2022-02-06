@@ -10,7 +10,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
 #include "quadtree.h"
-	
+#include "socialEngine.h"
+
 void Game::initInterface()
 {
 
@@ -37,6 +38,8 @@ void Game::initInterface()
 //Private member functions
 void Game::initVariables()
 {
+	socialengine = new socialEngine();
+	socialengine->game = this;
 	clockImGui.restart();
 	fShaderClock = shaderClock.restart().asSeconds();
 	screenSize.x = 1100;
@@ -51,6 +54,7 @@ void Game::initVariables()
 		this->rectangle[i].setFillColor(sf::Color(235, 149, 13));
 	}*/
 
+	jediengine.loadAssetFile();
 	this->points = 0;
 	this->enemySpawnTimerMax = 1.f;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
@@ -59,6 +63,9 @@ void Game::initVariables()
 	this->health = 15;
 	this->endGame = false;
 
+
+	//text input for assets imgui interface
+	textinput = new char{};
 	//Initialise quadtree rectangle boundary
 	boundary.h = 3500;
 	boundary.w = 3500;
@@ -141,7 +148,7 @@ void Game::initVariables()
 	texTrees.loadFromImage(imgTrees);
 	recTrees.setTexture(&texTrees);
 	recTrees.setSize(sf::Vector2f(imgTrees.getSize()));
-	recTrees.setPosition(6000, 6700);
+	recTrees.setPosition(3001, 3890);
 	
 	if (!imgTreeAsset.loadFromFile("treebare.png"))
 		std::cout << "Not loaded (tree asset)" << '\n';
@@ -155,6 +162,7 @@ void Game::initVariables()
 	assetDataW.open("treedata.txt");
 	if (assetDataW.is_open())
 	{
+		int item = 1;
 		int loop = 0;
 		std::cout << "Tree file open\n";
 		while (std::getline(assetDataW, sAssetTree))
@@ -165,24 +173,28 @@ void Game::initVariables()
 
 			{
 				//oss >> asset;
-
-
+				
+				loop++;
 				std::cout << "Substring: " << asset << ", ";
 				//sTreeAsset.x = std::stof(asset);//	std::cout << line << std::endl;}
-				if (loop % 2 == 0) {
-					sTreeAsset.ID = loop;
+				if (item == 1) {
+					
 					sTreeAsset.x = std::stof(asset);
 					std::cout << sTreeAsset.x << '\n';
+					item++;
+					
 				}
-				else
+				else if(item == 2)
 				{
 					sTreeAsset.y = std::stof(asset);
 					std::cout << sTreeAsset.y << '\n';
+					item++;
 				}
-				loop++;
-				if (loop % 2 == 0) {
-					sTreeAsset.ID = loop / 2;
+				
+				else if(item == 3){
+					sTreeAsset.ID = loop/3;
 					vStructAssets.push_back(sTreeAsset);
+					item = 1;
 					
 				}
 			}
@@ -191,13 +203,13 @@ void Game::initVariables()
 
 
 		}
-		assetDataW.close();
+		assetDataW.close();		std::sort(vStructAssets.begin(), vStructAssets.end(), [](Game::sAsset a, Game::sAsset b) {return a.ID < b.ID; });
 	}
 	
 
 
 
-
+	
 }
 
 
@@ -228,7 +240,7 @@ void Game::initWindow()
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 150;
+	humanityMaleGreen.peopleAmount = 10;
 	
 	 
 		
@@ -243,7 +255,7 @@ void Game::initWindow()
 	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleSandyJacket.peopleAmount = 220;
+	humanityMaleSandyJacket.peopleAmount = 20;
 
 		humanityMaleSandyJacket.populate();
 //	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -255,8 +267,8 @@ void Game::initWindow()
 
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
-	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color(255,0,0));
-	humanityMaleWhiteJacket.peopleAmount = 240;
+	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color::Red);
+	humanityMaleWhiteJacket.peopleAmount = 50;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -264,27 +276,27 @@ void Game::initWindow()
 	humanityMaleWhiteJacket.createBounds();
 
 
-	humanity.peopleAmount =156;
+	humanity.peopleAmount =250;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 120;
+	dogGR.peopleAmount = 10;
 	dogGR.populate();
 	dogGR.window = window;
 
-	drones.peopleAmount = 40;
+	drones.peopleAmount = 18;
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 275;
+	scooters.peopleAmount = 15;
 	scooters.populate();
 	scooters.window = window;
 
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 180;
+	scootersManSandyJacket.peopleAmount = 15;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
@@ -292,14 +304,14 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 90;
+	humanityWomanSnugGrey.peopleAmount = 10;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
 	//snug black coat woman population
 	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugBlack.peopleAmount = 90;
+	humanityWomanSnugBlack.peopleAmount = 20;
 	humanityWomanSnugBlack.populate();
 	humanityWomanSnugBlack.window = window;
 	humanityWomanSnugBlack.createBounds();
@@ -876,6 +888,7 @@ void Game::npcLookingGlass(Animation npc)
 	character.setTexture(*npc.actor.getTexture());
 	npc.uvRect.left = 0;
 	npc.uvRect.width = npc.actor.getSize().x * 2;
+	character.setScale(0.5, 0.5);
 	character.setTextureRect(npc.uvRect);
 	ImGui::Image(character);
 	ImGui::Text("Their Vibe is ");
@@ -1361,7 +1374,7 @@ void Game::pollEvents()
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
-
+						std::cout << player.actor.getPosition().x / 100 << " y : " << player.actor.getPosition().y / 100;
 						//	Point p(worldPos.x, worldPos.y);
 						//	qt.insert(p);
 						if (!pathColor)
@@ -1387,6 +1400,9 @@ void Game::pollEvents()
 										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
 										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
 								*/	vNPCLookingGlass.clear();
+								socialengine->bShowInteract = true; 
+								socialengine->selectedNpc = &people;
+								
 								vNPCLookingGlass.push_back(people);
 								/*Human.intelligence = 1 + rand() % (160);
 								Human.sexuality = 0 + rand() % (2);
@@ -1444,7 +1460,7 @@ void Game::pollEvents()
 								//people.pathSearch.path.clear();
 								//people.pathSearch.OnUserCreate();
 								//people.currentCount = 0;
-								//people.pathSearch.nodeStart = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
+								
 							//	people.pathSearch.nodeEnd = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
 						//		std::cout << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].x << ", " << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].y;
 
@@ -1655,8 +1671,10 @@ void Game::pollEvents()
 									}
 								}
 
-								pathUpdate(worldPos.x, worldPos.y);
-
+								if(bPathKey )
+									pathUpdate(worldPos.x, worldPos.y);
+								if(bAssetOneKey)
+									AssetUpdate(worldPos.x, worldPos.y);
 
 								//for (auto &people : humanity.people) //vector of NPCS
 								//{
@@ -1862,7 +1880,8 @@ void Game::updateEnemies()
 
 void Game::renderRain()
 {
-
+	int playerY = player.actor.getPosition().y;
+	int playerX = player.actor.getPosition().x;
 	if (part == 1) {
 		for (int i = 0; i < 300; i++) {
 			randomh = 1 + rand() % (15);
@@ -1872,7 +1891,7 @@ void Game::renderRain()
 			randomg = 30 + rand() % (35);
 			randomb = 210 + rand() % (45);
 		rectangle[i].setSize(sf::Vector2f(4, randomh));
-			rectangle[i].setPosition(randomx, -7);
+			rectangle[i].setPosition(randomx, player.actor.getPosition().y  -200);
 			rectangle[i].setFillColor(sf::Color(randomr, randomg, randomb));
 
 
@@ -1886,8 +1905,8 @@ void Game::renderRain()
 
 		for (int i = 0; i < 700; i++) {
 		if (rectangle[i].getPosition().y > 2000){
-			randomx = 2700 + rand() % (2500);
-			rectangle[i].setPosition(randomx, -5);
+			randomx = player.actor.getPosition().x  + rand() % (2500);
+			rectangle[i].setPosition(randomx, playerY - 7);
 			randomsp[i] = 15 + rand() % (28);
 			randomr = 0 + rand() % (45);
 			randomg = 30 + rand() % (35);
@@ -2043,8 +2062,11 @@ void Game::render()
 
 		for (auto& person : humanity.people)
 		{
+			vRectShapeDataVector.push_back(person.actor);
+			if (person.stopOverride)continue;
+		
 			if (!person.stopMove) {
-				vRectShapeDataVector.push_back(person.actor);
+				
 				//deltaTime = npcClock.restart().asSeconds();
 
 				//person.npcWalkSwitch = 0.2;
@@ -2716,6 +2738,7 @@ void Game::render()
 		renderAssets();
 		
 		
+		
 		if(!bNpcFollow)this->window->setView(view);
 		std::sort(vRectShapeDataVector.begin(), vRectShapeDataVector.end(), [](sf::RectangleShape a, sf::RectangleShape b) {return a.getPosition().y + a.getSize().y < b.getPosition().y + b.getSize().y; });
 		for (auto& npcs : vRectShapeDataVector)
@@ -2828,10 +2851,54 @@ void Game::render()
 			qt.show(*window);
 		}
 		qt.cleanseTree();
+
 		//qt.points.clear();
 	//	std::cout << "begin of render pop functions\n";
+
 		ImGui::SFML::Update(*window, clockImGui.restart());
 		static std::string strengh = "Strength";
+
+		if(socialengine->bShowInteract)
+			socialengine->interact(socialengine->selectedNpc);
+
+		ImGui::Begin("Asset List");
+		ImGui::InputText("Asset to add", textinput , 500);
+		//ImGui::SameLine(245);
+		if (ImGui::Button("Add Asset")) {
+		std::cout << "\nAdded asset, " << textinput << " to asset data";
+		jediengine.addAsset(textinput);
+		}
+
+		ImGui::SameLine(90);
+		if (ImGui::Button("Save Assets")) {
+			jediengine.saveAssets();
+		}
+
+		bool bIsSelected = false;
+		
+	if (ImGui::BeginCombo("Place Asset",""))
+	{
+		for (auto& label : jediengine.vAssetLabel) {
+		
+			if (ImGui::Selectable(label.c_str(), bIsSelected))
+			{
+			std::cout << label << '\n';
+			jediengine.currentAsset = label;
+			}
+		}
+		
+		
+		
+		
+		ImGui::EndCombo();
+		
+		
+	}
+
+	std::string current = "Currently Selected: " + jediengine.currentAsset;
+	ImGui::Text(current.c_str());
+		ImGui::End();
+
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 55));
 		ImGui::Begin("Nottingham Game Simulation");
 		ImGui::Checkbox("Rain", &bRain);
@@ -2955,6 +3022,7 @@ void Game::render()
 			//ImGui::Text(exper.c_str());
 			//ImGui::DrawRect(sf::FloatRect(sf::Vector2f(3000., 7000.), (sf::Vector2f(300., 700.))), sf::Color::Blue);
 		ImGui::End();
+		
 		//std::cout << "just before imgui sfml render\n";
 		ImGui::SFML::Render(*window);
 
@@ -2975,7 +3043,7 @@ void Game::render()
 			bufferDroneSwitch = false;
 			bDroneFollow = true;
 		}	vRectShapeDataVector.clear();
-		this->window->draw(recTrees);
+		//this->window->draw(recTrees);
 		 //Tell app that window is done drawing.
 		this->window->display();
 		if(!bNpcFollow )this->window->setView(view);
@@ -3074,8 +3142,9 @@ void Game::renderPlayers()
 
 		//client.vPlayers.clear();
 		return void();
-	
+
 }
+
 
 void Game::pathReset()
 {
@@ -3112,110 +3181,56 @@ void Game::pathReset()
 
 void Game::pathUpdate(int x, int y)
 {
-	if (bPathKey) {
-		bAssetOneKey = false;
-		//std::cout << int(x/100) << ", " << int(y/100);
-		x = int(x / 100);
-		y = int(y / 100);
-		pathDataW.open("pathdata.txt");
-		if (pathDataW.is_open())
-		{
-			if (vPathCollide[x][y] == '1')
-			{
-				int loca = 0;
-				for (auto& dot : vPathVisualAid)
-				{
-					if (dot.getPosition().x == x * 100 && dot.getPosition().y == y * 100)
-					{
-						vPathVisualAid.erase(vPathVisualAid.begin() + loca);
-						//dot.setFillColor(sf::Color::Red);
+	std::cout << x << "x, " << y << "\n";
 
-					}
-					loca++;
-				}
-
-				vPathCollide[x][y] = '0';
-			}
-			else
-			{
-				sf::RectangleShape dot;
-				dot.setPosition(sf::Vector2f(x * 100, y * 100));
-				dot.setSize(sf::Vector2f(10, 10));
-				dot.setFillColor(sf::Color::Yellow);
-				vPathVisualAid.push_back(dot);
-				vPathCollide[x][y] = '1';
-
-			}
-			//pathDataW << "This is a line.\n";
-			//pathDataW << "This is another line.\n";
-			pathDataW.close();
-		}
-	
-		pathdata.open("pathdata.txt");
-		std::string line;
-		std::cout << std::endl;
-		while (std::getline(pathdata, line))
-		{
-			//	std::cout << line << std::endl;
-		}
-	}
-
-
-	if (bAssetOneKey)
+	bAssetOneKey = false;
+	//std::cout << int(x/100) << ", " << int(y/100);
+	x = int(x / 100);
+	y = int(y / 100);
+	pathDataW.open("pathdata.txt");
+	if (pathDataW.is_open())
 	{
-	//variable switch to check for finding, and deleting tree		
-		bool found = false;
-		int del=0;
-		bool aidFound = false;
-		int aidDel = 0;
-		//delete tree from vector based on struct x and y
-		for (auto& tree : vStructAssets) {
-			
-			if (tree.x >= x-25 && tree.x<= x+25 && tree.y >= y - 25 && tree.y <= y + 25)
-			{
-				found = true;
-				std::cout << "found tree at this location. Removing\n";
-				for (auto& vAid : vAssetVisualAid) {
-					
-					if (vAid.getPosition().x >= x - 25 && vAid.getPosition().x <= x +25 && vAid.getPosition().y >= y - 25 && vAid.getPosition().y <= y + 25)
-					{
-						aidFound = true;
-						std::cout << "found Green node. Removing\n";
-					}
-					if (aidFound == true)break;
-					aidDel++;
-				}
-				if (aidFound)vAssetVisualAid.erase(vAssetVisualAid.begin() + aidDel);
-			}
-			if (found == true) break;
-			del++;
-		}
-
-		if (found) {
-				vStructAssets.erase(vStructAssets.begin() + del);
-			
-			return;
-		}
-		bPathKey = false;
-		bAssetOneKey = true;
-		//	assetDataW.open("treedata.txt");
-
-		sAsset tree;
-		tree.x = x;
-		tree.y = y;
-		tree.ID = (vStructAssets.size() + 1);
-		vStructAssets.push_back(tree);
-
-		
-		for (auto& tree : vStructAssets)
+		if (vPathCollide[x][y] == '1')
 		{
-			Rec.setPosition(tree.x, tree.y);
-			Rec.setFillColor(sf::Color::Green);
-			Rec.setSize(sf::Vector2f(25., 25.));
-		
-			vAssetVisualAid.push_back(Rec);
+			int loca = 0;
+			for (auto& dot : vPathVisualAid)
+			{
+				if (dot.getPosition().x == x * 100 && dot.getPosition().y == y * 100)
+				{
+					vPathVisualAid.erase(vPathVisualAid.begin() + loca);
+					//dot.setFillColor(sf::Color::Red);
+
+				}
+				loca++;
+			}
+
+			vPathCollide[x][y] = '0';
 		}
+		else
+		{
+			sf::RectangleShape dot;
+			dot.setPosition(sf::Vector2f(x * 100, y * 100));
+			dot.setSize(sf::Vector2f(10, 10));
+			dot.setFillColor(sf::Color::Yellow);
+			vPathVisualAid.push_back(dot);
+			vPathCollide[x][y] = '1';
+
+		}
+		//pathDataW << "This is a line.\n";
+		//pathDataW << "This is another line.\n";
+		pathDataW.close();
 	}
+
+	pathdata.open("pathdata.txt");
+	std::string line;
+	std::cout << std::endl;
+	while (std::getline(pathdata, line))
+	{
+		//	std::cout << line << std::endl;
+	}
+}
+
+
 				/*if (dot.getPosition().x == x * 100 && dot.getPosition().y == y * 100)
 				{
 					vAssetVisualAid.erase(vPathVisualAid.begin() + loca);
@@ -3245,7 +3260,7 @@ void Game::pathUpdate(int x, int y)
 
 	
 
-}
+
 
 void Game::pathSave()
 {
@@ -3272,27 +3287,143 @@ void Game::pathSave()
 }
 
 
+void Game::AssetUpdate(int x, int y)
+{
+	bPathKey = false;
+	int idreset = 1;
+	for (auto &range : vStructAssets) {
+		range.ID = idreset;
+		idreset++;
+	}
+
+	
+		//variable switch to check for finding, and deleting tree		
+		bool found = false;
+		int del = 0;
+		bool aidFound = false;
+		int aidDel = 0;
+		//delete tree from vector based on struct x and y
+		for (auto& tree : vStructAssets) {
+
+			if (tree.x >= x - 25 && tree.x <= x + 25 && tree.y >= y - 25 && tree.y <= y + 25)
+			{
+				found = true;
+				std::cout << "found tree at this location. Removing\n";
+				for (auto& vAid : vAssetVisualAid) {
+
+					if (vAid.getPosition().x >= x - 25 && vAid.getPosition().x <= x + 25 && vAid.getPosition().y >= y - 25 && vAid.getPosition().y <= y + 25)
+					{
+						aidFound = true;
+						std::cout << "found Green node. Removing\n";
+					}
+					if (aidFound == true)break;
+					aidDel++;
+				}
+				if (aidFound)vAssetVisualAid.erase(vAssetVisualAid.begin() + aidDel);
+			}
+			if (found == true) break;
+			del++;
+		}
+
+		if (found) {
+			std::vector<Game::sAsset> ::iterator it;
+			for (it = vStructAssets.begin() + del; it != vStructAssets.end(); it++)
+
+				vStructAssets[del].ID--;
+			//
+			vStructAssets.erase(vStructAssets.begin() + del);
+
+			return;
+		}
+		bPathKey = false;
+		bAssetOneKey = true;
+		//	assetDataW.open("treedata.txt");
+
+		sAsset tree;
+		tree.x = x;
+		tree.y = y;
+		tree.ID = (vStructAssets.size() + 1);
+		vStructAssets.push_back(tree);
+
+
+		for (auto& tree : vStructAssets)
+		{
+			Rec.setPosition(tree.x, tree.y);
+			Rec.setFillColor(sf::Color::Green);
+			Rec.setSize(sf::Vector2f(25., 25.));
+
+			vAssetVisualAid.push_back(Rec);
+		}
+
+		//testing new asset tool
+		sf::RectangleShape newRec;
+		sf::Image image;
+		sf::Texture texture;
+
+		if (!jediengine.assetImage.loadFromFile(jediengine.currentAsset))
+			std::cout << "Failed to load Image";
+		//jediengine.assetImage.createMaskFromColor(sf::Color::White);
+		
+		jediengine.assetTexture.loadFromImage(jediengine.assetImage);
+		
+	
+		jediengine.assetRect.setSize(sf::Vector2f(jediengine.assetTexture.getSize()));
+		//Rec.setFillColor(sf::Color::Blue);
+		jediengine.assetRect.setTexture(&jediengine.assetTexture);
+		
+		jediengine.assetRect.setPosition(x, y);
+		jediengine.vAssets.push_back(jediengine.assetRect);
+
+		//
+
+		//if (!imgTreeAsset.loadFromFile("treebare.png"))
+		//	std::cout << "Not loaded (tree asset)" << '\n';
+		//imgTreeAsset.createMaskFromColor(sf::Color::White, 255);
+
+		//texTreeAsset.loadFromImage(imgTreeAsset);
+		//rectTree.setTexture(&texTreeAsset);
+		//rectTree.setSize(sf::Vector2f(imgTreeAsset.getSize()));
+		//sprTreeAsset.setTexture(texTreeAsset);
+		////Read treeAsset file into vector
+
+
+
+
+
+	}
+
+
+
 void Game::treeAssetSave()
 {
-	assetDataW.open("treedata.txt");
-	if (assetDataW.is_open())
+	vStructAssets.pop_back();
+	vAssetVisualAid.pop_back();
+	std::ofstream out("treedata.txt", std::ios::trunc);
+	//assetDataW.open("treedata.txt", std::ios::trunc);
+	if (out.is_open())
 	{
 		std::string line;
 		for (auto &line : vStructAssets)
 		{
 			
-				assetDataW << line.x << " ";
-				assetDataW << line.y << " ";
-				assetDataW << line.ID << '\n';
+				out << line.x << " ";
+				out << line.y << " ";
+				out << line.ID << '\n';
 
 								//routefind.nodes[j * 100 + i].bObstacle = false;
 				//std::cout << i << " " << j << std::endl;
 			}
-		assetDataW << "\n";
+		
 		}
 	assetDataW.close();
-
+	//bAssetOneKey = false;
 	
+}
+
+void Game::interact()
+
+{
+
 }
 
 void Game::renderAssets()
@@ -3311,4 +3442,7 @@ void Game::renderAssets()
 		//this->window->draw(sprTreeAsset);
 
 	}
+	if (jediengine.vAssets.size() >0)
+	for (auto asset : jediengine.vAssets)
+		vRectShapeDataVector.push_back(asset);
 }

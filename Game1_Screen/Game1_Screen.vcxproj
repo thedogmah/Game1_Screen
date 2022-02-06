@@ -162,6 +162,7 @@
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="jediEngine.cpp" />
     <ClCompile Include="login.cpp" />
     <ClCompile Include="multiworld.cpp" />
     <ClCompile Include="Network.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="PopulationDrone.cpp" />
     <ClCompile Include="PopulationScooter.cpp" />
     <ClCompile Include="quadtree.cpp" />
+    <ClCompile Include="socialEngine.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -188,6 +190,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="jediEngine.h" />
     <ClInclude Include="login.h" />
     <ClInclude Include="multiworld.h" />
     <ClInclude Include="Network.h" />
@@ -197,6 +200,7 @@
     <ClInclude Include="PopulationDrone.h" />
     <ClInclude Include="PopulationScooter.h" />
     <ClInclude Include="quadtree.h" />
+    <ClInclude Include="socialEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\char.png" />
