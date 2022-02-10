@@ -201,9 +201,12 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 				
 				//if (count ==9)
 				
-				if (currentCount == (path.size()))
+				if (currentCount == (path.size() -1))
 				{
-					//currentCount = currentCount;
+					if(this->hasControl == false)
+					currentCount = 0;
+					this->stopAnimate = true;
+					this->stopMove = true;
 					//row = 3;
 					//currentCount++;
 				}
@@ -244,8 +247,8 @@ void Animation::StopNpc()
 
 void Animation::UpdateNpc(int row, float deltaTime)
 {
-	if (this->stopOverride == true)
-		return;
+//	if (this->stopOverride == true)
+		//return;
 	npcWalkSpeed += deltaTime;
 	npcTotalTime += deltaTime;
 
@@ -278,7 +281,7 @@ void Animation::UpdateNpc(int row, float deltaTime)
 
 		//After setting correctd row and taking time from loop, image is checked to move to next animation slide (For walking animation etc)
 		
-			currentImage.y = row;
+		currentImage.y = row;
 		totalTime += deltaTime;
 		
 		if (totalTime > switchTime)
@@ -323,7 +326,7 @@ void Animation::UpdateNpc(int row, float deltaTime)
 		}
 
 
-		if (lerpCount > 99 && currentCount < path.size())
+		if (lerpCount > 99 && currentCount < path.size() )
 		{
 
 			//	npcWalkSpeed = 0;
@@ -339,7 +342,20 @@ void Animation::UpdateNpc(int row, float deltaTime)
 			lerpCount = 0;
 			
 		}
-		
+		if (currentCount == path.size() - 1 && this->hasControl == false && lerpCount > 50)
+		{
+			//
+			//Generate initial vibe circle colour, and text size
+			fon.loadFromFile("Arial.ttf");
+			msg.setString(sf::String("Good Vibes"));
+			msg.setPosition(this->actor.getPosition());
+			msg.setFont(fon);
+			msg.setCharacterSize(8 + rand() %(20));
+			msg.setFillColor(sf::Color(15 +rand() %(240), 15 + rand() % (240), 15 + rand() % (240)));
+			this->stopOverride = true;
+
+			//this->msg = arrivadurch;
+		}
 	}
 
 

@@ -29,12 +29,16 @@ public:
 	sf::Shader water;
 	bool textureSwitch = true;
 	virtual bool populate();
+	void newPath(Animation& npc, sf::RectangleShape player);
 	bool moved = false;
 	virtual bool drawPeople(float, float, float);
 	aStar aStarPath;
 
 	sf::FloatRect rt;
 	virtual void createBounds();
+	std::vector<sf::Text> vTextMessage();
+std::vector<sf::Text> vecText;
+	sf::Text vMessages;
 private:
 
 

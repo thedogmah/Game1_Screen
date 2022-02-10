@@ -46,7 +46,12 @@
 
 	QuadTree::QuadTree()
 {
+		qtqueryx = new char( ' ');
+		qtqueryy = new char(' ');
+		qtqueryh = new char(' ');
+		qtqueryw = new char(' ');
 };
+
 	
 	QuadTree::QuadTree(Rectangle boundary, int capacity)
 	{
@@ -172,6 +177,46 @@
 			this->divided = false;
 			
 		}
+	}
+	std::vector<Point> QuadTree::query(sf::RectangleShape& range, std::vector<Point> &points)
+	{
+		std::vector<Point> found;
+		Rectangle query;//use this and create a bool to say whether we've already initialsied.
+		query.x = range.getPosition().x;
+		query.y = range.getPosition().y;
+		query.w = range.getSize().x;
+		query.h = range.getSize().y;
+		//std::cout << "shape passed range width is: "<< query.w <<'\n';
+		//std::cout << "range height is: " << query.h << '\n';
+		//std::cout << "range x is: " << query.x << '\n';
+		//std::cout << "range y is: " << query.y << '\n';
+
+		queryPoint.x = query.x;
+		queryPoint.y = 6000;
+		//std::cout << "\n\nquery point x width is: " << queryPoint.x << '\n';
+		//std::cout << "\n\nquery point y width is: " << queryPoint.y << '\n';
+	if (!this->boundary.contains(queryPoint)) {
+			return points;
+		}
+		else { 
+			for (auto p : this->points) {
+				if (query.contains(p)) {
+					found.push_back(p);
+				}
+			}
+			if (this->divided) {
+				this->northwest->query(range, qpoints);
+				this->northeast->query(range, qpoints);
+				this->southwest->query(range, qpoints);
+				this->southeast->query(range, qpoints);
+			}
+		}
+	for (auto& point : found)
+	{
+		std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
+		qpoints.push_back(point);
+	}
+		return qpoints;
 	}
 	bool QuadTree::insert(Point point)
 	{

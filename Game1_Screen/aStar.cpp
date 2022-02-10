@@ -16,7 +16,7 @@
 #include <list>
 
 aStar::aStar() {
-	this->nMapWidth = 75; this->nMapHeight = 130 ;
+	this->nMapWidth = 75; this->nMapHeight = 105 ;
 	this->init();
 		}
 	//m_sAppName = L"Path Finding";
@@ -60,7 +60,8 @@ aStar::aStar() {
 	sNode* nodeEnd = nullptr;
 	
 	
-
+	
+	
 	void aStar::init()
 	{
 		vaGrid.setPrimitiveType(sf::Lines);
@@ -185,8 +186,8 @@ aStar::aStar() {
 
 		}
 
-		nodeStart = &nodes[0];
-		nodeEnd = &nodes[1];
+		nodeStart = &nodes[2];
+		nodeEnd = &nodes[3];
 		return true;
 	}
 
@@ -364,7 +365,7 @@ aStar::aStar() {
 		//			}
 		//		}
 		//Draw nodes on top
-		
+
 					//windowdraw(rectangle);
 
 
@@ -380,8 +381,25 @@ aStar::aStar() {
 				if (&nodes[y * nMapWidth + x] == nodeEnd)
 					Fill(x * nNodeSize + nNodeBorder, y * nNodeSize + nNodeBorder, (x + 1) * nNodeSize - nNodeBorder, (y + 1) * nNodeSize - nNodeBorder, PIXEL_SOLID, FG_RED);*/
 
-			
-	
+		if (fElapsedTime == 0.1f)
+		{
+		
+		if (nodeEnd != nullptr)
+		{
+			sNode* p = nodes;
+			while (p->parent != nullptr)
+			{
+				paths coords;
+				p = p->parent;
+				//std::cout << p->x << ", " << p->y << "\n"; 
+				coords.x = static_cast<float>(p->x);
+				coords.y = static_cast<float>(p->y);
+				path.push_back(coords);
+
+			}
+		}
+		return path;
+	}
 			if (nodeEnd != nullptr)
 			{
 				sNode* p = nodeEnd; 
@@ -396,7 +414,7 @@ aStar::aStar() {
 					
 				} 
 			}
-		//	pathGangShit(paths);
+		
 		return path;
 	};
 

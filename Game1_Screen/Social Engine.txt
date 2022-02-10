@@ -1,0 +1,4 @@
+Take Photo, create an event. Have an event 'Level'
+Check for distance from event.
+
+Do a dice roll on certain people. But have the first 4 always accept.

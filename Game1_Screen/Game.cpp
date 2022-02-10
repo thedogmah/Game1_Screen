@@ -11,7 +11,7 @@
 #include "imgui/imgui-SFML.h"
 #include "quadtree.h"
 #include "socialEngine.h"
-
+void pixelTextMove(std::vector<sf::Text>&,int);
 void Game::initInterface()
 {
 
@@ -63,21 +63,22 @@ void Game::initVariables()
 	this->health = 15;
 	this->endGame = false;
 
-
+	//playercombat
+	player.battleTime = player.combatClock.restart().asMilliseconds();
 	//text input for assets imgui interface
 	textinput = new char{};
 	//Initialise quadtree rectangle boundary
-	boundary.h = 3500;
-	boundary.w = 3500;
-	boundary.x = 1000;
-	boundary.y = 1000;
+	boundary.h = 6500;
+	boundary.w = 6500;
+	boundary.x = 0;
+	boundary.y = 0;
 	Point p(10, 10);
 	qt.boundary = boundary;
-	qt.capacity = 2;
+	qt.capacity = 20;
 	for (int i = 0; i < 100; i++) {
-		p.x = 1 + rand() % (2500);
-		p.y = 1 + rand() % (2000);
-		qt.insert(p);
+	//	p.x = 1 + rand() % (2500);
+	//	p.y = 1 + rand() % (2000);
+	//	qt.insert(p);
 	}
 
 	//Initialise path collide vector
@@ -124,7 +125,7 @@ void Game::initVariables()
 
 	if (!imgTramBus.loadFromFile("trambus.png"))
 		std::cout << "trambus.png failed to load\n";
-	imgTramBus.createMaskFromColor(sf::Color::White, 255);
+	imgTramBus.createMaskFromColor(sf::Color::White);
 	texTramBus.loadFromImage(imgTramBus);
 	recTramBus.setTexture(&texTramBus);
 	//sprTramBus.setTexture(texTramBus);
@@ -240,7 +241,7 @@ void Game::initWindow()
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 10;
+	humanityMaleGreen.peopleAmount = 50;
 	
 	 
 		
@@ -252,10 +253,23 @@ void Game::initWindow()
 	humanityMaleGreen.createBounds();
 
 
+	if (!deliverooBike.imgHuman.loadFromFile("deliveroo2.png"))
+	
+		std::cout << "deliveroo not loaded";
+	//deliverooBike.imgHuman.createMaskFromColor(sf::Color::White);
+	//deliverooBike.texHuman.setSmooth(true);
+	deliverooBike.peopleAmount = 33;
+	
+	deliverooBike.populate();
+	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
+	deliverooBike.window = window;
+	deliverooBike.createBounds();
+
+
 	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleSandyJacket.peopleAmount = 20;
+	humanityMaleSandyJacket.peopleAmount = 60;
 
 		humanityMaleSandyJacket.populate();
 //	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -268,7 +282,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityMaleWhiteJacket.peopleAmount = 50;
+	humanityMaleWhiteJacket.peopleAmount = 60;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -276,27 +290,27 @@ void Game::initWindow()
 	humanityMaleWhiteJacket.createBounds();
 
 
-	humanity.peopleAmount =250;
+	humanity.peopleAmount =70;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 10;
+	dogGR.peopleAmount = 100;
 	dogGR.populate();
 	dogGR.window = window;
 
-	drones.peopleAmount = 18;
+	drones.peopleAmount = 38;
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 15;
+	scooters.peopleAmount = 60;
 	scooters.populate();
 	scooters.window = window;
 
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 15;
+	scootersManSandyJacket.peopleAmount = 70;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
@@ -304,14 +318,14 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 10;
+	humanityWomanSnugGrey.peopleAmount = 70;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
 	//snug black coat woman population
 	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugBlack.peopleAmount = 20;
+	humanityWomanSnugBlack.peopleAmount = 70;
 	humanityWomanSnugBlack.populate();
 	humanityWomanSnugBlack.window = window;
 	humanityWomanSnugBlack.createBounds();
@@ -329,6 +343,11 @@ void Game::initEnemies()
 }	
 void Game::initSprites()
 {
+	if (!imgPSword.loadFromFile("sword.png"))
+		std::cout << "Sword png not loaded";
+	imgPSword.createMaskFromColor(sf::Color::White);
+	texPSword.loadFromImage(imgPSword);
+	rectPSword.setTexture(&texPSword);
 	noise.loadFromFile("noise.png");
 	//test water shader
 	if (!texFountain.loadFromFile("water.jpg"))
@@ -398,6 +417,75 @@ void Game::initSprites()
 void Game::checkCollide()
 {
 
+	
+	if (playerAttack) {
+		for (auto &npc : humanity.people)
+			if (rectPSword.getGlobalBounds().intersects( sf::FloatRect( npc.actor.getPosition().x, npc.actor.getPosition().y,npc.actor.getSize().x, npc.actor.getSize().y))) {
+				player.attack(npc, rectPSword);
+				//playerAttack = false;
+				break;
+			}
+		if (playerAttack)
+			for (auto &npc : humanityMaleGreen.people)
+				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
+
+					player.attack(npc, rectPSword);
+				//	playerAttack = false;
+					break;
+				}
+		if (playerAttack)
+			for (auto &npc : humanityMaleSandyJacket.people)
+				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
+										player.attack(npc, rectPSword);
+									//	playerAttack = false;
+										break;
+				}
+	
+	
+		if (playerAttack)
+			for (auto &npc : humanityMaleWhiteJacket.people)
+				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))) {
+
+					player.attack(npc, rectPSword);
+				//	playerAttack = false;
+					break;
+				}
+		if (playerAttack)
+			for (auto &npc : humanityWomanSnugBlack.people)
+				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
+
+					player.attack(npc, rectPSword);
+				//	playerAttack = false;
+					break;
+				}
+	
+		if (playerAttack)
+			for (auto &npc : humanityWomanSnugGrey.people)
+				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))) {
+
+					player.attack(npc, rectPSword);
+					//playerAttack = false;
+					break;
+				}
+
+	}
+	if (player.enemy != nullptr)
+		vRectShapeDataVector.push_back(*player.enemy);
+	//blank world text interactdion data before reloading 
+
+	if (jediengine.vAssets.size() > 0)
+	for (auto taxi : jediengine.vAssets)
+	{
+		if (taxi.getGlobalBounds().contains(player.actor.getPosition().x, player.actor.getPosition().y ) )
+		{
+			sf::Text taxiText;
+			taxiText.setCharacterSize(16);
+			taxiText.setString(sf::String("Yes Sir! The Taxi is available."));
+			taxiText.setPosition(taxi.getPosition().x +115, taxi.getPosition().y - 38);
+			taxiText.setFont(fontUI);
+			player.vVibesText.push_back(taxiText);
+		}
+	}
 	for (auto& humans : humanityMaleGreen.people)
 	{
 		if (recTramBus.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100) || recTramBus2.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100)) {
@@ -409,11 +497,13 @@ void Game::checkCollide()
 			humans.UpdateNpc(3, 0.2);
 		}
 		else {
-			humans.stopMove = false;
-			humans.stopAnimate = false;
+			if (humans.bodyHealth > 0 )
+			{humans.stopMove = false;
+				humans.stopAnimate = false;
+			}
 		}
 	}
-	player.vVibesText.clear();
+
 	if (player.bVibeInstinctSwitch) {
 		for (auto& humans : humanityMaleGreen.people) {
 			if (recTramBus.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100) || recTramBus2.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100)) {
@@ -443,7 +533,7 @@ void Game::checkCollide()
 
 
 		}
-		else {
+		else if (humans.bodyHealth > 0){
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -474,7 +564,7 @@ void Game::checkCollide()
 			humans.stopAnimate = true;
 
 		}
-		else {
+		else if (humans.bodyHealth > 0) {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -504,7 +594,7 @@ void Game::checkCollide()
 			humans.currentImage.y = 3;
 			
 		}
-		else {
+		else if(humans.bodyHealth > 0) {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -534,7 +624,7 @@ void Game::checkCollide()
 			humans.currentImage.y = 3;
 		//	humans.UpdateNpc(3, 0.2);
 		}
-		else {
+		else if (humans.bodyHealth > 0) {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -563,7 +653,7 @@ void Game::checkCollide()
 			humans.currentImage.y = 3;
 			humans.UpdateNpc(3, 0.2);
 		}
-		else {
+		else if (humans.bodyHealth > 0) {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -593,7 +683,7 @@ void Game::checkCollide()
 				humans.currentImage.y = 3;
 				humans.UpdateNpc(3, 0.2);
 			}
-			else {
+			else  {
 				humans.stopMove = false;
 				humans.stopAnimate = false;
 			}
@@ -607,7 +697,7 @@ void Game::checkCollide()
 					humans.currentImage.y = 3;
 					humans.UpdateNpc(3, 0.2);
 				}
-				else {
+				else  {
 					humans.stopMove = false;
 					humans.stopAnimate = false;
 				}
@@ -1152,6 +1242,7 @@ void Game::pollEvents()
 			}
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
+				player.profile.facingLeft = true;
 				bNpcFollow = false;
 				still = false;
 				faceUp = false;
@@ -1228,6 +1319,7 @@ void Game::pollEvents()
 				window->setView(view);
 			}	if (this->ev.key.code == sf::Keyboard::Right)
 			{
+				player.profile.facingLeft = false;
 				//reset drone view /cancel out
 				//this->window->setView(view);
 				bDroneFollow = false;
@@ -1374,6 +1466,7 @@ void Game::pollEvents()
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
+						//playerAttack = true;
 						std::cout << player.actor.getPosition().x / 100 << " y : " << player.actor.getPosition().y / 100;
 						//	Point p(worldPos.x, worldPos.y);
 						//	qt.insert(p);
@@ -1386,291 +1479,443 @@ void Game::pollEvents()
 						//std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 					//	bool found = false;
 
-
-						for (auto& people : humanity.people) //vector of NPCS
+						if (!playerAttack)
 						{
-							if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+
+							for (auto& people : humanityWomanSnugGrey.people) //vector of NPCS
 							{
-								//SETTING VIEW PORT FOR NPC FOLLOW
-								circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-								circleID = people.ID;
-								popCircleLocator = &people;
-								/*	system("cls");
-									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+									//SETTING VIEW PORT FOR NPC FOLLOW
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									/*	system("cls");
+										std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+											"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+											"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
+									*/	vNPCLookingGlass.clear();
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+
+									vNPCLookingGlass.push_back(people);
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									//found = true;
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+
+
+
+
+
+								}
+							}
+
+
+							for (auto& people : humanityWomanSnugBlack.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+									//SETTING VIEW PORT FOR NPC FOLLOW
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									/*	system("cls");
+										std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+											"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+											"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
+									*/	vNPCLookingGlass.clear();
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+
+									vNPCLookingGlass.push_back(people);
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									//found = true;
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+
+
+
+
+
+								}
+							}
+							for (auto& people : humanity.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+									//SETTING VIEW PORT FOR NPC FOLLOW
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									/*	system("cls");
+										std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+											"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+											"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
+									*/	vNPCLookingGlass.clear();
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+
+									vNPCLookingGlass.push_back(people);
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									//found = true;
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+
+
+
+
+
+								}
+							}
+
+							for (auto& people : deliverooBike.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+									//SETTING VIEW PORT FOR NPC FOLLOW
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 255);
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::Transparent);
+									circle.setScale(1, 0.1);
+									circleID = people.ID;
+									popCircleLocator = &people;
+									/*	system("cls");
+										std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+											"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+											"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
+									*/	vNPCLookingGlass.clear();
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+
+									vNPCLookingGlass.push_back(people);
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									//found = true;
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+
+
+
+
+
+								}
+							}
+
+							for (auto& people : humanityMaleGreen.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+
+									if (people.stopAnimate == true)
+									{//people.StopNpc();
+										people.stopAnimate = false;
+										people.stopMove = false;
+										//	people.currentImage.x = 3;
+										//	people.currentImage.y = 0;
+										//	// people.UpdateNpc(0, 0.2f);
+										//	if (people.eFacing == people.East)
+										//	{
+										//		people.uvRect.left = people.currentImage.x * people.uvRect.width;
+										//		people.uvRect.width = abs(people.uvRect.width);
+										//	}
+										//	else //facing West
+										//	{
+										//		people.uvRect.left = (people.currentImage.x + 1) * abs(people.uvRect.width);
+										//		people.uvRect.width = -abs(people.uvRect.width);
+										//	}
+
+											//people.actor.setTextureRect(people.uvRect);
+											//this->window->draw(people.actor, &water);
+										//}
+									}
+									else
+										people.stopAnimate = true;
+
+									//system("cls");
+									//people.pathSearch.path.clear();
+									//people.pathSearch.OnUserCreate();
+									//people.currentCount = 0;
+
+								//	people.pathSearch.nodeEnd = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
+							//		std::cout << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].x << ", " << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].y;
+
+								//	people.pathSearch.solve_AStar();
+
+									//people.pathSearch.nodes.
+								//	people.pathSearch.path = people.pathSearch.OnUserUpdate(0.2f);
+
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
 										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
-										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
-								*/	vNPCLookingGlass.clear();
-								socialengine->bShowInteract = true; 
-								socialengine->selectedNpc = &people;
-								
-								vNPCLookingGlass.push_back(people);
-								/*Human.intelligence = 1 + rand() % (160);
-								Human.sexuality = 0 + rand() % (2);
-								Human.married = 0 + rand() % (1);
-								Human.mindHealth = 1 + rand() % (100);
-								Human.bodyHealth = 1 + rand() % (100);
-								Human.soulHealth = 1 + rand() % (100);
-								Human.influencer = 1 +*/
-								//found = true;
-								followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									//found = true;
 
-								this->window->setView(followView);
-								vNpcFollowPointer = &people;
-								bNpcFollow = true;
-								return;
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
 
-
-
-
-
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+								}
 							}
-						}
 
-						for (auto& people : humanityMaleGreen.people) //vector of NPCS
-						{
-							if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+
+							for (auto& people : drones.people) //vector of NPCS
 							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
 
-								if (people.stopAnimate == true)
-								{//people.StopNpc();
-									people.stopAnimate = false;
-									people.stopMove = false;
-									//	people.currentImage.x = 3;
-									//	people.currentImage.y = 0;
-									//	// people.UpdateNpc(0, 0.2f);
-									//	if (people.eFacing == people.East)
-									//	{
-									//		people.uvRect.left = people.currentImage.x * people.uvRect.width;
-									//		people.uvRect.width = abs(people.uvRect.width);
-									//	}
-									//	else //facing West
-									//	{
-									//		people.uvRect.left = (people.currentImage.x + 1) * abs(people.uvRect.width);
-									//		people.uvRect.width = -abs(people.uvRect.width);
-									//	}
 
-										//people.actor.setTextureRect(people.uvRect);
-										//this->window->draw(people.actor, &water);
-									//}
+
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									/*	system("cls");
+										std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+											"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+											"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
+									*/	vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									//found = true;
+
+
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									flyingView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									bufferDroneSwitch = true;//
+									droneFollowPointer = &people;
+									bNpcFollow = false;
+									bDroneFollow = true;
+
+
+
+									//this->window->setView(followView);
+
+
+									return;
 								}
-								else
-									people.stopAnimate = true;
-
-								//system("cls");
-								//people.pathSearch.path.clear();
-								//people.pathSearch.OnUserCreate();
-								//people.currentCount = 0;
-								
-							//	people.pathSearch.nodeEnd = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
-						//		std::cout << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].x << ", " << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].y;
-
-							//	people.pathSearch.solve_AStar();
-
-								//people.pathSearch.nodes.
-							//	people.pathSearch.path = people.pathSearch.OnUserUpdate(0.2f);
-
-								circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-								circleID = people.ID;
-								popCircleLocator = &people;
-								std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
-									"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
-									"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
-								/*Human.intelligence = 1 + rand() % (160);
-								Human.sexuality = 0 + rand() % (2);
-								Human.married = 0 + rand() % (1);
-								Human.mindHealth = 1 + rand() % (100);
-								Human.bodyHealth = 1 + rand() % (100);
-								Human.soulHealth = 1 + rand() % (100);
-								Human.influencer = 1 +*/
-								//found = true;
-								vNPCLookingGlass.clear();
-								vNPCLookingGlass.push_back(people);
-								followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
-
-								this->window->setView(followView);
-								vNpcFollowPointer = &people;
-								bNpcFollow = true;
-								return;
 							}
-						}
-
-
-						for (auto& people : drones.people) //vector of NPCS
-						{
-							if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+							for (auto& people : humanityMaleSandyJacket.people) //vector of NPCS
 							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
 
 
 
-								circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-								circleID = people.ID;
-								popCircleLocator = &people;
-								/*	system("cls");
-									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer  << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
-										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
-										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime <<  "\nDepression: " <<people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " <<people.spirituality << "\n\n\n\n\n\n\n";
-								*/	vNPCLookingGlass.clear();
-								vNPCLookingGlass.push_back(people);
-								/*Human.intelligence = 1 + rand() % (160);
-								Human.sexuality = 0 + rand() % (2);
-								Human.married = 0 + rand() % (1);
-								Human.mindHealth = 1 + rand() % (100);
-								Human.bodyHealth = 1 + rand() % (100);
-								Human.soulHealth = 1 + rand() % (100);
-								Human.influencer = 1 +*/
-								//found = true;
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									//system("cls");
+									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+									//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									///*Human.intelligence = 1 + rand() % (160);
+									/*Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 + */
+									//	found = true;
+
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+								}
+							}
+
+							for (auto& people : humanityMaleWhiteJacket.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
 
 
-								vNPCLookingGlass.clear();
-								vNPCLookingGlass.push_back(people);
-								flyingView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
 
-								bufferDroneSwitch = true;//
-								droneFollowPointer = &people;
-								bNpcFollow = false;
-								bDroneFollow = true;
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									//system("cls");
+									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+									//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									///*Human.intelligence = 1 + rand() % (160);
+									/*Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 + */
+									//	found = true;
+
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									this->window->draw(CharBG, &water);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+								}
+							}
+
+							for (auto& people : scooters.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
 
 
 
-								//this->window->setView(followView);
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									//system("cls");
+									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+									//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									///*Human.intelligence = 1 + rand() % (160);
+									/*Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 + */
+									//	found = true;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+								}
+							}
+
+							for (auto& people : scootersManSandyJacket.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
 
 
-								return;
+
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									//system("cls");
+									//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+									//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+									//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									///*Human.intelligence = 1 + rand() % (160);
+									/*Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 + */
+									//	found = true;
+
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+								}
 							}
 						}
-								for (auto& people : humanityMaleSandyJacket.people) //vector of NPCS
-								{
-									if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
-									{
-
-
-
-										circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-										circleID = people.ID;
-										popCircleLocator = &people;
-										//system("cls");
-										//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
-										//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
-										//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
-										///*Human.intelligence = 1 + rand() % (160);
-										/*Human.sexuality = 0 + rand() % (2);
-										Human.married = 0 + rand() % (1);
-										Human.mindHealth = 1 + rand() % (100);
-										Human.bodyHealth = 1 + rand() % (100);
-										Human.soulHealth = 1 + rand() % (100);
-										Human.influencer = 1 + */
-										//	found = true;
-										vNPCLookingGlass.clear();
-										vNPCLookingGlass.push_back(people);
-										followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
-
-										this->window->setView(followView);
-										vNpcFollowPointer = &people;
-										bNpcFollow = true;
-										return;
-									}
-								}
-
-								for (auto& people : humanityMaleWhiteJacket.people) //vector of NPCS
-								{
-									if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
-									{
-
-
-
-										circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-										circleID = people.ID;
-										popCircleLocator = &people;
-										//system("cls");
-										//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
-										//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
-										//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
-										///*Human.intelligence = 1 + rand() % (160);
-										/*Human.sexuality = 0 + rand() % (2);
-										Human.married = 0 + rand() % (1);
-										Human.mindHealth = 1 + rand() % (100);
-										Human.bodyHealth = 1 + rand() % (100);
-										Human.soulHealth = 1 + rand() % (100);
-										Human.influencer = 1 + */
-										//	found = true;
-										vNPCLookingGlass.clear();
-										vNPCLookingGlass.push_back(people);
-										followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
-
-										this->window->setView(followView);
-										this->window->draw(CharBG, &water);
-										vNpcFollowPointer = &people;
-										bNpcFollow = true;
-										return;
-									}
-								}
-
-								for (auto& people : scooters.people) //vector of NPCS
-								{
-									if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
-									{
-
-
-
-										circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-										circleID = people.ID;
-										popCircleLocator = &people;
-										//system("cls");
-										//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
-										//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
-										//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
-										///*Human.intelligence = 1 + rand() % (160);
-										/*Human.sexuality = 0 + rand() % (2);
-										Human.married = 0 + rand() % (1);
-										Human.mindHealth = 1 + rand() % (100);
-										Human.bodyHealth = 1 + rand() % (100);
-										Human.soulHealth = 1 + rand() % (100);
-										Human.influencer = 1 + */
-										//	found = true;
-										vNPCLookingGlass.clear();
-										vNPCLookingGlass.push_back(people);
-										followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
-
-										this->window->setView(followView);
-										vNpcFollowPointer = &people;
-										bNpcFollow = true;
-										return;
-									}
-								}
-
-								for (auto& people : scootersManSandyJacket.people) //vector of NPCS
-								{
-									if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
-									{
-
-
-
-										circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-										circleID = people.ID;
-										popCircleLocator = &people;
-										//system("cls");
-										//std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
-										//	"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
-										//	"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
-										///*Human.intelligence = 1 + rand() % (160);
-										/*Human.sexuality = 0 + rand() % (2);
-										Human.married = 0 + rand() % (1);
-										Human.mindHealth = 1 + rand() % (100);
-										Human.bodyHealth = 1 + rand() % (100);
-										Human.soulHealth = 1 + rand() % (100);
-										Human.influencer = 1 + */
-										//	found = true;
-										vNPCLookingGlass.clear();
-										vNPCLookingGlass.push_back(people);
-										followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
-
-										this->window->setView(followView);
-										vNpcFollowPointer = &people;
-										bNpcFollow = true;
-										return;
-									}
-								}
-
 								if(bPathKey )
 									pathUpdate(worldPos.x, worldPos.y);
 								if(bAssetOneKey)
@@ -1714,9 +1959,9 @@ void Game::pollEvents()
 								routefind.nodeStart = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
 
 								//	routefind.nodes		 [(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)].bObstacle = true;
-								npc.path.clear();
-								npc.currentCount = 0;
-								routefind.solve_AStar();
+								//npc.path.clear();
+								//npc.currentCount = 0;
+								//routefind.solve_AStar();
 								//std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
 								//std::cout << "\nPath (starting at the end) is: ";
 								if (npcMove) {
@@ -1737,18 +1982,18 @@ void Game::pollEvents()
 									pathColor = false;
 
 								routefind.nodeEnd = &routefind.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
-								npc.path.clear();
-								npc.currentCount = 0;
-								routefind.solve_AStar();
+								//npc.path.clear();
+							//	npc.currentCount = 0;
+							//	routefind.solve_AStar();
 								std::cout << "\nNew end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "";
 								std::cout << "\nOriginal Start node is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 
 								std::cout << "\n\n Size of path count in NPC animation update function: " << npc.pathCount;
 
 								std::cout << "\nPath (starting at the end) is: ";
-								npc.path.clear();
-								npc.currentCount = 0;
-								routefind.solve_AStar();
+							//	npc.path.clear();
+							//	npc.currentCount = 0;
+							//	routefind.solve_AStar();
 								if (npcMove) {
 
 									//	humanity.aStarPath.nodeEnd = &humanity.aStarPath.nodes[(int(worldPos.y) / 100) * routefind.nMapWidth + (int(worldPos.x) / 100)];
@@ -1819,7 +2064,8 @@ void Game::updateEnemies()
 
 
 	/*	@return void
-		Updates the enemy spawn timer and spawns enemies when the total amount of enemies is smaller than the maximum.
+		Updates the enemy spawn timer and spawns enemies when the total 
+ of enemies is smaller than the maximum.
 		Moves the enemies downwards.
 		Removes the enemies at the edge of the screen.
 	*/
@@ -2032,7 +2278,8 @@ void Game::render()
 		//window->draw(actorMain);
 		this->renderPlayers();
 
-		//routefind.solve_AStar();delta
+		//routefind.
+		// _AStar();delta
 		// 
 		//npc.path = routefind.OnUserUpdate(0.0f);
 		//npc.pathCount = routefind.path.size();
@@ -2055,6 +2302,14 @@ void Game::render()
 		//cThread.join();
 		this->checkCollide();
 
+		//Social Engine Game Checks (interactions)
+		//Interaction Checks.
+	/*	if (socialengine->selectedClone.currentCount >= socialengine->selectedClone.path.size() - 1)
+		{
+			socialengine->selectedClone.stopMove = true;
+			socialengine->selectedClone.stopAnimate = true;
+		}
+	*/
 
 		//drawers players vibe circle if imgui checked.
 		if (player.bvibeInstinctsDraw)
@@ -2066,11 +2321,11 @@ void Game::render()
 			if (person.stopOverride)continue;
 		
 			if (!person.stopMove) {
-				
+
 				//deltaTime = npcClock.restart().asSeconds();
 
 				//person.npcWalkSwitch = 0.2;
-
+				
 				npcTimeHold += npcDelta;
 				//	if(npcTimeHold >= npcDeltaSwitch){
 				switch (person.eFacing) {
@@ -2117,10 +2372,83 @@ void Game::render()
 			}
 			//}
 			humanity.createBounds();
-			person.UpdateNpc(0, npcDelta);
+			//person.UpdateNpc(0, npcDelta);
 			//person.actor.setTextureRect(person.uvRect);
 			person.actor.setTextureRect(person.uvRect);
 		}
+
+
+	
+
+		//deliveroo
+		for (auto& person : deliverooBike.people)
+		{
+			person.actor.setScale(1.15, 1.15);
+			
+			vRectShapeDataVector.push_back(person.actor);
+			if (person.stopOverride)continue;
+
+			if (!person.stopMove) {
+
+				//deltaTime = npcClock.restart().asSeconds();
+
+				//person.npcWalkSwitch = 0.2;
+
+				npcTimeHold += npcDelta;
+				//	if(npcTimeHold >= npcDeltaSwitch){
+				switch (person.eFacing) {
+				case Animation::East:
+					person.actor.move(3, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+					//	person.actor.setTextureRect(person.uvRect);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor,&water);
+					break;
+
+				case Animation::West:
+					person.actor.move(-3, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect); 
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor, &water);
+					break;
+
+				case Animation::North:
+					person.actor.move(0, -3);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//this->window->draw(person.actor, &water);
+				//	person.actor.setTextureRect(person.uvRect);
+					break;
+
+				case Animation::South:
+					person.actor.move(0, 3);
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect);
+					break;
+	
+
+				}
+			}
+			//}
+			deliverooBike.createBounds();
+			person.UpdateTransport(0, deltaTime);
+			//person.UpdateNpc(0, npcDelta);
+			//person.actor.setTextureRect(person.uvRect);
+			person.actor.setTextureRect(person.uvRect);
+		}
+
+
+	
+
 
 		for (auto& person : humanityMaleGreen.people)
 		{
@@ -2132,6 +2460,7 @@ void Game::render()
 			//	person.actor.scale(-1, 1);
 			}
 			vRectShapeDataVector.push_back(person.actor);
+			if (person.stopOverride)continue;
 			if (!person.stopMove) {
 				//deltaTime = npcClock.restart().asSeconds();
 
@@ -2183,7 +2512,7 @@ void Game::render()
 
 				//}
 				humanityMaleGreen.createBounds();
-				person.UpdateNpc(0, npcDelta);
+				//person.UpdateNpc(0, npcDelta);
 				//person.actor.setTextureRect(person.uvRect);
 				person.actor.setTextureRect(person.uvRect);
 			}
@@ -2200,6 +2529,7 @@ void Game::render()
 			}
 			vRectShapeDataVector.push_back(person.actor);
 			//animate them if not in the stop state
+			if (person.stopOverride)continue; // this will stop them
 			if (!person.stopMove) {
 
 				//deltaTime = npcClock.restart().asSeconds();
@@ -2253,7 +2583,7 @@ void Game::render()
 
 			//}
 			humanityMaleWhiteJacket.createBounds();
-			person.UpdateNpc(0, npcDelta);
+			//person.UpdateNpc(0, npcDelta);
 			//person.actor.setTextureRect(person.uvRect);
 			person.actor.setTextureRect(person.uvRect);
 		}
@@ -2267,7 +2597,11 @@ void Game::render()
 			}
 			//animate and move npc if not stopped
 
+
+
+
 			vRectShapeDataVector.push_back(person.actor);
+			if (person.stopOverride)continue;
 			if (!person.stopMove) {
 				//deltaTime = npcClock.restart().asSeconds();
 
@@ -2319,7 +2653,7 @@ void Game::render()
 
 				//}
 				humanityMaleSandyJacket.createBounds();
-				person.UpdateNpc(0, npcDelta);
+			//	person.UpdateNpc(0, npcDelta);
 				//person.actor.setTextureRect(person.uvRect);
 				person.actor.setTextureRect(person.uvRect);
 			}
@@ -2329,7 +2663,7 @@ void Game::render()
 		for (auto& person : humanityWomanSnugGrey.people)
 		{
 			vRectShapeDataVector.push_back(person.actor);
-
+			if (person.stopOverride)continue;
 			//animate if not stopped
 			if (!person.stopMove) {
 				//deltaTime = npcClock.restart().asSeconds();
@@ -2382,7 +2716,7 @@ void Game::render()
 
 				//}
 				humanityWomanSnugGrey.createBounds();
-				person.UpdateNpc(0, npcDelta);
+			//	person.UpdateNpc(0, npcDelta);
 				//person.actor.setTextureRect(person.uvRect);
 				person.actor.setTextureRect(person.uvRect);
 			}
@@ -2394,6 +2728,7 @@ void Game::render()
 		{
 			vRectShapeDataVector.push_back(person.actor);
 			//animate if not stopped
+			if (person.stopOverride)continue;
 			if (!person.stopMove) {
 				//deltaTime = npcClock.restart().asSeconds();
 
@@ -2445,7 +2780,7 @@ void Game::render()
 
 				//}
 				humanityWomanSnugBlack.createBounds();
-				person.UpdateNpc(0, npcDelta);
+				//person.UpdateNpc(0, npcDelta);
 				//person.actor.setTextureRect(person.uvRect);
 				person.actor.setTextureRect(person.uvRect);
 			}
@@ -2456,13 +2791,39 @@ void Game::render()
 
 		Point point;
 
-		for (auto& dot : scooters.people)
-		{
-			//Point point;
-			point.x = dot.actor.getPosition().x + (dot.actor.getSize().x / 2);
-			point.y = dot.actor.getPosition().y + (dot.actor.getSize().y / 2);
-			qt.insert(point);
-		}
+		//for (auto& dot : scooters.people)
+		//{
+		//	//Point point;
+		//	point.x = dot.actor.getPosition().x + (dot.actor.getSize().x / 2);
+		//	point.y = dot.actor.getPosition().y + (dot.actor.getSize().y / 2);
+		//	qt.insert(point);
+		//}
+
+		//for (auto& dot : scootersManSandyJacket.people)
+		//{
+		//	//Point point;
+		//	point.x = dot.actor.getPosition().x + (dot.actor.getSize().x / 2);
+		//	point.y = dot.actor.getPosition().y + (dot.actor.getSize().y / 2);
+		//	qt.insert(point);
+		//}
+
+		//for (auto& dot : dogGR.people)
+		//{
+		//	//Point point;
+		//	point.x = dot.actor.getPosition().x + (dot.actor.getSize().x / 2);
+		//	point.y = dot.actor.getPosition().y + (dot.actor.getSize().y / 2);
+		//	qt.insert(point);
+		//}
+
+		//for (auto& dot : humanity.people)
+		//{
+		//	//Point point;
+		//	point.x = dot.actor.getPosition().x + (dot.actor.getSize().x / 2);
+		//	point.y = dot.actor.getPosition().y + (dot.actor.getSize().y / 2);
+		//	qt.insert(point);
+		//}
+
+
 
 		//for (int i = 0; i <= 6; i++)
 		//	for (int j = 0; j <= 6; j++)
@@ -2532,7 +2893,7 @@ void Game::render()
 				}
 
 				//}
-				dog.UpdateNpc(0, deltaTime);
+			//	dog.UpdateNpc(0, deltaTime);
 				dog.actor.setTextureRect(dog.uvRect);
 
 			}
@@ -2704,7 +3065,7 @@ void Game::render()
 			}
 
 			//}
-			dog.UpdateNpc(0, deltaTime);
+		//	dog.UpdateNpc(0, deltaTime);
 			dog.actor.setTextureRect(dog.uvRect);
 
 		}
@@ -2723,14 +3084,23 @@ void Game::render()
 			humanity.drawPeople(dayTime, uTime, npcDelta);
 			humanityWomanSnugGrey.drawPeople(dayTime, uTime, npcDelta);
 			humanityWomanSnugBlack.drawPeople(dayTime, uTime, npcDelta);
+			deliverooBike.drawPeople(dayTime, uTime, npcDelta);
 		}
 		fShaderClock = shaderClock.getElapsedTime().asSeconds();
 		sFountain.setUniform("iTime", fShaderClock);
 		window->draw(sprFountain, &sFountain);
 
+	
+		player.vVibesText.clear();
+
+		//draw battle text.
+	
+
 		//If Vibe Switch is turned on in the GUI, update instinct circle.
 		if (player.bVibeInstinctSwitch)
 			player.Update();
+	//	vRectShapeDataVector.push_back(rectPSword);
+		//this->window->draw(rectPSword);
 		vRectShapeDataVector.push_back(player.actor);
 		vRectShapeDataVector.push_back(recTramBus);
 		vRectShapeDataVector.push_back(recTramBus2);
@@ -2741,16 +3111,35 @@ void Game::render()
 		
 		if(!bNpcFollow)this->window->setView(view);
 		std::sort(vRectShapeDataVector.begin(), vRectShapeDataVector.end(), [](sf::RectangleShape a, sf::RectangleShape b) {return a.getPosition().y + a.getSize().y < b.getPosition().y + b.getSize().y; });
-		for (auto& npcs : vRectShapeDataVector)
+		for (auto& npcs : vRectShapeDataVector) {
+
 			this->window->draw(npcs);
 
-	
-		
-		for (auto& npcs : vRectShapeDataVector)
-		{
-			
-			this->window->draw(npcs);
+			//new bit
+			if (npcs.getPosition().x > 1 && npcs.getPosition().x < 6500 && npcs.getPosition().y > 1 && npcs.getPosition().y < 6500) {
+				point.x = npcs.getPosition().x;
+				point.y = npcs.getPosition().y;
+
+				qt.insert(point);
+			}//putting data into quad tree respective to everything that moves 
 		}
+		if (uiMessages.size() > 0)
+			pixelTextMove(uiMessages,3);
+		for (auto& text : uiMessages)
+			window->draw(text);
+			//window->draw(text);
+		sf::RectangleShape rec;
+		for (auto& point : pointsReturned) {
+			
+			std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
+
+			rec.setPosition(sf::Vector2f(point.x, point.y));
+			rec.setSize(sf::Vector2f(200, 200));
+			rec.setFillColor(sf::Color::Red);
+			this->window->draw(rec);
+		}
+
+	
 	//	this->window->setView(view);
 	
 		//this->window->draw(player.actor, &water);
@@ -2850,9 +3239,8 @@ void Game::render()
 		{
 			qt.show(*window);
 		}
-		qt.cleanseTree();
-
-		//qt.points.clear();
+		//qt.cleanseTree();
+		
 	//	std::cout << "begin of render pop functions\n";
 
 		ImGui::SFML::Update(*window, clockImGui.restart());
@@ -2869,10 +3257,18 @@ void Game::render()
 		jediengine.addAsset(textinput);
 		}
 
+
 		ImGui::SameLine(90);
 		if (ImGui::Button("Save Assets")) {
 			jediengine.saveAssets();
 		}
+
+		if (ImGui::Button("Delete Last Asset")) {
+			//std::cout << "\nAdded asset, " << textinput << " to asset data";
+		if (jediengine.vAssets.size()>0)	jediengine.vAssets.pop_back();
+		}
+
+
 
 		bool bIsSelected = false;
 		
@@ -2894,10 +3290,43 @@ void Game::render()
 		
 		
 	}
-
+	for (auto text : player.vCombatText)
+		this->window->draw(text);
 	std::string current = "Currently Selected: " + jediengine.currentAsset;
 	ImGui::Text(current.c_str());
 		ImGui::End();
+
+
+		ImGui::Begin("Quad Tree Query");
+		ImGui::InputText("Quadtree query X", qt.qtqueryx, 100);
+		ImGui::InputText("Quadtree query Y", qt.qtqueryy, 100);
+		ImGui::InputText("Quadtree query H", qt.qtqueryh, 100);
+		ImGui::InputText("Quadtree query W", qt.qtqueryw, 100);
+		//ImGui::SameLine(245);
+		if (ImGui::Button("Query")) {
+			sf::RectangleShape rec;
+			rec.setPosition(sf::Vector2f(0,0));
+			rec.setSize(sf::Vector2f(8200,8200));
+			rec.setFillColor(sf::Color::Blue);
+			//this->window->draw(rec);
+			pointsReturned = qt.query(rec, qt.qpoints);
+			for (auto &point : pointsReturned)
+				std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
+			
+			rec.setPosition(sf::Vector2f(point.x,point.y));
+			rec.setSize(sf::Vector2f(100,100));
+			rec.setFillColor(sf::Color::White);
+			this->window->draw(rec);
+		}
+		//sf::RectangleShape rec;
+		rec.setPosition(sf::Vector2f(0, 0));
+		rec.setSize(sf::Vector2f(8200, 8200));
+		rec.setFillColor(sf::Color::Blue);
+		
+		//qt.northeast.points.clear();
+		qt.cleanseTree();
+		ImGui::End();
+
 
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 55));
 		ImGui::Begin("Nottingham Game Simulation");
@@ -3043,8 +3472,20 @@ void Game::render()
 			bufferDroneSwitch = false;
 			bDroneFollow = true;
 		}	vRectShapeDataVector.clear();
+		for (auto& point : pointsReturned)
+			std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
+
+		rec.setPosition(sf::Vector2f(point.x, point.y));
+		rec.setSize(sf::Vector2f(100, 100));
+		rec.setFillColor(sf::Color::White);
+		this->window->draw(rec);
 		//this->window->draw(recTrees);
 		 //Tell app that window is done drawing.
+
+		//this->window->setView(player.playerUI);
+	//	for (auto ass : player.playerUIAssets)
+	//		this->window->draw(ass);
+	//	this->window->setView(view); //back to default
 		this->window->display();
 		if(!bNpcFollow )this->window->setView(view);
 		
@@ -3104,17 +3545,17 @@ void Game::renderPlayers()
 					sf::Text playerText;
 					playerText.setString(playerInput);
 					playerText.setCharacterSize(15);
-					playerText.setPosition(e.second.getPosition().x, e.second.getPosition().y +220);
+					playerText.setPosition(e.second.getPosition().x, e.second.getPosition().y + 220);
 					playerText.setFont(fontUI);
 					this->window->draw(playerText);
 				}
 			}
 		}
 
-	/*	for (auto& f : client.ChatMap)
-		{
-			std::cout << e.first << f.first << f.second << std::endl;
-		*/
+		/*	for (auto& f : client.ChatMap)
+			{
+				std::cout << e.first << f.first << f.second << std::endl;
+			*/
 			/*if (e.first == f.first)
 			{
 				sf::String playerInput;
@@ -3127,21 +3568,70 @@ void Game::renderPlayers()
 				this->window->draw(playerText);
 
 				}*/
-//				conversations.push_back(playerText);
-				
-				//location to draw text. ;
-				
-			
+				//				conversations.push_back(playerText);
 
-		
+								//location to draw text. ;
+
+
+
+
 	}
 
-		
+	//Sword testing.
+	/*
+	rectPSword.setPosition(player.actor.getPosition().x + (player.actor.getSize().x / 4) +15, player.actor.getPosition().y + (player.actor.getSize().y / 4 - 20));
+	rectPSword.setSize(sf::Vector2f(texPSword.getSize()));
+	//float rotate{};
+	if (player.profile.facingLeft)
+	{
+		rectPSword.setPosition(player.actor.getPosition().x + (player.actor.getSize().x / 4) + 50, player.actor.getPosition().y + (player.actor.getSize().y / 4 - 20));
 
+		rectPSword.setScale(-0.09, 0.09);
+	}
+	else
+		rectPSword.setScale(0.09, 0.09);
+	//if(player.)
+	//rectPSword.setOrigin(player.actor.getPosition().x-texPSword.getSize()0., player.actor.getPosition().y);
+	//rotate = player.actor.getPosition().y + sf::Mouse::getPosition().y/8;
+	if (playerAttack) {
+		rotate++;
+		rectPSword.setRotation(rotate);
+	//	if (player.profile.facingLeft)
+	//		rectPSword.move(-0.2,0);
+	//	else
+	//	{
+//rectPSword.move(, 0);
+	//	}
+	}
 
+	if (rotate > 40)
+	{
+		rotate = 0;
+		playerAttack = false;
+		rectPSword.setPosition(player.actor.getPosition().x + (player.actor.getSize().x / 4) + 15, player.actor.getPosition().y + (player.actor.getSize().y / 4 - 20));
 
-		//client.vPlayers.clear();
-		return void();
+	}
+	//rectPSword.setRotation()
+	vRectShapeDataVector.push_back(rectPSword);
+	//client.vPlayers.clear();
+	
+
+	player.battleTime = player.combatClock.getElapsedTime().asSeconds();
+	//std::cout << player.combatClock.getElapsedTime().asSeconds();	
+	if (player.battleTime > 5 || player.vCombatText.size()> 3) {
+		player.vCombatText.clear();
+		player.battleTime = 0;
+		player.combatClock.restart();
+	}
+
+	//render XP Bar.
+	player.playerXpBar.setPosition(10,10);
+	player.playerXpBar.setFillColor(sf::Color::Green);
+	player.playerXpBar.setSize(sf::Vector2f(player.profile.xp * 25, 25));
+	player.playerUIAssets.push_back(player.playerXpBar);
+	//vRectShapeDataVector.push_back(player.playerXpBar);
+	*/
+	return;
 
 }
 
@@ -3428,8 +3918,30 @@ void Game::interact()
 
 void Game::renderAssets()
 {
-	
-	
+	uiMessages.clear();
+	std::vector<sf::Text> temp{};
+	temp = humanity.vTextMessage();
+	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
+	temp = humanityMaleGreen.vTextMessage();
+	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
+	temp = humanityMaleSandyJacket.vTextMessage();
+	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
+	temp = humanityMaleWhiteJacket.vTextMessage();
+	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
+	temp = humanityMaleWhiteJacket.vTextMessage();
+	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
+	temp = humanityWomanSnugBlack.vTextMessage();
+	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
+	temp = humanityWomanSnugGrey.vTextMessage();
+	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
+	temp.clear();
+	//uiMessages.emplace_back(humanity.vTextMessage());
+//	uiMessages.emplace_back(humanityMaleGreen.vTextMessage());
+	/*for (auto &ani : humanity.people)
+	{
+		if (ani.msg.getString().getSize()>1)
+			uiMessages.push_back(ani.msg);
+	}*/
 	for (auto& tree : vStructAssets)
 	{
 		rectTree.setPosition(tree.x, tree.y);
@@ -3445,4 +3957,14 @@ void Game::renderAssets()
 	if (jediengine.vAssets.size() >0)
 	for (auto asset : jediengine.vAssets)
 		vRectShapeDataVector.push_back(asset);
+	
+}
+
+
+void pixelTextMove(std::vector <sf::Text>& text, int size) {
+	//std::cout << "\nentered free function to move text";
+	for (auto& msg : text) {
+		msg.move(sf::Vector2f(1+ rand() % (size), 1+ rand() % (size)) );
+	}
+	return;
 }

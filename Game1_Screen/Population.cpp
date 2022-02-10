@@ -40,6 +40,7 @@ bool Population::populate()
 		Human.actor.setSize(sf::Vector2f(97, 200));
 		Human.actor.setPosition(4500.0f, 1000.0f);
 		Human.pathSearch.OnUserCreate();
+
 		Human.imageCount = sf::Vector2u(4, 4);
 		
 		Human.uvRect.width = texHuman.getSize().x / float(Human.imageCount.x);
@@ -110,7 +111,7 @@ bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
 		//UNCOMMENT OUT TO ONLY DRAW PERSON WHEN VISIBLE (BETTER PERFORMANCE)
 		//if (this->rt.contains(person.actor.getPosition().x, person.actor.getPosition().y) )
 		//window->draw(person.actor, &water);
-		if (person.currentCount >= person.path.size() - 1) {
+		if (person.currentCount >= person.path.size() - 1 && person.hasControl == true) {
 			std::reverse(person.path.begin(), person.path.end());
 			
 			/*person.pathSearch.nodeStartBuffer = person.pathSearch.nodeStart;
@@ -132,6 +133,16 @@ bool Population::drawPeople(float dayTime, float uTime, float deltaTime)
 	return true;
 }
 
+std::vector<sf::Text> Population::vTextMessage()
+{
+	vecText.clear();
+	for (auto& ppl : this->people) {
+		if (ppl.msg.getString().getSize() > 1)
+			vecText.push_back(ppl.msg);
+	}
+	
+	return vecText;
+}
 void Population::createBounds()
 {
 
@@ -140,4 +151,16 @@ void Population::createBounds()
 	this->rt.width = this->window->getSize().x + 100;
 	this->rt.height = this->window->getSize().y + 2500;
 
+}
+
+void Population::newPath(Animation& npc, sf::RectangleShape player)
+{
+	////npc.pathSearch.OnUserCreate();
+	//npc.pathSearch.nodeEnd = &Human.pathSearch.nodes[int(player.getPosition().y) / 100 * npc.pathSearch.nMapWidth + int(player.getPosition().x) / 100];
+	//npc.pathSearch.nodeStart = &Human.pathSearch.nodes[int(npc.actor.getPosition().y) / 100 * npc.pathSearch.nMapWidth + int(npc.actor.getPosition().x) / 100];//
+	//npc.pathSearch.init();
+	//npc.pathSearch.solve_AStar();
+	//npc.path = Human.pathSearch.OnUserUpdate(0.2f);
+	//npc.currentImage.x = rand() % 4;
+	//npc.currentImage.y = rand() % 4;
 }

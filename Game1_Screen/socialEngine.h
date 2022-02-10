@@ -14,7 +14,8 @@
 #include <istream>
 #include <vector>
 #include "Animation.h"
-
+#include "aStar.h"
+#include "Population.h"
 class Game;
 class socialEngine
 {
@@ -22,10 +23,15 @@ public:
 	
 	socialEngine();
 	bool bShowInteract = false;
+	aStar astar{};
 	Game* game;
 	void interact(Animation *npc);
 	//get the currently selected npc
 	Animation* selectedNpc;
+	Animation selectedClone;
+	Population worldBase;
 	std::string sLabelChoose = "Choose interaction with: ";
+
+	std::vector<Animation> *vInteraction;
 
 };

@@ -1,9 +1,2 @@
-tree.png
 tram.png
-ryan.png
-jedi.png
-taxi.png
-he
-"treesBare.png"
-wo2.png
-treesBare.png
+cab.png

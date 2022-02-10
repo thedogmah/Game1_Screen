@@ -42,6 +42,10 @@ public:
 		float mindhealth = 60.f;
 		float bodyhealth = 60.f;
 		float soulhealth = 60.f;
+
+		float xp = 0.0f;
+		bool facingLeft = 0;
+		
 	};
 
 	//bools for vibes
@@ -54,10 +58,27 @@ public:
 	std::vector<vibes> vInstinctVibes;
 	//Vector will collecdt the text of the vibes sensed around Player Character. Vector is reset every frame so it doesnt draw multiple.
 	std::vector<sf::Text> vVibesText;
+	std::vector<sf::Text> vCombatText;
+	sf::Clock combatClock;
+	float battleTime{};
 	sf::RectangleShape actor;
 	Player();
+	void attack(Animation& npc, sf::RectangleShape &weapon);
+
+	sf::RectangleShape enemyHealth;
+	sf::RectangleShape playerXpBar;
+	sf::RectangleShape* enemy = nullptr;
+	sf::Text VibeText;
+	sf::Font uiFont;
 	void vibeCatch(std::string);
 	void Update();
 	sf::CircleShape vibeInstinct;
+	sf::SoundBuffer soundbuffer;
+	sf::Sound sattack;
+
+	//combat view.
+
+	sf::View playerUI;
+	std::vector<sf::RectangleShape> playerUIAssets;
 };
 

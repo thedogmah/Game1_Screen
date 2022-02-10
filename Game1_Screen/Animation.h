@@ -47,11 +47,20 @@ public:
 	bool stopAnimate = false; 
 	bool stopMove = false;
 	bool stopOverride = false;//have they been stopped.
+	bool hasControl = true;
+
+	//npc message
+	sf::Font fon;
+	sf::Text msg;
 	sf::RectangleShape actor;	//Rectangle will display NPC image.
 	sf::IntRect uvRect;
 	aStar pathSearch;
+	aStar interactedPathSearch;
 	aStar::paths steps;
+	aStar::paths interactedSteps;
 	std::vector<aStar::paths> path;
+	std::vector<aStar::paths> interactedPath;
+
 	sf::Vector2u imageCount; 
 	sf::Vector2u currentImage;
 	float switchTime=0.28;

@@ -42,5 +42,12 @@ public:
 	void subdivide();
 	void show(sf::RenderWindow &window, int depth = 0);
 	void cleanseTree();
+	std::vector<Point> qpoints; //points collected in query, to be returned
+	std::vector<Point>  query(sf::RectangleShape &range, std::vector<Point> &points);
+	char* qtqueryx; //used to query through imgui input text in game.cpp
+	char* qtqueryy;
+	char* qtqueryh;
+	char* qtqueryw;
+	Point queryPoint;
 };
 

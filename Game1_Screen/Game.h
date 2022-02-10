@@ -104,7 +104,7 @@ public:
 	Population humanityMaleWhiteJacket;
 	Population humanityWomanSnugGrey;
 	Population humanityWomanSnugBlack;
-
+	PopulationScooter deliverooBike;
 	Animation *popCircleLocator =nullptr; //pointer to individual who should be 'wearing' 'NPC selected' circle.
 //npcVibeText (used in collission function)
 	sf::Text VibeText;
@@ -167,7 +167,7 @@ private:
 	float vZoom = 1	;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 1.1;
+	float zoomfactor = 0.88;
 	//Mouse Positions
 	bool viewDrawTwice = false;
 	
@@ -212,6 +212,7 @@ private:
 	//sf::RectangleShape rectTree;
 	Rectangle boundary; //is the boundary (sub part) of the quadtree
 	QuadTree qt; //will act as the parent node / base of tree / father / root node.
+	std::vector<Point> pointsReturned;
 	// Interface
 	sf::Font fontUI;
 
@@ -245,8 +246,14 @@ private:
 	sf::Sprite CharBG;
 	
 
-	
-
+	//Combat
+	//Player
+	sf::Texture texPSword;
+	sf::Image imgPSword;
+	sf::Sprite sprPSword;
+	sf::RectangleShape rectPSword;
+	bool playerAttack = false;
+	int rotate = 0;
 
 	//Weather
 	int randomh, randomr, randomg, randomb, randomx, randomsp[1500];
@@ -271,6 +278,7 @@ private:
 	sf::RectangleShape enemy;
 	std::vector<sf::RectangleShape> enemies;
 	std::vector<sf::Text> ui;
+	std::vector<sf::Text> uiMessages;
 	std::vector<sf::Text> conversations;
 	//Private functions
 	
