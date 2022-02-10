@@ -1,9 +1,10 @@
 #include "Animation.h"
 #include <iostream>
-
+#include "socialEngine.h"
+class socialEngine;
 Animation::Animation()
 {
-	
+	//socialengine = new socialEngine();
 	std::cout << "Animation created, must initialise variables in game body before use, try INIT function\n";
 }
 Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime)
@@ -336,7 +337,9 @@ void Animation::UpdateNpc(int row, float deltaTime)
 				this->offsetX = rand() % 200 + (-100);
 				this->offsetY = rand() % 200 + (-100);
 				this->offsetStep = rand() % 3;
-				this->moved = true;
+				this->moved = true; //MAKE SURE TO CHANGE THIS BACK IN SOCIAL ENGINE DISCARD buttton. if necessary
+				this->stopAnimate = false;
+				
 			}
 			currentCount++;
 			lerpCount = 0;
@@ -353,7 +356,12 @@ void Animation::UpdateNpc(int row, float deltaTime)
 			msg.setCharacterSize(8 + rand() %(20));
 			msg.setFillColor(sf::Color(15 +rand() %(240), 15 + rand() % (240), 15 + rand() % (240)));
 			this->stopOverride = true;
+			this->currentImage.x = 3;
 
+			this->currentImage.y = 3;
+			if (!this->arrived)
+			socialengine->vInteraction.push_back(this);
+			this->arrived = true;
 			//this->msg = arrivadurch;
 		}
 	}

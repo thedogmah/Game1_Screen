@@ -2,11 +2,12 @@
 #include "Animation.h"
 #include "aStar.h"
 #include <algorithm>
+//#include "socialEngine.h"
 class Population
 {
 
 public:
-	 
+	//socialEngine* socialengine;
 	Population();
 
 	Population(int cpeopleAmount, int boundx, int boundy, sf::RenderWindow &window);

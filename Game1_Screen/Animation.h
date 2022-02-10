@@ -2,6 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include "aStar.h"
 #include <math.h>
+//#include "socialEngine.h"
+
+class socialEngine;
 //#include "Player.h"
 class Animation
 {
@@ -19,6 +22,10 @@ public:
 	int lerpCount;
 //	Player player;
 	bool isNPC = true;
+	
+	//social variables
+	socialEngine* socialengine;
+	bool arrived = false; //determines whether they have reached their invite destination and ise used in the animation function to add to vector if not (to add only once)
 	//	character bio
 
 	int ID; //unique ID for each animation created, particularly for poplation class. Will link NPC with bio data / database
@@ -49,6 +56,8 @@ public:
 	bool stopOverride = false;//have they been stopped.
 	bool hasControl = true;
 
+
+	//socialEngine *socialengine;
 	//npc message
 	sf::Font fon;
 	sf::Text msg;

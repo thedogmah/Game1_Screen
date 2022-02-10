@@ -39,7 +39,21 @@ void Game::initInterface()
 void Game::initVariables()
 {
 	socialengine = new socialEngine();
+
 	socialengine->game = this;
+	humanity.Human.socialengine = this->socialengine;
+	humanityMaleGreen.Human.socialengine = this->socialengine;
+	humanityMaleSandyJacket.Human.socialengine = this->socialengine;
+	humanityMaleWhiteJacket.Human.socialengine = this->socialengine;
+	
+	humanityWomanSnugBlack.Human.socialengine = this->socialengine;
+	humanityWomanSnugGrey.Human.socialengine = this->socialengine;
+//	scooters.Human.socialengine = this->socialengine;
+	//dogGR.Human.socialengine = this->socialengine;
+//	//scootersManSandyJacket.Human.socialengine = this->socialengine;
+//	deliverooBike.Human.socialengine = this->socialengine;
+//	drones.Human.socialengine = this->socialengine;
+	//i.ehumanity.Human.socialengine = this->socialengine;
 	clockImGui.restart();
 	fShaderClock = shaderClock.restart().asSeconds();
 	screenSize.x = 1100;
@@ -418,57 +432,57 @@ void Game::checkCollide()
 {
 
 	
-	if (playerAttack) {
-		for (auto &npc : humanity.people)
-			if (rectPSword.getGlobalBounds().intersects( sf::FloatRect( npc.actor.getPosition().x, npc.actor.getPosition().y,npc.actor.getSize().x, npc.actor.getSize().y))) {
-				player.attack(npc, rectPSword);
-				//playerAttack = false;
-				break;
-			}
-		if (playerAttack)
-			for (auto &npc : humanityMaleGreen.people)
-				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
+	//if (playerAttack) {
+		//for (auto &npc : humanity.people)
+		//	if (rectPSword.getGlobalBounds().intersects( sf::FloatRect( npc.actor.getPosition().x, npc.actor.getPosition().y,npc.actor.getSize().x, npc.actor.getSize().y))) {
+		//		player.attack(npc, rectPSword);
+		//		//playerAttack = false;
+		//		break;
+		//	}
+		//if (playerAttack)
+		//	for (auto &npc : humanityMaleGreen.people)
+		//		if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
 
-					player.attack(npc, rectPSword);
-				//	playerAttack = false;
-					break;
-				}
-		if (playerAttack)
-			for (auto &npc : humanityMaleSandyJacket.people)
-				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
-										player.attack(npc, rectPSword);
-									//	playerAttack = false;
-										break;
-				}
+		//			player.attack(npc, rectPSword);
+		//		//	playerAttack = false;
+		//			break;
+		//		}
+		//if (playerAttack)
+		//	for (auto &npc : humanityMaleSandyJacket.people)
+		//		if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
+		//								player.attack(npc, rectPSword);
+		//							//	playerAttack = false;
+		//								break;
+		//		}
 	
 	
-		if (playerAttack)
-			for (auto &npc : humanityMaleWhiteJacket.people)
-				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))) {
+		//if (playerAttack)
+		//	for (auto &npc : humanityMaleWhiteJacket.people)
+		//		if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))) {
 
-					player.attack(npc, rectPSword);
-				//	playerAttack = false;
-					break;
-				}
-		if (playerAttack)
-			for (auto &npc : humanityWomanSnugBlack.people)
-				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
+		//			player.attack(npc, rectPSword);
+		//		//	playerAttack = false;
+		//			break;
+		//		}
+		//if (playerAttack)
+		//	for (auto &npc : humanityWomanSnugBlack.people)
+		//		if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))){
 
-					player.attack(npc, rectPSword);
-				//	playerAttack = false;
-					break;
-				}
+		//			player.attack(npc, rectPSword);
+		//		//	playerAttack = false;
+		//			break;
+		//		}
 	
-		if (playerAttack)
-			for (auto &npc : humanityWomanSnugGrey.people)
-				if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))) {
+		//if (playerAttack)
+		//	for (auto &npc : humanityWomanSnugGrey.people)
+		//		if (rectPSword.getGlobalBounds().intersects(sf::FloatRect(npc.actor.getPosition().x, npc.actor.getPosition().y, npc.actor.getSize().x, npc.actor.getSize().y))) {
 
-					player.attack(npc, rectPSword);
-					//playerAttack = false;
-					break;
-				}
+		//			player.attack(npc, rectPSword);
+		//			//playerAttack = false;
+		//			break;
+		//		}
 
-	}
+	
 	if (player.enemy != nullptr)
 		vRectShapeDataVector.push_back(*player.enemy);
 	//blank world text interactdion data before reloading 
@@ -486,6 +500,8 @@ void Game::checkCollide()
 			player.vVibesText.push_back(taxiText);
 		}
 	}
+
+
 	for (auto& humans : humanityMaleGreen.people)
 	{
 		if (recTramBus.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100) || recTramBus2.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100)) {
@@ -496,12 +512,11 @@ void Game::checkCollide()
 			humans.currentImage.y = 3;
 			humans.UpdateNpc(3, 0.2);
 		}
-		else {
-			if (humans.bodyHealth > 0 )
+		else 
 			{humans.stopMove = false;
 				humans.stopAnimate = false;
 			}
-		}
+		
 	}
 
 	if (player.bVibeInstinctSwitch) {
@@ -533,7 +548,7 @@ void Game::checkCollide()
 
 
 		}
-		else if (humans.bodyHealth > 0){
+		else {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -564,7 +579,7 @@ void Game::checkCollide()
 			humans.stopAnimate = true;
 
 		}
-		else if (humans.bodyHealth > 0) {
+		else  {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -594,7 +609,7 @@ void Game::checkCollide()
 			humans.currentImage.y = 3;
 			
 		}
-		else if(humans.bodyHealth > 0) {
+		else  {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -624,7 +639,7 @@ void Game::checkCollide()
 			humans.currentImage.y = 3;
 		//	humans.UpdateNpc(3, 0.2);
 		}
-		else if (humans.bodyHealth > 0) {
+		else  {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -653,7 +668,7 @@ void Game::checkCollide()
 			humans.currentImage.y = 3;
 			humans.UpdateNpc(3, 0.2);
 		}
-		else if (humans.bodyHealth > 0) {
+		else  {
 			humans.stopMove = false;
 			humans.stopAnimate = false;
 		}
@@ -2522,14 +2537,10 @@ void Game::render()
 		//}
 		for (auto& person : humanityMaleWhiteJacket.people)
 		{
-			if (person.actor.getRotation() == 0 && person.actor.getRotation() != 22)
-			{
-				//	person.actor.setRotation(8.0f);
-					//person.actor.scale(-1, -1);
-			}
+			
 			vRectShapeDataVector.push_back(person.actor);
 			//animate them if not in the stop state
-			if (person.stopOverride)continue; // this will stop them
+			if (person.stopOverride )continue; // this will stop them
 			if (!person.stopMove) {
 
 				//deltaTime = npcClock.restart().asSeconds();
@@ -3248,7 +3259,8 @@ void Game::render()
 
 		if(socialengine->bShowInteract)
 			socialengine->interact(socialengine->selectedNpc);
-
+		if (socialengine->vInteraction.size() > 0)
+			socialengine->interactParty(socialengine->vInteraction);
 		ImGui::Begin("Asset List");
 		ImGui::InputText("Asset to add", textinput , 500);
 		//ImGui::SameLine(245);

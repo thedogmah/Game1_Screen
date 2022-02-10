@@ -13,7 +13,7 @@
 #include <fstream>
 #include <istream>
 #include <vector>
-#include "Animation.h"
+//#include "Animation.h"
 #include "aStar.h"
 #include "Population.h"
 class Game;
@@ -26,12 +26,14 @@ public:
 	aStar astar{};
 	Game* game;
 	void interact(Animation *npc);
+	void interactParty(std::vector<Animation*> npc);
+	void disbandParty(std::vector<Animation*> npc);
 	//get the currently selected npc
 	Animation* selectedNpc;
 	Animation selectedClone;
 	Population worldBase;
 	std::string sLabelChoose = "Choose interaction with: ";
-
-	std::vector<Animation> *vInteraction;
+	Animation *vInteract;
+	std::vector<Animation*> vInteraction;
 
 };
