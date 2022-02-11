@@ -78,7 +78,7 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		packet >> username >> data >> location.x >> location.y >> message >> ip >> port ;
 	//	std::cout << "From server data: " << data << " now at: " << location.x << ", " << location.y << std::endl;
 		//DEBUG COMMENTS std::cout << "Printing message from clientside function: " << message ;
-		iPlayers.loadFromFile("wo1.png");
+		iPlayers.loadFromFile("RyanChar2.png");
 		iPlayers.createMaskFromColor(sf::Color::Black);
 		tPlayers.loadFromImage(iPlayers);
 		sPlayers.setTexture(tPlayers);

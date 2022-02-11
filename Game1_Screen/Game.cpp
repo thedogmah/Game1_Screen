@@ -12,6 +12,7 @@
 #include "quadtree.h"
 #include "socialEngine.h"
 void pixelTextMove(std::vector<sf::Text>&,int);
+void pixelTextMove(std::vector <Animation*> npc, int size);
 void Game::initInterface()
 {
 
@@ -56,8 +57,8 @@ void Game::initVariables()
 	//i.ehumanity.Human.socialengine = this->socialengine;
 	clockImGui.restart();
 	fShaderClock = shaderClock.restart().asSeconds();
-	screenSize.x = 1100;
-	screenSize.y = 1100;
+	screenSize.x = 1200;
+	screenSize.y = 1200;
 	settings.antialiasingLevel = 8.0;
 	this->window = nullptr;
 	//resizing Players across server.
@@ -231,8 +232,8 @@ void Game::initVariables()
 void Game::initWindow()
 {
 	
-	this->videoMode.height = 1530;
-	this->videoMode.width = 1500;
+	this->videoMode.height = 1900;
+	this->videoMode.width = 2250;
 //	this->videoMode.getDesktopMode;
 	this->window = new sf::RenderWindow(this->videoMode, "The City", sf::Style::Default, settings);
 	ImGui::SFML::Init(*window);
@@ -948,9 +949,9 @@ std::string Game::npcSexuality(Animation person)
 		return "Bisexual";
 	}
 }
-void Game::initClient(sf::TcpSocket* rsocket)
-{
-}
+//void Game::initClient(sf::TcpSocket* rsocket)
+//{
+//}
 Game::Game()
 {
 	//Check all sections are doing the relevant things.
@@ -1112,6 +1113,8 @@ ImGui::PopStyleColor(1);
 	//ImGui::PopStyleColor(17);
 	//std::cout << "end of looking glassn";
 	ImGui::End();
+
+	socialengine->worldChat(client.ChatMap);
 	//std::cout << "very end of looking glass functions\n";
 	
 	//	"\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
@@ -1124,7 +1127,7 @@ ImGui::PopStyleColor(1);
 void Game::initConnection()
 {
 		bool connect = false;
-	//while (!connect)
+	while (!connect)
 		if (client.socket.connect(client.ip, 2000) == sf::Socket::Done)
 		{
 			connect = true;
@@ -1132,7 +1135,7 @@ void Game::initConnection()
 			std::cout << "Connected to server \n " << client.socket.getRemoteAddress();
 
 		}
-	//	else
+		else
 			std::cout << "probing for server\n / Connection needed to be established to run = false (edit InitConnection fuinction in game.cpp to change) " << sf::IpAddress::LocalHost << "3000\n";
 	}
 
@@ -2043,23 +2046,23 @@ void Game::pollEvents()
 			userText.setPosition(spChar.getPosition().x - 15, spChar.getPosition().y - 65);
 
 		}
-		//void Game::initClient(sf::TcpSocket* rsocket)
-		//{
+		void Game::initClient(sf::TcpSocket* rsocket)
+		{
 
-		//		while (true) {
-		//		//rsocket->setBlocking(false);
-		//		if (rsocket->receive(this->rpacket) == sf::Socket::Done)
-		//		{
-		//			std::cout << "received data";
-		//		}
-		//		else
-		//			std::cout << "\npacket not received";
+				while (true) {
+				//rsocket->setBlocking(false);
+				if (rsocket->receive(this->rpacket) == sf::Socket::Done)
+				{
+					std::cout << "received data";
+				}
+				else
+					std::cout << "\npacket not received";
 
-		//		std::this_thread::sleep_for((std::chrono::milliseconds)10);
-		//		//}
-		//	}
+				std::this_thread::sleep_for((std::chrono::milliseconds)10);
+		}
+			}
 	
-	//}}
+	
 
 
 void Game::updateEnemies()
@@ -3119,9 +3122,11 @@ void Game::render()
 		renderAssets();
 		
 		
-		
 		if(!bNpcFollow)this->window->setView(view);
 		std::sort(vRectShapeDataVector.begin(), vRectShapeDataVector.end(), [](sf::RectangleShape a, sf::RectangleShape b) {return a.getPosition().y + a.getSize().y < b.getPosition().y + b.getSize().y; });
+		if (vSocialShapeDataVector.size() > 0)
+			window->draw(socialengine->partyGrid);
+			//vRectShapeDataVector.insert(vRectShapeDataVector.begin()+2, socialengine->partyGrid);
 		for (auto& npcs : vRectShapeDataVector) {
 
 			this->window->draw(npcs);
@@ -3134,8 +3139,12 @@ void Game::render()
 				qt.insert(point);
 			}//putting data into quad tree respective to everything that moves 
 		}
+		socialengine->drawSocial();
 		if (uiMessages.size() > 0)
 			pixelTextMove(uiMessages,3);
+		if (socialengine->vInteraction.size() > 0)
+			pixelTextMove(socialengine->vInteraction, 2);
+
 		for (auto& text : uiMessages)
 			window->draw(text);
 			//window->draw(text);
@@ -3502,6 +3511,8 @@ void Game::render()
 		if(!bNpcFollow )this->window->setView(view);
 		
 		this->window->clear();
+		if(!initialised)
+		initialised = true;
 	}
 		
 	
@@ -3534,36 +3545,53 @@ void Game::login()
 {
 
 	std::cout << "\nPlease enter Character name: ";
-	username = "Ryan";
+	std::cin >> username;
+	//username = "Ryan";
 	userText.setString(username);
 }
 
 
 void Game::renderPlayers()
 {//renders play chat when online.
-	for (auto& e : client.PlayerMap)
-	{
-		//std::cout << "\n" << e.getPosition().x << ", " << e.getPosition().y << std::endl;
-		if (e.first != username)
-		{
-			this->window->draw(e.second);
-			for (auto& f : client.ChatMap)
 
+	std::string text;
+	
+	if (socialengine->vInteraction.size() > 0)
+	{
+
+		
+		for (auto& e : client.PlayerMap)
+		{
+			//std::cout << "\n" << e.getPosition().x << ", " << e.getPosition().y << std::endl;
+			if (e.first != username)
 			{
-				if (e.first == f.first)
+				this->window->draw(e.second);
+				for (auto& f : client.ChatMap)
+
 				{
-					sf::String playerInput{};
-					playerInput = f.second;
-					sf::Text playerText;
-					playerText.setString(playerInput);
-					playerText.setCharacterSize(15);
-					playerText.setPosition(e.second.getPosition().x, e.second.getPosition().y + 220);
-					playerText.setFont(fontUI);
-					this->window->draw(playerText);
+					if (e.first == f.first)
+					{
+						sf::String playerInput{};
+
+						text = f.second;
+						playerInput = f.second;
+						sf::Text playerText;
+						playerText.setString(playerInput);
+						playerText.setCharacterSize(15);
+						playerText.setPosition(e.second.getPosition().x, e.second.getPosition().y + 220);
+						playerText.setFont(fontUI);
+						this->window->draw(playerText);
+						
+
+					}
+
 				}
 			}
+
 		}
 
+	
+	}
 		/*	for (auto& f : client.ChatMap)
 			{
 				std::cout << e.first << f.first << f.second << std::endl;
@@ -3587,8 +3615,7 @@ void Game::renderPlayers()
 
 
 
-	}
-
+	
 	//Sword testing.
 	/*
 	rectPSword.setPosition(player.actor.getPosition().x + (player.actor.getSize().x / 4) +15, player.actor.getPosition().y + (player.actor.getSize().y / 4 - 20));
@@ -3977,6 +4004,25 @@ void pixelTextMove(std::vector <sf::Text>& text, int size) {
 	//std::cout << "\nentered free function to move text";
 	for (auto& msg : text) {
 		msg.move(sf::Vector2f(1+ rand() % (size), 1+ rand() % (size)) );
+		msg.rotate(0.1);
+		
 	}
+	return;
+}
+
+void pixelTextMove(std::vector <Animation*> npc, int size) {
+	//std::cout << "\nentered free function to move text";
+	return;
+	int flavour{};
+	flavour = rand() % (2);
+	//std::cout << flavour;
+	if (flavour == 1)
+	for (auto& msg : npc) {
+		msg->actor.move(sf::Vector2f(1 + rand() % (size), 1 + rand() % (size)));
+	}
+	else //(flavour == 0)
+		for (auto& msg : npc) {
+			msg->actor.move(sf::Vector2f(-(  rand() % (-size)),-  ( rand() % (-size))));
+		}
 	return;
 }

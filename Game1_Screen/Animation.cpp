@@ -5,7 +5,7 @@ class socialEngine;
 Animation::Animation()
 {
 	//socialengine = new socialEngine();
-	std::cout << "Animation created, must initialise variables in game body before use, try INIT function\n";
+	//std::cout << "Animation created, must initialise variables in game body before use, try INIT function\n";
 }
 Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime)
 {
@@ -345,7 +345,7 @@ void Animation::UpdateNpc(int row, float deltaTime)
 			lerpCount = 0;
 			
 		}
-		if (currentCount == path.size() - 1 && this->hasControl == false && lerpCount > 50)
+		if (currentCount == path.size() - 1 && this->hasControl == false && lerpCount > 70)
 		{
 			//
 			//Generate initial vibe circle colour, and text size
@@ -353,14 +353,27 @@ void Animation::UpdateNpc(int row, float deltaTime)
 			msg.setString(sf::String("Good Vibes"));
 			msg.setPosition(this->actor.getPosition());
 			msg.setFont(fon);
-			msg.setCharacterSize(8 + rand() %(20));
-			msg.setFillColor(sf::Color(15 +rand() %(240), 15 + rand() % (240), 15 + rand() % (240)));
+			msg.setCharacterSize(7 + rand() % (20));
+			msg.setFillColor(sf::Color(15 + rand() % (240), 15 + rand() % (240), 15 + rand() % (240)));
 			this->stopOverride = true;
 			this->currentImage.x = 3;
+			this->path.clear();
+			int flavour{};
+			flavour = rand() % (2);
+			//std::cout << flavour;
+			if (flavour == 1)
+			{
 
+
+				msg.rotate(-5 + rand() % (5));
+				msg.rotate(-5 + rand() % (5));
+			}
 			this->currentImage.y = 3;
-			if (!this->arrived)
-			socialengine->vInteraction.push_back(this);
+			if (!this->arrived){
+				socialengine->vInteraction.push_back(this);
+
+		}
+			socialengine->partySizeChange = true;
 			this->arrived = true;
 			//this->msg = arrivadurch;
 		}

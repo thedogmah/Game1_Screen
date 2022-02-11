@@ -131,12 +131,16 @@ public:
 	bool bAssetOneKey = false;
 	bool bQuadTree = false;
 	sf::Clock clockImGui;
+	//zoom 
+	float zoomfactor = 0.88; // is accessed by other classes
 
-
-	
+	//Main asset for draying rect shape across Y axis, and is used by social engine (party grid)
+	std::vector<sf::RectangleShape> vRectShapeDataVector;
+	std::vector<sf::CircleShape> vSocialShapeDataVector;
 	//player statistics
 	int experience = 0;
 	std::string exper="";
+	sf::RenderWindow* window;
 private:
 
 	//Variables	
@@ -147,7 +151,7 @@ private:
 	sf::ContextSettings settings;
 	
 	sf::Vector2i screenSize ;
-	sf::RenderWindow* window;
+	
 	
 	sf::VideoMode videoMode;
 	sf::Event ev;
@@ -167,7 +171,7 @@ private:
 	float vZoom = 1	;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
-	float zoomfactor = 0.88;
+	
 	//Mouse Positions
 	bool viewDrawTwice = false;
 	
@@ -177,7 +181,7 @@ private:
 
 	//Resources
 		//file stream for reading pathfinding file
-	std::vector<sf::RectangleShape> vRectShapeDataVector;
+	
 	//Pathfinding / Collissions
 	std::ifstream pathdata;
 	std::fstream pathDataW;
@@ -274,6 +278,7 @@ private:
 	int health;
 	bool mouseHeld;
 	bool endGame;
+	bool initialised = false;
 	//Game Objects
 	sf::RectangleShape enemy;
 	std::vector<sf::RectangleShape> enemies;
