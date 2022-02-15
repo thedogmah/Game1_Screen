@@ -359,6 +359,8 @@ void Animation::UpdateNpc(int row, float deltaTime)
 			this->currentImage.x = 3;
 			this->path.clear();
 			int flavour{};
+			std::cout << this->lerpCount << "< lerp\n for " << this->ID << '\n';
+			this->lerpCount = 0;
 			flavour = rand() % (2);
 			//std::cout << flavour;
 			if (flavour == 1)

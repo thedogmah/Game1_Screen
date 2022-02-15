@@ -2,6 +2,7 @@
 #include "Animation.h"
 #include "Game.h"
 #include "Population.h"
+#include <math.h>
 socialEngine::socialEngine(){
 
 //	initialise images. Mustn't be local since they will go out of scope for sprites (no reference)
@@ -23,6 +24,7 @@ void socialEngine::interact(Animation* npc)
 {
 
 	ImGui::Begin("Interact!", &bShowInteract);
+	
 	std::string title;
 	title = sLabelChoose + std::to_string(npc->ID);
 	int pathsofar = npc->currentCount;
@@ -52,46 +54,49 @@ void socialEngine::interact(Animation* npc)
 				partyGrid.setOutlineThickness(5);
 				partyGrid.setOutlineColor(sf::Color::Green);
 				partyGrid.setOrigin(partyGrid.getRadius(), partyGrid.getRadius());
-			//	partyGrid.set
-				//partyGrid.setSize(sf::Vector2f(100, 100));
-				//partyGrid.setOrigin((partyGridi)
+				//	partyGrid.set
+					//partyGrid.setSize(sf::Vector2f(100, 100));
+					//partyGrid.setOrigin((partyGridi)
 			}
-			npc->stopOverride = true;
+			if (!npc->arrived) {
+				npc->stopOverride = true;
 
-			npc->currentImage.x = 3;			
-			npc->currentImage.y = 3;
-			
-			npc->hasControl = false;
-			//npc->stopAnimate = true;
-			//npc->stopMove = true;
-			
-			//selectedClone.actor = npc->actor;
-		
-			//npc->pathSearch.OnUserCreate();
+				npc->currentImage.x = 3;
+				npc->currentImage.y = 3;
 
-			//astar.OnUserCreate();
-			npc->path.clear();
-			npc->currentCount = 0;
-			//npc->pathSearch.nodeEnd = &npc->pathSearch.nodes[5];
-		//	npc->pathSearch.nodeStart = &npc->pathSearch.nodes[20];
-			npc->pathSearch.nodeStart = &npc->pathSearch.nodes[int(game->player.actor.getPosition().y /100)  * npc->pathSearch.nMapWidth +(int(game->player.actor.getPosition().x) /100) ];
-		//	std::cout << int(game->player.actor.getPosition().y) * npc->pathSearch.nMapWidth + (int(game->player.actor.getPosition().x));
-			npc->pathSearch.nodeEnd = &npc->pathSearch.nodes[int(npc->actor.getPosition().y / 100) * npc->pathSearch.nMapWidth + (int(npc->actor.getPosition().x) / 100)];//
-			npc->pathSearch.solve_AStar();
-			npc->path = npc->pathSearch.OnUserUpdate(0.2f);
-	//
+				npc->hasControl = false;
+				//npc->stopAnimate = true;
+				npc->stopMove = true;
 
-			npc->currentImage.x = rand() % 4;
+				//selectedClone.actor = npc->actor;
+
+				//npc->pathSearch.OnUserCreate();
+
+				//astar.OnUserCreate();
+				npc->path.clear();
+				npc->currentCount = 0;
+				npc->lerpCount = 0;
+				//npc->pathSearch.nodeEnd = &npc->pathSearch.nodes[5];
+			//	npc->pathSearch.nodeStart = &npc->pathSearch.nodes[20];
+				npc->pathSearch.nodeStart = &npc->pathSearch.nodes[int(game->player.actor.getPosition().y / 100) * npc->pathSearch.nMapWidth + (int(game->player.actor.getPosition().x) / 100)];
+				//	std::cout << int(game->player.actor.getPosition().y) * npc->pathSearch.nMapWidth + (int(game->player.actor.getPosition().x));
+				npc->pathSearch.nodeEnd = &npc->pathSearch.nodes[int(npc->actor.getPosition().y / 100) * npc->pathSearch.nMapWidth + (int(npc->actor.getPosition().x) / 100)];//
+				npc->pathSearch.solve_AStar();
+				npc->path = npc->pathSearch.OnUserUpdate(0.2f);
+				//
+
+				npc->currentImage.x = rand() % 4;
 
 			}
+		}
 		else {
 		
-			
-			npc->stopOverride = false;
+			if (!npc->arrived) {
+				npc->stopOverride = false;
 
-			npc->stopAnimate = false;
-			npc->stopMove = false;
-
+				npc->stopAnimate = false;
+				npc->stopMove = false;
+			}
 		}
 		ImGui::Text("Called Over");
 	}
@@ -302,7 +307,26 @@ void socialEngine::drawSocial()
 
 void socialEngine::moveNPCs(std::vector<Animation*> npc)
 {
-	for (auto const& person : npc)
+	int xspace{};
+	int placeline = 0;
+	int line = sqrt(npc.size());
+	//create array grid and fill npcs/
+		for (int i = 1; i < npc.size(); i++)
+	{
+			xspace = 50 * i;
+			npc[i]->actor.setPosition(npc[0]->actor.getPosition().x + (i * 50 ), npc[0]->actor.getPosition().y + placeline * 50  );
+			std::cout << "\nitem: " << i << npc[i]->actor.getPosition().x << " and y" << npc[i]->actor.getPosition().y << '\n';
+			placeline++;
+			std::cout << placeline;
+			if (placeline > line)
+			{
+				line++;
+				placeline = 0; 
+			}
+		}
+	
+	//legacy code moves NPCs a few spaces
+	/*for (auto const& person : npc)
 	{
 		int smooth = rand() % (2);
 		int xx =  rand() % 81+(-40);
@@ -311,6 +335,6 @@ void socialEngine::moveNPCs(std::vector<Animation*> npc)
 		if (smooth == 1)
 		person->actor.move(xx/2, 0);
 		else
-			person->actor.move(0 , yy);
-	}
+			person->actor.move(0 , yy);*/
+	//}
 }

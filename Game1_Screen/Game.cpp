@@ -39,6 +39,8 @@ void Game::initInterface()
 //Private member functions
 void Game::initVariables()
 {
+	offSetX = -492;
+	offSetY = 251;
 	socialengine = new socialEngine();
 
 	socialengine->game = this;
@@ -46,7 +48,7 @@ void Game::initVariables()
 	humanityMaleGreen.Human.socialengine = this->socialengine;
 	humanityMaleSandyJacket.Human.socialengine = this->socialengine;
 	humanityMaleWhiteJacket.Human.socialengine = this->socialengine;
-	
+	humanityBlackMaleJacket.Human.socialengine = this->socialengine;
 	humanityWomanSnugBlack.Human.socialengine = this->socialengine;
 	humanityWomanSnugGrey.Human.socialengine = this->socialengine;
 //	scooters.Human.socialengine = this->socialengine;
@@ -57,7 +59,7 @@ void Game::initVariables()
 	//i.ehumanity.Human.socialengine = this->socialengine;
 	clockImGui.restart();
 	fShaderClock = shaderClock.restart().asSeconds();
-	screenSize.x = 1200;
+	screenSize.x = 1500;
 	screenSize.y = 1200;
 	settings.antialiasingLevel = 8.0;
 	this->window = nullptr;
@@ -114,7 +116,7 @@ void Game::initVariables()
 		}
 	}
 
-	for (int i = 0; i < 74; i++)
+	for (int i = 0; i < 119; i++)
 	{
 		for (int j = 0; j < 129; j++)
 		{
@@ -144,7 +146,7 @@ void Game::initVariables()
 	texTramBus.loadFromImage(imgTramBus);
 	recTramBus.setTexture(&texTramBus);
 	//sprTramBus.setTexture(texTramBus);
-	recTramBus.setPosition(7000., 4375);
+	recTramBus.setPosition(7000., 4075);
 	recTramBus.setSize(sf::Vector2f(imgTramBus.getSize()));
 	recTramBus2.setScale(sf::Vector2f(-1, 1));
 
@@ -155,7 +157,7 @@ void Game::initVariables()
 	texTramBus2.loadFromImage(imgTramBus);
 	recTramBus2.setTexture(&texTramBus);
 	//sprTramBus.setTexture(texTramBus);
-	recTramBus2.setPosition(-2000., 4275);
+	recTramBus2.setPosition(-2000., 3975);
 	recTramBus2.setSize(sf::Vector2f(imgTramBus.getSize()));
 
 	if (!imgTrees.loadFromFile("treesBare.png"))
@@ -232,20 +234,20 @@ void Game::initVariables()
 void Game::initWindow()
 {
 	
-	this->videoMode.height = 1900;
-	this->videoMode.width = 2250;
+	this->videoMode.height = 2100;
+	this->videoMode.width = 2800;
 //	this->videoMode.getDesktopMode;
 	this->window = new sf::RenderWindow(this->videoMode, "The City", sf::Style::Default, settings);
 	ImGui::SFML::Init(*window);
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	this->window->setFramerateLimit(100);
+	this->window->setFramerateLimit(120);
 
-	view.setCenter(3700, 1260);
+	view.setCenter(4370, 3970);
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 
-	followView.zoom(0.85);
+	followView.zoom(1);
 	followView.setViewport(sf::FloatRect(0, 0, 1, 1));
 
 
@@ -267,6 +269,21 @@ void Game::initWindow()
 	humanityMaleGreen.window = window;
 	humanityMaleGreen.createBounds();
 
+
+	if (!humanityBlackMaleJacket.imgHuman.loadFromFile("protagonistblackmalejacket.png"))
+
+		std::cout << "Green Protagonist not loaded";
+	humanityBlackMaleJacket.imgHuman.createMaskFromColor(sf::Color::Red);
+	humanityBlackMaleJacket.peopleAmount = 78;
+	
+	 
+		
+		
+		
+	humanityBlackMaleJacket.populate();
+//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
+	humanityBlackMaleJacket.window = window;
+	humanityBlackMaleJacket.createBounds();
 
 	if (!deliverooBike.imgHuman.loadFromFile("deliveroo2.png"))
 	
@@ -356,6 +373,41 @@ void Game::initEnemies()
 	//this->enemy.setOutlineThickness(1.f);
 
 }	
+
+void Game::initMarketSquare() {
+	if (!imgmsquarewall.loadFromFile("\images/msquarewall.png"))
+		std::cout << "Failed to load market sq wall";
+//	imgmsquarewall.createMaskFromColor(sf::Color::White);
+	textsquarewall.loadFromImage(imgmsquarewall);
+	
+	Rectmsquarewall.setTexture(&textsquarewall);
+	Rectmsquarewall.setScale(0.6, 0.6);
+	Rectmsquarewall.setPosition(4800 +offSetX, 2564 +offSetY);
+	Rectmsquarewall.setSize(sf::Vector2f(textsquarewall.getSize()));
+
+	if (!iwallpost.loadFromFile("\images/signpostNottingham.png"))
+		std::cout << "Failed to load market sq wall";
+	//	imgmsquarewall.createMaskFromColor(sf::Color::White);
+	twallpost.loadFromImage(iwallpost);
+
+	recwallpost.setTexture(&twallpost);
+	recwallpost.setScale(0.6, 0.8);
+	recwallpost.setPosition(4800 + offSetX, 1575 + offSetY);
+	recwallpost.setSize(sf::Vector2f(twallpost.getSize()));
+	lastAssets.push_back(recwallpost);
+	recwallpost.setPosition(5400 + offSetX, 1575 + offSetY);
+	//
+	iwallpost.loadFromFile("\images/signpostNottinghamOrange.png");
+	twallpostOrange.loadFromImage(iwallpost);
+	recwallpost.setTexture(&twallpostOrange);
+	lastAssets.push_back(recwallpost);
+	iwallpost.loadFromFile("\images/signpostNottinghamBlue.png");
+	twallpostBlue.loadFromImage(iwallpost);
+	recwallpost.setTexture(&twallpostBlue);
+	recwallpost.setPosition(6000 + offSetX, 1575 + offSetY);
+	lastAssets.push_back(recwallpost);
+	
+}
 void Game::initSprites()
 {
 	if (!imgPSword.loadFromFile("sword.png"))
@@ -414,6 +466,7 @@ void Game::initSprites()
 	//Char.loadFromImage(image);
 	spChar.setTexture(Char);
 	
+	initMarketSquare();
 
 	//Load main background file (replace with tile system / resource manager
 	if (!bg.loadFromFile("RyanChar1.png"))
@@ -425,14 +478,29 @@ void Game::initSprites()
 	spChar.scale(0.21, 0.21);
 	
 	//spChar.setTexture(Char2);
-	spChar.setPosition(3180, 3980); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
+	spChar.setPosition(3910, 2708); //setPosition(4710, 2108); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
 	//Current new char is rendered at same coordinates so makes no difference. Delete spChar or keep for a backup char.
 	
 }
 void Game::checkCollide()
 {
-
 	
+	//for (const auto& object : vPathVisualAid)
+	//{
+	//	if (object.getGlobalBounds().intersects(this->player.actor.getGlobalBounds()))
+	//	{
+	//		
+	//		if (playerLastLocation.x >= this->player.actor.getPosition().x)
+	//			player.actor.move(1500, 0);
+	//		if (playerLastLocation.x <= this->player.actor.getPosition().x)
+	//			player.actor.move(-1500, 0);
+	//		std::cout << " collide";//this->player.stopped = true;
+	//		
+
+	//	}
+	//	else
+	//		playerLastLocation = this->player.actor.getPosition();
+	//}
 	//if (playerAttack) {
 		//for (auto &npc : humanity.people)
 		//	if (rectPSword.getGlobalBounds().intersects( sf::FloatRect( npc.actor.getPosition().x, npc.actor.getPosition().y,npc.actor.getSize().x, npc.actor.getSize().y))) {
@@ -511,7 +579,7 @@ void Game::checkCollide()
 			humans.stopMove = true;
 			humans.currentImage.x = 3;
 			humans.currentImage.y = 3;
-			humans.UpdateNpc(3, 0.2);
+			//humans.UpdateNpc(3, 0.2);
 		}
 		else 
 			{humans.stopMove = false;
@@ -536,7 +604,43 @@ void Game::checkCollide()
 		}
 	}
 
-	for (auto& humans : humanityMaleSandyJacket.people)
+
+	for(auto & humans : humanityMaleGreen.people)
+	{
+		if (recTramBus.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100) || recTramBus2.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100)) {
+
+			humans.stopAnimate = true;
+			humans.stopMove = true;
+			humans.currentImage.x = 3;
+			humans.currentImage.y = 3;
+			//humans.UpdateNpc(3, 0.2);
+		}
+		else
+		{
+			humans.stopMove = false;
+			humans.stopAnimate = false;
+		}
+
+	}
+
+	if (player.bVibeInstinctSwitch) {
+		for (auto& humans : humanityBlackMaleJacket.people) {
+			if (recTramBus.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100) || recTramBus2.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100)) {
+				VibeText.setCharacterSize(14);
+				VibeText.setString(sf::String(npcVibe(humans)));
+				VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
+				VibeText.setFont(fontUI);
+				player.vibeCatch(VibeText.getString());
+				player.vVibesText.push_back(VibeText);
+				//window->draw(VibeText);
+				//	std::cout << "Vibe instinct collide with Male Green\n";
+				player.profile.powerVibeInstinct -= player.profile.powerVibeInstinctTolerance;
+			}
+		}
+	}
+
+
+	for (auto& humans : humanityBlackMaleJacket.people)
 	{
 		if (recTramBus.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100) || recTramBus2.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100)) {
 			humans.currentImage.x = 3;
@@ -555,7 +659,7 @@ void Game::checkCollide()
 		}
 	}
 	if (player.bVibeInstinctSwitch) {
-		for (auto& humans : humanityMaleSandyJacket.people) {
+		for (auto& humans : humanityBlackMaleJacket.people) {
 
 			if (recTramBus.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100) || recTramBus2.getGlobalBounds().contains(humans.actor.getPosition().x, humans.actor.getPosition().y + 100)) {
 				VibeText.setCharacterSize(14);
@@ -593,7 +697,7 @@ void Game::checkCollide()
 					VibeText.setString(sf::String(npcVibe(humans)));
 					VibeText.setPosition(humans.actor.getPosition().x, humans.actor.getPosition().y - 18);
 					VibeText.setFont(fontUI);
-					//window->draw(VibeText);
+					window->draw(VibeText);
 					player.vibeCatch(VibeText.getString());
 					player.vVibesText.push_back(VibeText);
 					//	std::cout << "Vibe instinct collide with White Jacket Male Green\n";
@@ -625,7 +729,7 @@ void Game::checkCollide()
 				VibeText.setFont(fontUI);
 				player.vibeCatch(VibeText.getString());
 				player.vVibesText.push_back(VibeText);
-				//window->draw(VibeText);
+				window->draw(VibeText);
 				//	std::cout << "Vibe instinct collide with Woman, snug black Jacket\n";
 			}
 		}
@@ -965,7 +1069,9 @@ Game::Game()
 
 Game::~Game()
 {
+	delete this->socialengine;
 	delete this->window;
+	delete this->textinput;
 }
 
 
@@ -1126,7 +1232,7 @@ ImGui::PopStyleColor(1);
 
 void Game::initConnection()
 {
-		bool connect = false;
+	return;	bool connect = false;
 	while (!connect)
 		if (client.socket.connect(client.ip, 2000) == sf::Socket::Done)
 		{
@@ -1198,49 +1304,55 @@ void Game::pollEvents()
 				this->window->close();*/
 			if (this->ev.key.code == sf::Keyboard::Down)
 			{//stops follow npc
-				bNpcFollow = false;
-				//spChar.setTexture(Char);
-				still = false;
-				faceRight = false;
-				faceUp = false;
-				faceDown = true;
+				player.stopped = false;
+				if (!player.stopped) {
+					playerCollide(sf::Vector2i(0,1));
+					if (player.stopped)
+						return;
+					bNpcFollow = false;
+					//spChar.setTexture(Char);
+					still = false;
+					faceRight = false;
+					faceUp = false;
+					faceDown = true;
 
-				sf::Vector2i location;
-				location.x = spChar.getPosition().x;
-				location.y = spChar.getPosition().y;
-				//std::cout << "\n x: " << spChar.getPosition().x << ", y: " << spChar.getPosition().y << "\n";
-				//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+					sf::Vector2i location;
+					location.x = spChar.getPosition().x;
+					location.y = spChar.getPosition().y;
+					//std::cout << "\n x: " << spChar.getPosition().x << ", y: " << spChar.getPosition().y << "\n";
+					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 
-				//###Need to send packet less often.### Maybe on a delta time check.
-				std::string down = "Down ";
-				down += username;
-				client.sendingpacket << username << down << location.x << location.y << chat.playerInput.toAnsiString();
-				//DEBUG COMMENTS std::cout << "Printing message from Game.dowNkey function: " << chat.playerInput.toAnsiString();
+					//###Need to send packet less often.### Maybe on a delta time check.
+					std::string down = "Down ";
+					down += username;
+					client.sendingpacket << username << down << location.x << location.y << chat.playerInput.toAnsiString();
+					//DEBUG COMMENTS std::cout << "Printing message from Game.dowNkey function: " << chat.playerInput.toAnsiString();
 
-				movement = "Down ";
-				movement += username;
-				client.sendingpacket << movement;
+					movement = "Down ";
+					movement += username;
+					client.sendingpacket << movement;
 
-				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					std::cout << "packet 'Down' not sent";
+					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+						std::cout << "packet 'Down' not sent";
+					}
+					client.sendingpacket.clear();
+
+					spChar.move(0, 10);
+					player.actor.move(0, 10);
+					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
+					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
+
+					if (aPosition.x < 0)
+						aPosition.x = 0;
+					if (aPosition.y < 0)
+						aPosition.y = 0;
+
+					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
+
+
+					view.zoom(zoomfactor);
+					window->setView(view);
 				}
-				client.sendingpacket.clear();
-
-				spChar.move(0, 12);
-				player.actor.move(0, 12);
-				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
-				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
-
-				if (aPosition.x < 0)
-					aPosition.x = 0;
-				if (aPosition.y < 0)
-					aPosition.y = 0;
-
-				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-
-
-				view.zoom(zoomfactor);
-				window->setView(view);
 			}
 
 			if (this->ev.type == sf::Event::JoystickMoved)
@@ -1260,123 +1372,144 @@ void Game::pollEvents()
 			}
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
-				player.profile.facingLeft = true;
-				bNpcFollow = false;
-				still = false;
-				faceUp = false;
-				faceDown = false;
-				faceRight = false;
+				player.stopped = false;
+				if (!player.stopped) {
+					playerCollide(sf::Vector2i(-1, 0));
+					if (player.stopped)
+						return;
+					player.profile.facingLeft = true;
+					bNpcFollow = false;
+					still = false;
+					faceUp = false;
+					faceDown = false;
+					faceRight = false;
 
-				spChar.move(-12, 0);
-				player.actor.move(-12, 0);
-				sf::Vector2i location;
-				location.x = spChar.getPosition().x;
-				location.y = spChar.getPosition().y;
+					spChar.move(-10, 0);
+					player.actor.move(-10, 0);
+					sf::Vector2i location;
+					location.x = spChar.getPosition().x;
+					location.y = spChar.getPosition().y;
 
-				//DEBUG COMMENTSstd::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-				std::string left = "Left ";
-				left += username;
-				client.sendingpacket << username << left << location.x << location.y << chat.playerInput.toAnsiString();
+					//DEBUG COMMENTSstd::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+					std::string left = "Left ";
+					left += username;
+					client.sendingpacket << username << left << location.x << location.y << chat.playerInput.toAnsiString();
 
-				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					std::cout << "packet 'Left' not sent";
+					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+						std::cout << "packet 'Left' not sent";
+					}
+					client.sendingpacket.clear();
+
+					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
+					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
+
+					if (aPosition.x < 0)
+						aPosition.x = 0;
+					if (aPosition.y < 0)
+						aPosition.y = 0;
+
+					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
+
+					view.zoom(zoomfactor);
+					window->setView(view);
 				}
-				client.sendingpacket.clear();
-
-				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
-				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
-
-				if (aPosition.x < 0)
-					aPosition.x = 0;
-				if (aPosition.y < 0)
-					aPosition.y = 0;
-
-				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-
-				view.zoom(zoomfactor);
-				window->setView(view);
 			}
-
 
 			if (this->ev.key.code == sf::Keyboard::Up)
 			{
-				bNpcFollow = false;
-				player.actor.move(0, -12);
-				//spChar.setTexture(Char3);
-				still = false;
-				faceDown = false;
-				faceUp = true;
-				faceRight = false;
-				sf::Vector2i location;
-				location.x = spChar.getPosition().x;
-				location.y = spChar.getPosition().y;
+				player.stopped = false;
+				if (!player.stopped) {
 
-				//DEBUG COMMENTS  std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-				std::string up = "Up ";
-				up += username;
-				client.sendingpacket << username << up << location.x << location.y << chat.playerInput.toAnsiString();
+					playerCollide(sf::Vector2i(0, -1));
+					if (player.stopped)
+						return;
+					bNpcFollow = false;
+					player.actor.move(0, -10);
+					//spChar.setTexture(Char3);
+					still = false;
+					faceDown = false;
+					faceUp = true;
+					faceRight = false;
+					sf::Vector2i location;
+					location.x = spChar.getPosition().x;
+					location.y = spChar.getPosition().y;
 
-				//spChar.setTexture(Char4);
-				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					std::cout << "packet 'Up' not sent";
+					//DEBUG COMMENTS  std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+					std::string up = "Up ";
+					up += username;
+					client.sendingpacket << username << up << location.x << location.y << chat.playerInput.toAnsiString();
+
+					//spChar.setTexture(Char4);
+					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+						std::cout << "packet 'Up' not sent";
+					}
+					client.sendingpacket.clear();
+
+					spChar.move(0, -10);
+					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
+					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
+
+					if (aPosition.x < 0)
+						aPosition.x = 0;
+					if (aPosition.y < 0)
+						aPosition.y = 0;
+
+					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
+
+					view.zoom(zoomfactor);
+					window->setView(view);
 				}
-				client.sendingpacket.clear();
-
-				spChar.move(0, -12);
-				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
-				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
-
-				if (aPosition.x < 0)
-					aPosition.x = 0;
-				if (aPosition.y < 0)
-					aPosition.y = 0;
-
-				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-
-				view.zoom(zoomfactor);
-				window->setView(view);
 			}	if (this->ev.key.code == sf::Keyboard::Right)
 			{
-				player.profile.facingLeft = false;
-				//reset drone view /cancel out
-				//this->window->setView(view);
-				bDroneFollow = false;
-				//stops following npc if seleced to follow
-				bNpcFollow = false;
-				still = false;
-				faceDown = false;
-				faceUp = false;
-				faceRight = true;
-				sf::Vector2i location;
-				location.x = spChar.getPosition().x;
-				location.y = spChar.getPosition().y;
+				player.stopped = false;
+				if (!player.stopped) {
+					
+					playerCollide(sf::Vector2i(1, 0));
+					if (player.stopped)
+						return;
+				//	playerLastLocation = player.actor.getPosition();
+					std::cout << playerLastLocation.x << " " << playerLastLocation.y << "\n";
+					player.profile.facingLeft = false;
+					//reset drone view /cancel out
+					//this->window->setView(view);
+					bDroneFollow = false;
+					//stops following npc if seleced to follow
+					bNpcFollow = false;
+					still = false;
+					faceDown = false;
+					faceUp = false;
+					faceRight = true;
+					sf::Vector2i location;
+					location.x = spChar.getPosition().x;
+					location.y = spChar.getPosition().y;
 
-				//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-				std::string right = "Right ";
-				right += username;
-				client.sendingpacket << username << right << location.x << location.y << chat.playerInput.toAnsiString();
+					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+					std::string right = "Right ";
+					right += username;
+					client.sendingpacket << username << right << location.x << location.y << chat.playerInput.toAnsiString();
 
 
-				//spChar.setTexture(Char4);
-				if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					std::cout << "packet 'Right' not sent";
+					//spChar.setTexture(Char4);
+					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+						std::cout << "packet 'Right' not sent";
+					}
+					client.sendingpacket.clear();
+					spChar.move(10, 0);
+					player.actor.move(10, 0);
+
+					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
+					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
+
+					if (aPosition.x < 0)
+						aPosition.x = 0;
+					if (aPosition.y < 0)
+						aPosition.y = 0;
+
+					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
+
+					view.zoom(zoomfactor);
+					window->setView(view);
 				}
-				client.sendingpacket.clear();
-				spChar.move(12, 0);
-				player.actor.move(12, 0);
-
-				aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
-				aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
-
-				if (aPosition.x < 0)
-					aPosition.x = 0;
-				if (aPosition.y < 0)
-					aPosition.y = 0;
-
-				view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-
-				view.zoom(zoomfactor);
-				window->setView(view);
 			}
 			//	this->enemy.setPosition(sf::Vector2f(102.f, 100.f));
 			if (this->ev.key.code == sf::Keyboard::F2)
@@ -1410,8 +1543,10 @@ void Game::pollEvents()
 			}
 
 			break;
-
-
+			
+			case::sf::Event::MouseButtonReleased:
+				mouseDown = false;
+				break;
 		case sf::Event::KeyReleased:
 		{
 			still = true;
@@ -1484,6 +1619,21 @@ void Game::pollEvents()
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
+						if (!mouseDown)
+						{
+							mouseDown = true;
+							
+							mouseDrag.setPosition(sf::Vector2f(sf::Mouse::getPosition(*window).x, sf::Mouse::getPosition(*window).y));
+							mouseDrag.setOutlineThickness(30);
+							mouseDrag.setFillColor(sf::Color::Transparent);
+							mouseDrag.setOutlineColor(sf::Color::Yellow);
+							drawBox= true;
+						}
+						if (drawBox && mouseDown)
+						{
+							mouseDrag.setSize(sf::Vector2f(mouseDrag.getPosition().x + 50, mouseDrag.getPosition().y + 50));
+						}
+						
 						//playerAttack = true;
 						std::cout << player.actor.getPosition().x / 100 << " y : " << player.actor.getPosition().y / 100;
 						//	Point p(worldPos.x, worldPos.y);
@@ -1738,6 +1888,78 @@ void Game::pollEvents()
 								}
 							}
 
+							for (auto& people : humanityBlackMaleJacket.people) //vector of NPCS
+							{
+								if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
+								{
+
+									if (people.stopAnimate == true)
+									{//people.StopNpc();
+										people.stopAnimate = false;
+										people.stopMove = false;
+										//	people.currentImage.x = 3;
+										//	people.currentImage.y = 0;
+										//	// people.UpdateNpc(0, 0.2f);
+										//	if (people.eFacing == people.East)
+										//	{
+										//		people.uvRect.left = people.currentImage.x * people.uvRect.width;
+										//		people.uvRect.width = abs(people.uvRect.width);
+										//	}
+										//	else //facing West
+										//	{
+										//		people.uvRect.left = (people.currentImage.x + 1) * abs(people.uvRect.width);
+										//		people.uvRect.width = -abs(people.uvRect.width);
+										//	}
+
+											//people.actor.setTextureRect(people.uvRect);
+											//this->window->draw(people.actor, &water);
+										//}
+									}
+									else
+										people.stopAnimate = true;
+
+									//system("cls");
+									//people.pathSearch.path.clear();
+									//people.pathSearch.OnUserCreate();
+									//people.currentCount = 0;
+
+								//	people.pathSearch.nodeEnd = &people.pathSearch.nodes[(int(player.actor.getPosition().y) ) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) )];
+							//		std::cout << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].x << ", " << people.pathSearch.nodes[(int(player.actor.getPosition().y) / 100) * people.pathSearch.nMapWidth + (int(player.actor.getPosition().x) / 100)].y;
+
+								//	people.pathSearch.solve_AStar();
+
+									//people.pathSearch.nodes.
+								//	people.pathSearch.path = people.pathSearch.OnUserUpdate(0.2f);
+
+									circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
+									circleID = people.ID;
+									circle.setFillColor(sf::Color::Transparent);
+									circle.setOutlineColor(sf::Color::White);
+									popCircleLocator = &people;
+									std::cout << "This is Human number: " << people.ID << ".\nTheir vibe is: " << npcVibe(people) << "\nTheir career is: " << npcCareer(people) << ".\nTheir influencer reach is : " << people.influencer << "\nTheir personal wealth is: " << people.wealth << "\n\nTheir IQ is: " << people.intelligence << ".\nTheir sexuality is: " << npcSexuality(people) <<
+										"\nTheir marital status is: " << npcMarried(people) << ".\n\nTheir mind health is: " << people.mindHealth << ".\nTheir body health is: " << people.bodyHealth <<
+										"\nTheir soul health is: " << people.soulHealth << "\n\nThere tendancies are:\nCrime: " << people.crime << "\nDepression: " << people.depression << "\nAnxiety: " << people.anxiety << "\n\nTheir instinct level is: " << people.instinct << "\nTheir belief system is: " << npcReligion(people) << "\nTheir spirituality is: " << people.spirituality << "\n\n\n\n\n\n\n";
+									/*Human.intelligence = 1 + rand() % (160);
+									Human.sexuality = 0 + rand() % (2);
+									Human.married = 0 + rand() % (1);
+									Human.mindHealth = 1 + rand() % (100);
+									Human.bodyHealth = 1 + rand() % (100);
+									Human.soulHealth = 1 + rand() % (100);
+									Human.influencer = 1 +*/
+									//found = true;
+
+									socialengine->bShowInteract = true;
+									socialengine->selectedNpc = &people;
+									vNPCLookingGlass.clear();
+									vNPCLookingGlass.push_back(people);
+									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
+
+									this->window->setView(followView);
+									vNpcFollowPointer = &people;
+									bNpcFollow = true;
+									return;
+								}
+							}
 
 							for (auto& people : drones.people) //vector of NPCS
 							{
@@ -1854,7 +2076,7 @@ void Game::pollEvents()
 									followView.setCenter(people.actor.getPosition().x, people.actor.getPosition().y);
 
 									this->window->setView(followView);
-									this->window->draw(CharBG, &water);
+									this->window->draw(CharBG);
 									vNpcFollowPointer = &people;
 									bNpcFollow = true;
 									return;
@@ -1989,6 +2211,8 @@ void Game::pollEvents()
 										//humanity.people[0].path = humanity.aStarPath.OnUserUpdate(0.2f);
 								}
 							}
+							else 
+							mouseDown = false;
 							if (ev.mouseButton.button == sf::Mouse::Right)
 							{
 
@@ -2076,9 +2300,9 @@ void Game::updateEnemies()
 	* 
 	*/
 	if (recTramBus.getPosition().x < -4100)
-		recTramBus.setPosition(7000., 4375);
-	if (recTramBus2.getPosition().x > 10300)
-		recTramBus2.setPosition(-3000., 4275);
+		recTramBus.setPosition(10000.+offSetX, 2206 + offSetY);
+	if (recTramBus2.getPosition().x > 12300)
+		recTramBus2.setPosition(-3000. +offSetX, 2162+ offSetY);
 
 
 	/*	@return void
@@ -2262,7 +2486,7 @@ void Game::render()
 
 			//std::cout << bNpcFollow;
 	
-	window->draw(CharBG, &water);
+	window->draw(CharBG);
 	this->renderEnemies();
 			
 		if (bNpcFollow)
@@ -2465,7 +2689,73 @@ void Game::render()
 		}
 
 
-	
+		for (auto& person : humanityBlackMaleJacket.people)
+		{
+
+
+			if (person.actor.getRotation() == 0 && person.actor.getRotation() != 22)
+			{
+				//person.actor.setRotation(8.0f);
+			//	person.actor.scale(-1, 1);
+			}
+			vRectShapeDataVector.push_back(person.actor);
+			if (person.stopOverride)continue;
+			if (!person.stopMove) {
+				//deltaTime = npcClock.restart().asSeconds();
+
+				//person.npcWalkSwitch = 0.2;
+
+				npcTimeHold += npcDelta;
+				//	if(npcTimeHold >= npcDeltaSwitch){
+				switch (person.eFacing) {
+				case Animation::East:
+					person.actor.move(1, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+					//	person.actor.setTextureRect(person.uvRect);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor,&water);
+					break;
+
+				case Animation::West:
+					person.actor.move(-1, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect); 
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor, &water);
+					break;
+
+				case Animation::North:
+					person.actor.move(0, -1);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//this->window->draw(person.actor, &water);
+				//	person.actor.setTextureRect(person.uvRect);
+					break;
+
+				case Animation::South:
+					person.actor.move(0, 1);
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect);
+					break;
+
+
+				}
+
+				//}
+				humanityBlackMaleJacket.createBounds();
+				//person.UpdateNpc(0, npcDelta);
+				//person.actor.setTextureRect(person.uvRect);
+				person.actor.setTextureRect(person.uvRect);
+			}
+		}
 
 
 		for (auto& person : humanityMaleGreen.people)
@@ -3094,6 +3384,7 @@ void Game::render()
 		{
 			humanityMaleWhiteJacket.drawPeople(dayTime, uTime, npcDelta);
 			humanityMaleSandyJacket.drawPeople(dayTime, uTime, npcDelta);
+			humanityBlackMaleJacket.drawPeople(dayTime, uTime, npcDelta);
 			humanityMaleGreen.drawPeople(dayTime, uTime, npcDelta);
 			humanity.drawPeople(dayTime, uTime, npcDelta);
 			humanityWomanSnugGrey.drawPeople(dayTime, uTime, npcDelta);
@@ -3121,7 +3412,8 @@ void Game::render()
 		//rendering assets will order assets and add to vector.
 		renderAssets();
 		
-		
+		//
+		vRectShapeDataVector.push_back(Rectmsquarewall);
 		if(!bNpcFollow)this->window->setView(view);
 		std::sort(vRectShapeDataVector.begin(), vRectShapeDataVector.end(), [](sf::RectangleShape a, sf::RectangleShape b) {return a.getPosition().y + a.getSize().y < b.getPosition().y + b.getSize().y; });
 		if (vSocialShapeDataVector.size() > 0)
@@ -3139,6 +3431,8 @@ void Game::render()
 				qt.insert(point);
 			}//putting data into quad tree respective to everything that moves 
 		}
+		for (const auto& assets : lastAssets)
+			this->window->draw(assets);
 		socialengine->drawSocial();
 		if (uiMessages.size() > 0)
 			pixelTextMove(uiMessages,3);
@@ -3158,7 +3452,7 @@ void Game::render()
 			rec.setFillColor(sf::Color::Red);
 			this->window->draw(rec);
 		}
-
+		window->draw(mouseDrag);
 	
 	//	this->window->setView(view);
 	
@@ -3670,6 +3964,7 @@ void Game::renderPlayers()
 	player.playerUIAssets.push_back(player.playerXpBar);
 	//vRectShapeDataVector.push_back(player.playerXpBar);
 	*/
+	resetFrame();
 	return;
 
 }
@@ -3681,9 +3976,9 @@ void Game::pathReset()
 	if (pathDataW.is_open())
 	{
 
-		for (int i = 0; i < 75; i++)
+		for (int i = 0; i < 119; i++)
 		{
-			for (int j = 0; j < 130; j++)
+			for (int j = 0; j < 83; j++)
 
 			{
 
@@ -3797,9 +4092,9 @@ void Game::pathSave()
 	if (pathDataW.is_open())
 	{
 		std::string line;
-		for (int i = 0; i < 75; i++)
+		for (int i = 0; i < 119; i++)
 		{
-			for (int j = 0; j < 130; j++)
+			for (int j = 0; j < 83; j++)
 
 			{
 
@@ -3963,6 +4258,8 @@ void Game::renderAssets()
 	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
 	temp = humanityMaleGreen.vTextMessage();
 	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
+	temp = humanityBlackMaleJacket.vTextMessage();
+	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
 	temp = humanityMaleSandyJacket.vTextMessage();
 	uiMessages.insert(uiMessages.end(), temp.begin(), temp.end());
 	temp = humanityMaleWhiteJacket.vTextMessage();
@@ -4010,6 +4307,57 @@ void pixelTextMove(std::vector <sf::Text>& text, int size) {
 	return;
 }
 
+void Game::resetFrame() {
+//	player.stopped = false;
+	playerLastLocation = this->player.actor.getPosition();
+}
+
+void Game::playerCollide(sf::Vector2i movement)
+{
+	for (const auto& obstacle : vPathVisualAid)
+	{
+		if (obstacle.getGlobalBounds().intersects(this->player.actor.getGlobalBounds()))
+		{
+			if (movement.x == 1)
+			{
+				//player.actor.setPosition(playerLastLocation);
+				player.actor.move(-25, 0);
+				spChar.move(-25, 0);
+				std::cout << "Right\n";
+				//player.stopped = true;
+			}
+			else if (movement.x == -1)
+			{
+				//player.actor.setPosition(playerLastLocation);
+				player.actor.move(25, 0);
+				spChar.move(20, 0);
+				std::cout << "Left\n";
+				//player.stopped = true;
+			}
+			if (movement.y == 1)
+			{
+				//player.actor.setPosition(playerLastLocation);
+				player.actor.move(0, -25);
+			spChar.move(0, -25);
+				std::cout << "Down\n";
+				//player.stopped = true;
+			}
+			else if (movement.y == -1)
+			{
+				
+				player.actor.move(0, 25);
+				spChar.move(0, 25);
+				std::cout << "up\n";
+				
+			}
+		}
+		else {
+			playerLastLocation = this->player.actor.getPosition();
+			
+		}
+	}
+}
+
 void pixelTextMove(std::vector <Animation*> npc, int size) {
 	//std::cout << "\nentered free function to move text";
 	return;
@@ -4026,3 +4374,4 @@ void pixelTextMove(std::vector <Animation*> npc, int size) {
 		}
 	return;
 }
+

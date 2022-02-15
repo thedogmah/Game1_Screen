@@ -16,7 +16,7 @@
 #include <list>
 
 aStar::aStar() {
-	this->nMapWidth = 75; this->nMapHeight = 105 ;
+	this->nMapWidth = 119; this->nMapHeight = 83 ;
 	this->init();
 		}
 	//m_sAppName = L"Path Finding";

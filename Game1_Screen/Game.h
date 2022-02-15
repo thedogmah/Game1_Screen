@@ -62,6 +62,7 @@ public:
 	
 	std::string movement;
 	Player player;
+	sf::Vector2f playerLastLocation{};
 	Player playerTwo;
 	bool grid;			//bool to switch / flag node grid on or off (see below)
 	bool gridPath;		//bool to switch / flag a* drawing on or off
@@ -104,6 +105,7 @@ public:
 	Population humanityMaleWhiteJacket;
 	Population humanityWomanSnugGrey;
 	Population humanityWomanSnugBlack;
+	Population humanityBlackMaleJacket;
 	PopulationScooter deliverooBike;
 	Animation *popCircleLocator =nullptr; //pointer to individual who should be 'wearing' 'NPC selected' circle.
 //npcVibeText (used in collission function)
@@ -132,8 +134,12 @@ public:
 	bool bQuadTree = false;
 	sf::Clock clockImGui;
 	//zoom 
-	float zoomfactor = 0.88; // is accessed by other classes
+	float zoomfactor = 1.15; // is accessed by other classes
 
+
+	//variables to offset everything (for when changing map size)
+	int offSetX{};
+	int offSetY{};
 	//Main asset for draying rect shape across Y axis, and is used by social engine (party grid)
 	std::vector<sf::RectangleShape> vRectShapeDataVector;
 	std::vector<sf::CircleShape> vSocialShapeDataVector;
@@ -141,6 +147,25 @@ public:
 	int experience = 0;
 	std::string exper="";
 	sf::RenderWindow* window;
+
+	//mouse drag box/
+	sf::RectangleShape mouseDrag;
+	bool mouseDown;
+
+
+	//world assets.
+	sf::RectangleShape Rectmsquarewall;
+	sf::Image imgmsquarewall;
+	sf::Texture textsquarewall;
+	//sign posts on wall
+	sf::RectangleShape recwallpost;
+	sf::Image iwallpost;
+	sf::Texture twallpost;
+	sf::Texture twallpostOrange;
+	sf::Texture twallpostBlue;
+	std::vector<sf::RectangleShape> lastAssets;
+
+	
 private:
 
 	//Variables	
@@ -277,6 +302,7 @@ private:
 	int maxEnemies;
 	int health;
 	bool mouseHeld;
+	bool drawBox=false; //see above (mouse held)
 	bool endGame;
 	bool initialised = false;
 	//Game Objects
@@ -293,8 +319,13 @@ private:
 	void initWindow();
 	void initEnemies();
 	void initSprites();
+	void initMarketSquare();
 	void initConnection();
 	void initNPC();
+	void resetFrame();
+	void playerCollide(sf::Vector2i);
+
+	
 	void npcLookingGlass(Animation npc);
 	std::vector<Animation> vNPCLookingGlass;
 	std::string npcMarried(Animation person);

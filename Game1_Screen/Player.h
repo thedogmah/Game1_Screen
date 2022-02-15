@@ -17,7 +17,7 @@ public:
 		int vibe;
 
 	};
-	
+	bool stopped = false;
 	struct profiles{
 
 		std::string name = "Ryan";
