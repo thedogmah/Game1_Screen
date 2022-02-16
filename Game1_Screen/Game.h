@@ -61,7 +61,16 @@ public:
 	jediEngine jediengine;
 	
 	std::string movement;
+	
+	//player resources
 	Player player;
+	sf::Vector2f velocity;
+	float movementSpeed = 2.2;
+	bool moving_right = false;
+	bool moving_up = false;
+	bool moving_down = false;
+	bool moving_left = false;
+	void entityMove();
 	sf::Vector2f playerLastLocation{};
 	Player playerTwo;
 	bool grid;			//bool to switch / flag node grid on or off (see below)
@@ -134,7 +143,7 @@ public:
 	bool bQuadTree = false;
 	sf::Clock clockImGui;
 	//zoom 
-	float zoomfactor = 1.15; // is accessed by other classes
+	float zoomfactor = 1; // is accessed by other classes
 
 
 	//variables to offset everything (for when changing map size)
@@ -193,7 +202,7 @@ private:
 	bool bufferDroneSwitch = false;
 	Animation *vNpcFollowPointer = nullptr;
 	Animation* droneFollowPointer = nullptr;
-	float vZoom = 1	;
+	float vZoom = 0.8	;
 	float moveSpeed = 1000.0;
 	sf::Vector2f aPosition;
 	
@@ -244,8 +253,24 @@ private:
 	std::vector<Point> pointsReturned;
 	// Interface
 	sf::Font fontUI;
+	//big wheel
+	sf::RectangleShape bigwheel;
+	sf::Image imgbigwheel;
+	sf::Texture texbigwheel;
 
+	sf::RectangleShape bigwheel2;
+	sf::Image imgbigwheel2;
+	sf::Texture texbigwheel2;
 
+	sf::Clock carriageTimer;
+	float carriageTime;
+	sf::RectangleShape bigwheel3;
+	sf::RectangleShape origin;
+	sf::RectangleShape rotatorbin;
+	sf::RectangleShape rotatorbin2;
+	sf::Image imgrotatorbin;
+	sf::Texture textrotatorbin;//to test ferris wheel bins. (Keep going , this is exciting)
+	float rotateTime;
 	//Network
 	
 	//Chat instance
@@ -288,9 +313,15 @@ private:
 	int randomh, randomr, randomg, randomb, randomx, randomsp[1500];
 	int part = 1;
 
-	sf::RectangleShape rectangle[1000];
+	sf::RectangleShape rectangle[100];
 
-	
+	//ScreenEffect Resources
+	sf::RectangleShape fade;
+	sf::RectangleShape WelcomeTo;
+	sf::Image imgWelcomeTo;
+	sf::Texture textWelcometo;
+	float fadeTime=0;
+	sf::Clock fadeClock;
 	//Text
 	sf::Text userText;
 	sf::Text uiText;

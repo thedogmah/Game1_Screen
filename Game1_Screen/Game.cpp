@@ -13,6 +13,7 @@
 #include "socialEngine.h"
 void pixelTextMove(std::vector<sf::Text>&,int);
 void pixelTextMove(std::vector <Animation*> npc, int size);
+void entityMove();
 void Game::initInterface()
 {
 
@@ -39,10 +40,15 @@ void Game::initInterface()
 //Private member functions
 void Game::initVariables()
 {
+	fadeClock.restart();
+	carriageTimer.restart();
+	carriageTime = carriageTimer.getElapsedTime().asSeconds();
+	
 	offSetX = -492;
 	offSetY = 251;
 	socialengine = new socialEngine();
-
+	//rotator bin test (Delete)
+	
 	socialengine->game = this;
 	humanity.Human.socialengine = this->socialengine;
 	humanityMaleGreen.Human.socialengine = this->socialengine;
@@ -59,8 +65,8 @@ void Game::initVariables()
 	//i.ehumanity.Human.socialengine = this->socialengine;
 	clockImGui.restart();
 	fShaderClock = shaderClock.restart().asSeconds();
-	screenSize.x = 1500;
-	screenSize.y = 1200;
+	screenSize.x = 2400;
+	screenSize.y = 1400;
 	settings.antialiasingLevel = 8.0;
 	this->window = nullptr;
 	//resizing Players across server.
@@ -123,7 +129,7 @@ void Game::initVariables()
 			if (vPathCollide[i][j] == '1') {
 				sf::RectangleShape dot;
 				dot.setPosition(sf::Vector2f(i * 100, j * 100));
-				dot.setSize(sf::Vector2f(10, 10));
+				dot.setSize(sf::Vector2f(100, 100));
 				dot.setFillColor(sf::Color::Yellow);
 				vPathVisualAid.push_back(dot);
 			}
@@ -166,7 +172,7 @@ void Game::initVariables()
 	texTrees.loadFromImage(imgTrees);
 	recTrees.setTexture(&texTrees);
 	recTrees.setSize(sf::Vector2f(imgTrees.getSize()));
-	recTrees.setPosition(3001, 3890);
+	recTrees.setPosition(7701, 3660);
 	
 	if (!imgTreeAsset.loadFromFile("treebare.png"))
 		std::cout << "Not loaded (tree asset)" << '\n';
@@ -234,8 +240,8 @@ void Game::initVariables()
 void Game::initWindow()
 {
 	
-	this->videoMode.height = 2100;
-	this->videoMode.width = 2800;
+	this->videoMode.height = 1600;
+	this->videoMode.width = 3000;
 //	this->videoMode.getDesktopMode;
 	this->window = new sf::RenderWindow(this->videoMode, "The City", sf::Style::Default, settings);
 	ImGui::SFML::Init(*window);
@@ -246,14 +252,14 @@ void Game::initWindow()
 	view.setCenter(4370, 3970);
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
-
-	followView.zoom(1);
-	followView.setViewport(sf::FloatRect(0, 0, 1, 1));
+	view.rotate(-3);
+	followView.zoom(1.3);
+	followView.setViewport(sf::FloatRect(0, 0, 0.5, 0.65));
 
 
 	flyingView.setCenter(5000, 5000);
 	flyingView.setViewport(sf::FloatRect(0.7, 0, 1, 0.4));
-	flyingView.zoom(1.3);
+	flyingView.zoom(1);
 	this->window->setView(view);
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
@@ -274,7 +280,7 @@ void Game::initWindow()
 
 		std::cout << "Green Protagonist not loaded";
 	humanityBlackMaleJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityBlackMaleJacket.peopleAmount = 78;
+	humanityBlackMaleJacket.peopleAmount = 88;
 	
 	 
 		
@@ -290,7 +296,7 @@ void Game::initWindow()
 		std::cout << "deliveroo not loaded";
 	//deliverooBike.imgHuman.createMaskFromColor(sf::Color::White);
 	//deliverooBike.texHuman.setSmooth(true);
-	deliverooBike.peopleAmount = 33;
+	deliverooBike.peopleAmount = 53;
 	
 	deliverooBike.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -301,7 +307,7 @@ void Game::initWindow()
 	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleSandyJacket.peopleAmount = 60;
+	humanityMaleSandyJacket.peopleAmount = 70;
 
 		humanityMaleSandyJacket.populate();
 //	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -327,15 +333,15 @@ void Game::initWindow()
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 100;
+	dogGR.peopleAmount = 10;
 	dogGR.populate();
 	dogGR.window = window;
 
-	drones.peopleAmount = 38;
+	drones.peopleAmount = 3;
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 60;
+	scooters.peopleAmount = 8;
 	scooters.populate();
 	scooters.window = window;
 
@@ -350,14 +356,14 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 70;
+	humanityWomanSnugGrey.peopleAmount = 50;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
 	//snug black coat woman population
 	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugBlack.peopleAmount = 70;
+	humanityWomanSnugBlack.peopleAmount = 50;
 	humanityWomanSnugBlack.populate();
 	humanityWomanSnugBlack.window = window;
 	humanityWomanSnugBlack.createBounds();
@@ -409,7 +415,59 @@ void Game::initMarketSquare() {
 	
 }
 void Game::initSprites()
-{
+{//bigwheel
+	imgbigwheel.loadFromFile("bigwheel.png");
+
+	texbigwheel.loadFromImage(imgbigwheel);
+
+	
+	bigwheel.setTexture(&texbigwheel);
+	bigwheel.setSize(sf::Vector2f(texbigwheel.getSize()));//
+	bigwheel.setScale(0.7, 0.7);
+
+	imgbigwheel2.loadFromFile("bigwheel2.png");
+
+	texbigwheel2.loadFromImage(imgbigwheel2);
+
+
+	bigwheel2.setTexture(&texbigwheel2);
+	bigwheel2.setSize(sf::Vector2f(texbigwheel2.getSize().x, texbigwheel2.getSize().x));//
+	bigwheel2.setScale(0.7, 0.7);
+	bigwheel2.setOrigin(bigwheel2.getSize().x / 2, bigwheel2.getSize().y / 2);
+	bigwheel2.setPosition(4901, 2548);
+	
+
+	bigwheel3.setTexture(&texbigwheel2);
+	bigwheel3.setSize(sf::Vector2f(texbigwheel2.getSize().x, texbigwheel2.getSize().x));//
+	bigwheel3.setScale(0.7, 0.7);
+	bigwheel3.setOrigin(bigwheel2.getSize().x / 2, bigwheel2.getSize().x / 2);
+	bigwheel3.setPosition(4901, 2548);
+
+	imgrotatorbin.loadFromFile("carriage.png");
+	textrotatorbin.loadFromImage(imgrotatorbin);
+	rotatorbin.setTexture(&textrotatorbin);
+	//rotatorbin.setFillColor(sf::Color::White);
+
+	rotatorbin.setSize(sf::Vector2f(textrotatorbin.getSize().x, textrotatorbin.getSize().y));
+	rotatorbin.setPosition(bigwheel2.getPosition());
+	rotatorbin.setScale(0.7, 0.7);
+	rotatorbin.setOrigin(rotatorbin.getSize().x/2, rotatorbin.getSize().y / 2);
+
+	rotatorbin2.setSize(sf::Vector2f(textrotatorbin.getSize().x, textrotatorbin.getSize().y));
+	rotatorbin2.setPosition(bigwheel2.getPosition());
+	rotatorbin2.setScale(0.7, 0.7);
+	rotatorbin2.setOrigin(rotatorbin.getSize().x / 2, rotatorbin.getSize().y / 2);
+	rotatorbin2.setTexture(&textrotatorbin);
+
+
+
+	if (!imgWelcomeTo.loadFromFile("welcome.png");
+	std::cout <<"Welcome image failed to load");
+	textWelcometo.loadFromImage(imgWelcomeTo);
+	WelcomeTo.setTexture(&textWelcometo);
+	WelcomeTo.setSize(sf::Vector2f(textWelcometo.getSize()));
+	WelcomeTo.setPosition(this->player.actor.getPosition().x +390, this->player.actor.getPosition().y+41);
+
 	if (!imgPSword.loadFromFile("sword.png"))
 		std::cout << "Sword png not loaded";
 	imgPSword.createMaskFromColor(sf::Color::White);
@@ -478,9 +536,11 @@ void Game::initSprites()
 	spChar.scale(0.21, 0.21);
 	
 	//spChar.setTexture(Char2);
-	spChar.setPosition(3910, 2708); //setPosition(4710, 2108); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
+	spChar.setPosition(4160, 2708); //setPosition(4710, 2108); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
 	//Current new char is rendered at same coordinates so makes no difference. Delete spChar or keep for a backup char.
-	
+	fade.setFillColor(sf::Color(0,0,0, 0));
+	fade.setPosition(sf::Vector2f(0, 0));
+	fade.setSize(sf::Vector2f(screenSize.x*10, screenSize.y*10));
 }
 void Game::checkCollide()
 {
@@ -1277,9 +1337,13 @@ void Game::spawnEnemy()
 
 void Game::pollEvents()
 {
-	while (this->window->pollEvent(this->ev)) {
-		ImGui::SFML::ProcessEvent(ev);
 
+
+	ImGui::SFML::ProcessEvent(ev);
+	while (this->window->pollEvent(this->ev)) {
+		
+		//velocity.x = 0.;
+	//	velocity.y = 0;
 		switch (this->ev.type)
 		{
 
@@ -1297,25 +1361,38 @@ void Game::pollEvents()
 
 			break;
 		case sf::Event::KeyPressed:
+			aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
+					aPosition.y = spChar.getPosition().y +25 - (screenSize.y / 2);
 
+					if (aPosition.x < 0)
+						aPosition.x = 0;
+					if (aPosition.y < 0)
+						aPosition.y = 0;
+
+					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
+					view.setRotation(-4);
+
+					view.zoom(zoomfactor);
+					window->setView(view);
 			if (this->ev.key.code == sf::Keyboard::Delete)
 				chat.playerInput = "";
 			/*if (this->ev.key.code == sf::Keyboard::Escape)
 				this->window->close();*/
 			if (this->ev.key.code == sf::Keyboard::Down)
 			{//stops follow npc
+				still = false;
+				moving_down = true;
 				player.stopped = false;
+				
 				if (!player.stopped) {
-					playerCollide(sf::Vector2i(0,1));
-					if (player.stopped)
-						return;
+					
 					bNpcFollow = false;
 					//spChar.setTexture(Char);
 					still = false;
 					faceRight = false;
 					faceUp = false;
 					faceDown = true;
-
+					
 					sf::Vector2i location;
 					location.x = spChar.getPosition().x;
 					location.y = spChar.getPosition().y;
@@ -1337,8 +1414,9 @@ void Game::pollEvents()
 					}
 					client.sendingpacket.clear();
 
-					spChar.move(0, 10);
-					player.actor.move(0, 10);
+
+
+					//player.actor.move(0, 10);
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
 
@@ -1348,44 +1426,39 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-
+					view.setRotation(-4);
 
 					view.zoom(zoomfactor);
 					window->setView(view);
 				}
 			}
 
-			if (this->ev.type == sf::Event::JoystickMoved)
-			{
-				if (this->ev.joystickMove.axis == sf::Joystick::X)
-				{
-					std::cout << "X axis moved!" << std::endl;
-					std::cout << "joystick id: " << ev.joystickMove.joystickId << std::endl;
-					std::cout << "new position: " << ev.joystickMove.position << std::endl;
-				}
-				if (this->ev.joystickMove.axis == sf::Joystick::Y || this->ev.joystickMove.axis == sf::Joystick::R)
-				{
-					std::cout << "X axis moved!" << std::endl;
-					std::cout << "joystick id: " << ev.joystickMove.joystickId << std::endl;
-					std::cout << "new position: " << ev.joystickMove.position << std::endl;
-				}
-			}
+
 			if (this->ev.key.code == sf::Keyboard::Left)
 			{
+				still = false;
+				moving_left = true;
 				player.stopped = false;
 				if (!player.stopped) {
-					playerCollide(sf::Vector2i(-1, 0));
-					if (player.stopped)
-						return;
+
 					player.profile.facingLeft = true;
 					bNpcFollow = false;
 					still = false;
 					faceUp = false;
 					faceDown = false;
+					if (moving_up)
+						faceUp = true;
+					else if
+						(moving_down)
+							faceDown = true;
+						
+						
+				
 					faceRight = false;
 
-					spChar.move(-10, 0);
-					player.actor.move(-10, 0);
+
+					
+					//player.actor.move(-10, 0);
 					sf::Vector2i location;
 					location.x = spChar.getPosition().x;
 					location.y = spChar.getPosition().y;
@@ -1409,7 +1482,7 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-
+					view.setRotation(-4);
 					view.zoom(zoomfactor);
 					window->setView(view);
 				}
@@ -1417,14 +1490,15 @@ void Game::pollEvents()
 
 			if (this->ev.key.code == sf::Keyboard::Up)
 			{
+				still = false; 
+				moving_up = true;
 				player.stopped = false;
 				if (!player.stopped) {
 
-					playerCollide(sf::Vector2i(0, -1));
-					if (player.stopped)
-						return;
+					
 					bNpcFollow = false;
-					player.actor.move(0, -10);
+					
+					//player.actor.move(0, -10);
 					//spChar.setTexture(Char3);
 					still = false;
 					faceDown = false;
@@ -1445,7 +1519,7 @@ void Game::pollEvents()
 					}
 					client.sendingpacket.clear();
 
-					spChar.move(0, -10);
+
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
 
@@ -1455,19 +1529,19 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-
+					view.setRotation(-4);
 					view.zoom(zoomfactor);
 					window->setView(view);
 				}
 			}	if (this->ev.key.code == sf::Keyboard::Right)
 			{
+				still = false;
+				moving_right = true;
 				player.stopped = false;
 				if (!player.stopped) {
-					
-					playerCollide(sf::Vector2i(1, 0));
-					if (player.stopped)
-						return;
-				//	playerLastLocation = player.actor.getPosition();
+
+
+					//	playerLastLocation = player.actor.getPosition();
 					std::cout << playerLastLocation.x << " " << playerLastLocation.y << "\n";
 					player.profile.facingLeft = false;
 					//reset drone view /cancel out
@@ -1478,7 +1552,10 @@ void Game::pollEvents()
 					still = false;
 					faceDown = false;
 					faceUp = false;
-					faceRight = true;
+					if (moving_up)
+						faceUp = true;
+					else
+						faceRight = true;
 					sf::Vector2i location;
 					location.x = spChar.getPosition().x;
 					location.y = spChar.getPosition().y;
@@ -1494,9 +1571,9 @@ void Game::pollEvents()
 						std::cout << "packet 'Right' not sent";
 					}
 					client.sendingpacket.clear();
-					spChar.move(10, 0);
-					player.actor.move(10, 0);
 
+					//player.actor.move(10, 0);
+					velocity.x += movementSpeed;
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
 
@@ -1506,11 +1583,13 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-
+					view.setRotation(-4);
 					view.zoom(zoomfactor);
 					window->setView(view);
 				}
 			}
+			if (ev.type == sf::Event::Closed)
+				window->close();
 			//	this->enemy.setPosition(sf::Vector2f(102.f, 100.f));
 			if (this->ev.key.code == sf::Keyboard::F2)
 			{
@@ -1543,18 +1622,40 @@ void Game::pollEvents()
 			}
 
 			break;
-			
-			case::sf::Event::MouseButtonReleased:
-				mouseDown = false;
-				break;
+
+		case::sf::Event::MouseButtonReleased:
+			mouseDown = false;
+			break;
 		case sf::Event::KeyReleased:
-		{
-			still = true;
+		
+			
 			//DEBUG COMMENTS std::cout << "Key released";
 
-		}
 
-		break;
+			
+			if (ev.key.code == sf::Keyboard::Right)
+			{
+				moving_right = false;
+				still = true;
+			}
+			if (ev.key.code == sf::Keyboard::Down)
+			{	moving_down = false;
+			
+			still = true;
+			}
+			if (ev.key.code == sf::Keyboard::Up)
+			{	moving_up = false; 
+			still = true;
+			}
+
+			if (ev.key.code == sf::Keyboard::Left)
+			{moving_left = false;
+			still = true;
+			}
+			
+			break;
+		
+		
 		case sf::Event::MouseWheelMoved:
 		{
 			vZoom = 1.0;
@@ -1562,7 +1663,7 @@ void Game::pollEvents()
 			//std::cout << vZoom <<std::endl; //uncomment to display zoom level to console
 			view.zoom(vZoom);
 			window->setView(view);
-			//std::cout << vZoom;
+			std::cout << vZoom;
 			break;
 		}
 
@@ -1571,29 +1672,10 @@ void Game::pollEvents()
 		{
 			//
 			sf::Vector2i XY = sf::Mouse::getPosition(*window);
-			//int nSelectedNodeY = sf::Mouse::getPosition(window) ;
-
+		
 
 			sf::Vector2f worldPos = window->mapPixelToCoords(XY, view);
-			//for (auto &people : humanity.people) //vector of NPCS
-			//{
-			//	if (people.actor.getGlobalBounds().contains(worldPos))//This ismousePos))
-			//	{
-
-
-			//		circle.setPosition(people.actor.getPosition().x, people.actor.getPosition().y + 220);
-			//		circleID = people.ID;
-			//		std::cout << "\nThis is Human number: " << people.ID << '\n' << "There IQ is: " << people.intelligence << ".\nThere sexuality is: " << people.sexuality <<
-			//			"There marital status is: " << people.married << ".\nThere mind health is: " << people.mindHealth << ".\nThere body health is: " << people.bodyHealth;
-			//		/*Human.intelligence = 1 + rand() % (160); 
-			//		Human.sexuality = 0 + rand() % (2);
-			//		Human.married = 0 + rand() % (1);
-			//		Human.mindHealth = 1 + rand() % (100);
-			//		Human.bodyHealth = 1 + rand() % (100);
-			//		Human.soulHealth = 1 + rand() % (100);
-			//		Human.influencer = 1 +*/
-			//		break;
-			//	}
+			
 			//}
 
 			break;
@@ -2265,10 +2347,15 @@ void Game::pollEvents()
 				}
 
 			}
-
+			entityMove();
+		//	player.actor.move(velocity);
+			//std::cout << 
+		//	spChar.move(velocity);
+			velocity.x = 0;
+			velocity.y = 0;
 			//set text name locations
 			userText.setPosition(spChar.getPosition().x - 15, spChar.getPosition().y - 65);
-
+			
 		}
 		void Game::initClient(sf::TcpSocket* rsocket)
 		{
@@ -2485,7 +2572,7 @@ void Game::render()
 	
 
 			//std::cout << bNpcFollow;
-	
+	view.setRotation(-4);
 	window->draw(CharBG);
 	this->renderEnemies();
 			
@@ -2496,6 +2583,8 @@ void Game::render()
 			this->window->setView(followView);
 			//followView.setRotation(180.);
 			followView.setViewport(sf::FloatRect(0, 0, 1, 1));
+		
+			//followView.zoom((1.2);
 			
 		}
 
@@ -2531,6 +2620,7 @@ void Game::render()
 		float deltaTime;
 		dayTime -= 0.55;
 		water.setUniform("dayTime", dayTime);
+		resetFrame();
 		deltaTime = npcClock.restart().asSeconds();
 		npcDelta = npcDeltaClock.restart().asSeconds();
 		dogTimeHold = deltaTime;
@@ -3433,6 +3523,50 @@ void Game::render()
 		}
 		for (const auto& assets : lastAssets)
 			this->window->draw(assets);
+		
+		window->draw(WelcomeTo);
+		
+		
+		bigwheel.setPosition(4280, 2650);
+		
+		
+	/*	origin.setFillColor(sf::Color::Yellow);
+		origin.setPosition(bigwheel2.getOrigin());bigwhee
+		origin.setSize(sf::Vector2f(5000, 5000));
+		origin.setOutlineThickness(10);
+		*/
+		
+		rotateTime += carriageTimer.getElapsedTime().asSeconds();
+		if (rotateTime > 0.01)
+		{
+			float previous{};
+			previous = bigwheel2.getRotation();
+
+			bigwheel2.rotate(0.01);
+			rotatorbin.setPosition(bigwheel2.getOrigin().x + std::cos(bigwheel2.getRotation() ) - cos(previous) * bigwheel2.getSize().x / 2.3 *bigwheel2.getScale().x- std::cos(rotatorbin.getRotation()), bigwheel2.getOrigin().y + std::sin(bigwheel2.getRotation() ) - sin(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().y- std::sin(rotatorbin.getRotation()));
+			rotatorbin.move(2935, 610);
+
+			rotatorbin2.setPosition(bigwheel2.getOrigin().x + std::cos(bigwheel2.getRotation()) - cos(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().x - std::cos(rotatorbin2.getRotation()), bigwheel2.getOrigin().y + std::sin(bigwheel2.getRotation()) - sin(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().y - std::sin(rotatorbin2.getRotation()));
+			rotatorbin2.move(2935, 650);
+
+
+			rotateTime = 0;
+		}
+		carriageTime += carriageTimer.getElapsedTime().asSeconds();
+		if (carriageTime > 0.01)
+		{
+			bigwheel3.rotate(0.56);
+			carriageTime = 0;
+			carriageTimer.restart();
+		}
+	//rotatorbin.setPosition().y = bigwheel2.getOrigin().y + std::sin(rotatorbin.getRotation()) * bigwheel2.getSize().x / 2;
+		this->window->draw(bigwheel);
+		this->window->draw(bigwheel3);
+		this->window->draw(rotatorbin);
+		this->window->draw(rotatorbin2);
+	
+		//this->window->draw(origin);
+		window->draw(fade);
 		socialengine->drawSocial();
 		if (uiMessages.size() > 0)
 			pixelTextMove(uiMessages,3);
@@ -3526,6 +3660,7 @@ void Game::render()
 		if (bPathKey)
 			for (auto dot : vPathVisualAid)
 			{
+			//	dot.setScale(10, 10);
 				this->window->draw(dot);
 			}
 
@@ -3794,7 +3929,15 @@ void Game::render()
 		rec.setSize(sf::Vector2f(100, 100));
 		rec.setFillColor(sf::Color::White);
 		this->window->draw(rec);
-		//this->window->draw(recTrees);
+		this->window->draw(recTrees);
+		recTrees.setPosition(7751, 4029);
+		this->window->draw(recTrees);
+		recTrees.setPosition(8251, 4029);
+		this->window->draw(recTrees);
+		recTrees.setPosition(8751, 4029);
+		this->window->draw(recTrees);
+		recTrees.setPosition(9251, 4029);
+		this->window->draw(recTrees);
 		 //Tell app that window is done drawing.
 
 		//this->window->setView(player.playerUI);
@@ -4034,7 +4177,7 @@ void Game::pathUpdate(int x, int y)
 		{
 			sf::RectangleShape dot;
 			dot.setPosition(sf::Vector2f(x * 100, y * 100));
-			dot.setSize(sf::Vector2f(10, 10));
+			dot.setSize(sf::Vector2f(100, 100));
 			dot.setFillColor(sf::Color::Yellow);
 			vPathVisualAid.push_back(dot);
 			vPathCollide[x][y] = '1';
@@ -4308,9 +4451,19 @@ void pixelTextMove(std::vector <sf::Text>& text, int size) {
 }
 
 void Game::resetFrame() {
-//	player.stopped = false;
-	playerLastLocation = this->player.actor.getPosition();
+	//view.rotate(-3);
+	if (fadeTime > 600)
+		
+		return;
+	//std::cout <<" \nfade time " << fadeTime << "color : "<<  fade.getFillColor().Transparent.toInteger();
+	//fadeTime += fadeClock.getElapsedTime().asSeconds();
+	fadeTime = fadeTime + 0.10;
+	if (fadeTime < 513) {
+		fade.setFillColor(sf::Color(0, 0, 0, -(fadeTime / 2)));
+		WelcomeTo.setFillColor(sf::Color(0, 0, 0, -(fadeTime / 2)));
+	}
 }
+	
 
 void Game::playerCollide(sf::Vector2i movement)
 {
@@ -4375,3 +4528,47 @@ void pixelTextMove(std::vector <Animation*> npc, int size) {
 	return;
 }
 
+void Game::entityMove() {
+	faceDown = false;
+	faceRight = false;
+	faceUp = false;
+	
+	if (moving_left)
+	{velocity.x += -movementSpeed;
+	still = false;
+}
+	if (moving_down)
+	{
+		faceDown = true;
+		velocity.y += movementSpeed;
+		still = false;
+	}
+	if (moving_up)
+	{
+		velocity.y += -movementSpeed;
+		faceUp = true;
+		still = false;
+	}
+	if (moving_right)
+	{
+		velocity.x += movementSpeed;
+		faceRight = true;
+		still = false;
+	}
+//	std::cout << "\nvelocity x : "<< velocity.x << " : y" << velocity.y;
+	player.actor.move(velocity);
+	spChar.move(velocity);
+	aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
+	aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
+
+	if (aPosition.x < 0)
+		aPosition.x = 0;
+	if (aPosition.y < 0)
+		aPosition.y = 0;
+
+	view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
+
+
+	view.zoom(zoomfactor);
+	
+}

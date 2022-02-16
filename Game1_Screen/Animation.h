@@ -3,7 +3,7 @@
 #include "aStar.h"
 #include <math.h>
 //#include "socialEngine.h"
-
+class Game;
 class socialEngine;
 //#include "Player.h"
 class Animation
@@ -22,7 +22,7 @@ public:
 	int lerpCount;
 //	Player player;
 	bool isNPC = true;
-	
+	Game *game;
 	//social variables
 	socialEngine* socialengine;
 	bool arrived = false; //determines whether they have reached their invite destination and ise used in the animation function to add to vector if not (to add only once)

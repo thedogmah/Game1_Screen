@@ -45,10 +45,11 @@ void Animation::Update(int row, float deltaTime, bool faceRight, bool faceDown, 
 //	std::cout << "\n\nStart of animate npc funcurrenction, still is: " << still;
 	npcWalkSwitch = 0.001;
 	//npc
-	
+	//switchTime = 0.1;
 	if (path.size() == 0)
 	{
 		//these 3 set the row (whether animation is facing up or down or not moving)
+		
 		if (still == true)
 		{
 			row += 3;
@@ -284,7 +285,7 @@ void Animation::UpdateNpc(int row, float deltaTime)
 		
 		currentImage.y = row;
 		totalTime += deltaTime;
-		
+		switchTime = 0.15;
 		if (totalTime > switchTime)
 		{
 			totalTime -= totalTime;
