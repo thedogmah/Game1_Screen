@@ -13,7 +13,7 @@ Player::Player() {
 	this->actor.setSize(sf::Vector2f(97.0f, 200.0f));
 	//	actor.setScale(0.21, 0.21);
 
-	actor.setPosition(4160, 2708);
+	actor.setPosition(4637, 3000);
 	vibeInstinct.setOrigin(0.0f, 0.0f);
 	vibeInstinct.setRadius(230.0f);
 

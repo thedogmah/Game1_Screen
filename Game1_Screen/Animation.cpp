@@ -21,19 +21,19 @@ Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switch
 	uvRect.height = texture->getSize().y / static_cast<float>(imageCount.y);
 }
 
-Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<aStar::paths> path)
-{
-	//Constructor differs in that it takes a path, but not opted to use it myself so far.
-	this->path = path;
-	this->imageCount = imageCount;
-	this->switchTime = switchTime;
-	totalTime = 0.0f;
-	currentImage.x = 0;
-
-	uvRect.width = texture->getSize().x / float(imageCount.x);
-	uvRect.height = texture->getSize().y / float(imageCount.y);
-
-}
+//Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<aStar::paths> path)
+//{
+//	//Constructor differs in that it takes a path, but not opted to use it myself so far.
+//	this->path = path;
+//	this->imageCount = imageCount;
+//	this->switchTime = switchTime;
+//	totalTime = 0.0f;
+//	currentImage.x = 0;
+//
+//	uvRect.width = texture->getSize().x / float(imageCount.x);
+//	uvRect.height = texture->getSize().y / float(imageCount.y);
+//
+//}
 
 
 

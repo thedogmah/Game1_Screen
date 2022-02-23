@@ -21,7 +21,7 @@
 #include "quadtree.h"
 #include <sstream>
 #include "jediEngine.h"
-
+#include "boids.h"
 #include "Animation.h"
 //#include <sstream>
 //Class as the game engine.
@@ -30,6 +30,14 @@ class socialEngine;
 class Game
 {
 public:
+	std::random_device r;
+	std::default_random_engine generator{ r() };
+	
+	bool movementStarted = false;
+	sf::Vector2f magn;
+	sf::RectangleShape veccy;
+	Boids boids{ generator };
+	std::vector<sf::CircleShape> circles;
 	//packet movement string
 	socialEngine *socialengine;
 	aStar routefind;
@@ -108,13 +116,17 @@ public:
 	sf::Image npc1;
 	Animation npc;
 	std::thread collissionThread;
+	Boids vex{ generator };
 	Population humanity;
+	Population humanityChineseWomanPurple;
 	Population humanityMaleGreen;
 	Population humanityMaleSandyJacket;
 	Population humanityMaleWhiteJacket;
 	Population humanityWomanSnugGrey;
 	Population humanityWomanSnugBlack;
 	Population humanityBlackMaleJacket;
+	Population humanityAsianMaleSuit;
+	Population humanityBlackMaleSlick;
 	PopulationScooter deliverooBike;
 	Animation *popCircleLocator =nullptr; //pointer to individual who should be 'wearing' 'NPC selected' circle.
 //npcVibeText (used in collission function)
@@ -143,8 +155,10 @@ public:
 	bool bQuadTree = false;
 	sf::Clock clockImGui;
 	//zoom 
-	float zoomfactor = 1; // is accessed by other classes
+	float zoomfactor =1.3; // is accessed by other classes
 
+	//looking class
+	sf::Sprite character;
 
 	//variables to offset everything (for when changing map size)
 	int offSetX{};
@@ -244,6 +258,9 @@ private:
 	sf::Sprite sprTramBus2;
 	sf::RectangleShape recTramBus2;
 
+	sf::Image imgVictorianPost;
+	sf::Texture texVictorianPost;
+	sf::RectangleShape recVictorianPost;
 	sf::Image imgTrees;
 	sf::Texture texTrees;
 	sf::RectangleShape recTrees;
@@ -276,7 +293,15 @@ private:
 	//Chat instance
 	Chat chat;
 	
-
+	//wheel test members:
+	sf::Vector2f center = sf::Vector2f{ 3901, 2048 };
+	//int center = 4;
+	int buckets_n = 13;
+	float buckets_shift_deg = 3.1415926 * 2 / buckets_n;
+	float wheel_shift = 0.0;
+	
+	sf::CircleShape shape;
+	sf::CircleShape shape2;
 
 	//boundaries
 	sf::RectangleShape Rec;

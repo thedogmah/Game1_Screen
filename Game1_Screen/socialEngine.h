@@ -23,7 +23,7 @@ public:
 
 	socialEngine();
 	bool bShowInteract = false;
-	aStar astar{};
+	//aStar astar{};
 	Game* game;
 	void interact(Animation* npc);
 	void interactParty(std::vector<Animation*> npc);
@@ -35,7 +35,7 @@ public:
 	void moveNPCs(std::vector<Animation*> npc);
 	//get the currently selected npc
 	Animation* selectedNpc;
-	Animation selectedClone;
+	//Animation selectedClone;
 	Population worldBase;
 	std::string sLabelChoose = "Choose interaction with: ";
 	Animation* vInteract;

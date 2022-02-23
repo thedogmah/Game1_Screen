@@ -51,10 +51,10 @@ public:
 		sNode* parent;
 
 	};
-	sf::VertexArray vaGrid;
-	sf::VertexArray vaLine;
-	std::vector<sf::Vertex> gridRecs;
-	sf::Event ev;
+	//sf::VertexArray vaGrid;
+	//sf::VertexArray vaLine;
+	//std::vector<sf::Vertex> gridRecs;
+//	sf::Event ev;
 	sNode* nodes = nullptr;
 	int nMapWidth;
 	int nMapHeight;
@@ -77,7 +77,7 @@ public:
 	void init();
 	bool solve_AStar();
 	//std::vector<paths> pathGangShit(std::vector<paths>);
-	paths isFacing(paths);
+	//paths isFacing(paths);
 
 
 

@@ -6,14 +6,19 @@
 #include "Animation.h"
 #include "Player.h"
 #include "Population.h"
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
 #include "quadtree.h"
 #include "socialEngine.h"
+#include <cmath>
+sf::VertexArray batchCircles(std::vector<sf::CircleShape>& circles);
+
 void pixelTextMove(std::vector<sf::Text>&,int);
 void pixelTextMove(std::vector <Animation*> npc, int size);
-void entityMove();
+void wheel();
+sf::Vector2f rotatePoint(sf::Vector2f center, float angle_deg, sf::Vector2f p);
 void Game::initInterface()
 {
 
@@ -40,6 +45,9 @@ void Game::initInterface()
 //Private member functions
 void Game::initVariables()
 {
+
+	
+
 	fadeClock.restart();
 	carriageTimer.restart();
 	carriageTime = carriageTimer.getElapsedTime().asSeconds();
@@ -49,6 +57,9 @@ void Game::initVariables()
 	socialengine = new socialEngine();
 	//rotator bin test (Delete)
 	
+	//bigwheel test variables
+	shape.setRadius(900);
+	shape.setPosition(4901, 2548);
 	socialengine->game = this;
 	humanity.Human.socialengine = this->socialengine;
 	humanityMaleGreen.Human.socialengine = this->socialengine;
@@ -124,7 +135,7 @@ void Game::initVariables()
 
 	for (int i = 0; i < 119; i++)
 	{
-		for (int j = 0; j < 129; j++)
+		for (int j = 0; j < 83; j++)
 		{
 			if (vPathCollide[i][j] == '1') {
 				sf::RectangleShape dot;
@@ -145,14 +156,14 @@ void Game::initVariables()
 	initSprites();
 
 	//load trambus
-
+	
 	if (!imgTramBus.loadFromFile("trambus.png"))
 		std::cout << "trambus.png failed to load\n";
 	imgTramBus.createMaskFromColor(sf::Color::White);
 	texTramBus.loadFromImage(imgTramBus);
 	recTramBus.setTexture(&texTramBus);
 	//sprTramBus.setTexture(texTramBus);
-	recTramBus.setPosition(7000., 4075);
+	recTramBus.setPosition(10000. + offSetX, 2206 + offSetY);
 	recTramBus.setSize(sf::Vector2f(imgTramBus.getSize()));
 	recTramBus2.setScale(sf::Vector2f(-1, 1));
 
@@ -163,7 +174,7 @@ void Game::initVariables()
 	texTramBus2.loadFromImage(imgTramBus);
 	recTramBus2.setTexture(&texTramBus);
 	//sprTramBus.setTexture(texTramBus);
-	recTramBus2.setPosition(-2000., 3975);
+	recTramBus2.setPosition(-3000. + offSetX, 2162 + offSetY);
 	recTramBus2.setSize(sf::Vector2f(imgTramBus.getSize()));
 
 	if (!imgTrees.loadFromFile("treesBare.png"))
@@ -261,10 +272,61 @@ void Game::initWindow()
 	flyingView.setViewport(sf::FloatRect(0.7, 0, 1, 0.4));
 	flyingView.zoom(1);
 	this->window->setView(view);
+	
+
+
+		if (!humanityChineseWomanPurple.imgHuman.loadFromFile("chinesewomanpurple.png"))
+
+			std::cout << "black slick Male  not loaded";
+	humanityChineseWomanPurple.imgHuman.createMaskFromColor(sf::Color::Black);
+	humanityChineseWomanPurple.peopleAmount = 40;
+
+
+
+
+
+	humanityChineseWomanPurple.populate();
+	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
+	humanityChineseWomanPurple.window = window;
+	humanityChineseWomanPurple.createBounds();
+
+	if (!humanityBlackMaleSlick.imgHuman.loadFromFile("blackmaleslick.png"))
+
+		std::cout << "black slick Male  not loaded";
+	humanityBlackMaleSlick.imgHuman.createMaskFromColor(sf::Color::White);
+	humanityBlackMaleSlick.peopleAmount = 40;
+
+
+
+
+
+	humanityBlackMaleSlick.populate();
+	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
+	humanityBlackMaleSlick.window = window;
+	humanityBlackMaleSlick.createBounds();
+
+		if (!humanityAsianMaleSuit.imgHuman.loadFromFile("asianmansuit.png"))
+
+			std::cout << "Asian Male Protagonist not loaded";
+		humanityAsianMaleSuit.imgHuman.createMaskFromColor(sf::Color::White);
+	humanityAsianMaleSuit.peopleAmount = 40;
+
+
+
+
+
+	humanityAsianMaleSuit.populate();
+	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
+	humanityAsianMaleSuit.window = window;
+	humanityAsianMaleSuit.createBounds();
+
+
+
+	
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 50;
+	humanityMaleGreen.peopleAmount = 40;
 	
 	 
 		
@@ -280,7 +342,7 @@ void Game::initWindow()
 
 		std::cout << "Green Protagonist not loaded";
 	humanityBlackMaleJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityBlackMaleJacket.peopleAmount = 88;
+	humanityBlackMaleJacket.peopleAmount = 40;
 	
 	 
 		
@@ -296,7 +358,7 @@ void Game::initWindow()
 		std::cout << "deliveroo not loaded";
 	//deliverooBike.imgHuman.createMaskFromColor(sf::Color::White);
 	//deliverooBike.texHuman.setSmooth(true);
-	deliverooBike.peopleAmount = 53;
+	deliverooBike.peopleAmount = 45;
 	
 	deliverooBike.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -307,7 +369,7 @@ void Game::initWindow()
 	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleSandyJacket.peopleAmount = 70;
+	humanityMaleSandyJacket.peopleAmount = 40;
 
 		humanityMaleSandyJacket.populate();
 //	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -320,7 +382,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityMaleWhiteJacket.peopleAmount = 60;
+	humanityMaleWhiteJacket.peopleAmount = 40;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -328,12 +390,12 @@ void Game::initWindow()
 	humanityMaleWhiteJacket.createBounds();
 
 
-	humanity.peopleAmount =70;
+	humanity.peopleAmount =20;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 10;
+	dogGR.peopleAmount = 1;
 	dogGR.populate();
 	dogGR.window = window;
 
@@ -341,14 +403,14 @@ void Game::initWindow()
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount = 8;
+	scooters.peopleAmount =55;
 	scooters.populate();
 	scooters.window = window;
 
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 70;
+	scootersManSandyJacket.peopleAmount = 55;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
@@ -356,14 +418,14 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 50;
+	humanityWomanSnugGrey.peopleAmount = 10;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
 	//snug black coat woman population
 	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugBlack.peopleAmount = 50;
+	humanityWomanSnugBlack.peopleAmount = 10;
 	humanityWomanSnugBlack.populate();
 	humanityWomanSnugBlack.window = window;
 	humanityWomanSnugBlack.createBounds();
@@ -416,6 +478,11 @@ void Game::initMarketSquare() {
 }
 void Game::initSprites()
 {//bigwheel
+	if (!imgVictorianPost.loadFromFile("victorianPost.png"))
+		std::cout << "Victorian Post not loaded";
+	texVictorianPost.loadFromImage(imgVictorianPost);
+	recVictorianPost.setTexture(&texVictorianPost);
+	recVictorianPost.setSize(sf::Vector2f(texVictorianPost.getSize()));
 	imgbigwheel.loadFromFile("bigwheel.png");
 
 	texbigwheel.loadFromImage(imgbigwheel);
@@ -451,12 +518,12 @@ void Game::initSprites()
 	rotatorbin.setSize(sf::Vector2f(textrotatorbin.getSize().x, textrotatorbin.getSize().y));
 	rotatorbin.setPosition(bigwheel2.getPosition());
 	rotatorbin.setScale(0.7, 0.7);
-	rotatorbin.setOrigin(rotatorbin.getSize().x/2, rotatorbin.getSize().y / 2);
+	//rotatorbin.setOrigin(rotatorbin.getSize().x/2, rotatorbin.getSize().y / 2);
 
 	rotatorbin2.setSize(sf::Vector2f(textrotatorbin.getSize().x, textrotatorbin.getSize().y));
 	rotatorbin2.setPosition(bigwheel2.getPosition());
-	rotatorbin2.setScale(0.7, 0.7);
-	rotatorbin2.setOrigin(rotatorbin.getSize().x / 2, rotatorbin.getSize().y / 2);
+	rotatorbin2.setScale(1.9, 1.9);
+	//rotatorbin2.setOrigin(rotatorbin.getSize().x / 2, rotatorbin.getSize().y / 2);
 	rotatorbin2.setTexture(&textrotatorbin);
 
 
@@ -466,7 +533,7 @@ void Game::initSprites()
 	textWelcometo.loadFromImage(imgWelcomeTo);
 	WelcomeTo.setTexture(&textWelcometo);
 	WelcomeTo.setSize(sf::Vector2f(textWelcometo.getSize()));
-	WelcomeTo.setPosition(this->player.actor.getPosition().x +390, this->player.actor.getPosition().y+41);
+	WelcomeTo.setPosition(4542, 2819);
 
 	if (!imgPSword.loadFromFile("sword.png"))
 		std::cout << "Sword png not loaded";
@@ -536,7 +603,7 @@ void Game::initSprites()
 	spChar.scale(0.21, 0.21);
 	
 	//spChar.setTexture(Char2);
-	spChar.setPosition(4160, 2708); //setPosition(4710, 2108); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
+	spChar.setPosition(4637, 3000); //setPosition(4710, 2108); //spChar is an old character that is now invisible, but is moved in event capturing. The main camera follows spChar.
 	//Current new char is rendered at same coordinates so makes no difference. Delete spChar or keep for a backup char.
 	fade.setFillColor(sf::Color(0,0,0, 0));
 	fade.setPosition(sf::Vector2f(0, 0));
@@ -1156,7 +1223,7 @@ void Game::npcLookingGlass(Animation npc)
 	ImGui::Text(label.c_str());
 //	ImGui::SameLine(171);
 	
-	sf::Sprite character;
+	
 	character.setTexture(*npc.actor.getTexture());
 	npc.uvRect.left = 0;
 	npc.uvRect.width = npc.actor.getSize().x * 2;
@@ -1400,19 +1467,19 @@ void Game::pollEvents()
 					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 
 					//###Need to send packet less often.### Maybe on a delta time check.
-					std::string down = "Down ";
-					down += username;
-					client.sendingpacket << username << down << location.x << location.y << chat.playerInput.toAnsiString();
-					//DEBUG COMMENTS std::cout << "Printing message from Game.dowNkey function: " << chat.playerInput.toAnsiString();
+					//std::string down = "Down ";
+					//down += username;
+					//client.sendingpacket << username << down << location.x << location.y << chat.playerInput.toAnsiString();
+					////DEBUG COMMENTS std::cout << "Printing message from Game.dowNkey function: " << chat.playerInput.toAnsiString();
 
-					movement = "Down ";
-					movement += username;
-					client.sendingpacket << movement;
+					//movement = "Down ";
+					//movement += username;
+					//client.sendingpacket << movement;
 
-					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-						std::cout << "packet 'Down' not sent";
-					}
-					client.sendingpacket.clear();
+					//if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					//	//std::cout << "packet 'Down' not sent";
+					//}
+					//client.sendingpacket.clear();
 
 
 
@@ -1464,14 +1531,14 @@ void Game::pollEvents()
 					location.y = spChar.getPosition().y;
 
 					//DEBUG COMMENTSstd::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					std::string left = "Left ";
-					left += username;
-					client.sendingpacket << username << left << location.x << location.y << chat.playerInput.toAnsiString();
+					//std::string left = "Left ";
+					//left += username;
+					//client.sendingpacket << username << left << location.x << location.y << chat.playerInput.toAnsiString();
 
-					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-						std::cout << "packet 'Left' not sent";
-					}
-					client.sendingpacket.clear();
+					//if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					//	//std::cout << "packet 'Left' not sent";
+					//}
+					//client.sendingpacket.clear();
 
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
@@ -1509,15 +1576,15 @@ void Game::pollEvents()
 					location.y = spChar.getPosition().y;
 
 					//DEBUG COMMENTS  std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					std::string up = "Up ";
-					up += username;
-					client.sendingpacket << username << up << location.x << location.y << chat.playerInput.toAnsiString();
+					//std::string up = "Up ";
+					//up += username;
+					//client.sendingpacket << username << up << location.x << location.y << chat.playerInput.toAnsiString();
 
-					//spChar.setTexture(Char4);
-					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-						std::cout << "packet 'Up' not sent";
-					}
-					client.sendingpacket.clear();
+					////spChar.setTexture(Char4);
+					//if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					//	//std::cout << "packet 'Up' not sent";
+					//}
+					//client.sendingpacket.clear();
 
 
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
@@ -1542,7 +1609,7 @@ void Game::pollEvents()
 
 
 					//	playerLastLocation = player.actor.getPosition();
-					std::cout << playerLastLocation.x << " " << playerLastLocation.y << "\n";
+				//	std::cout << playerLastLocation.x << " " << playerLastLocation.y << "\n";
 					player.profile.facingLeft = false;
 					//reset drone view /cancel out
 					//this->window->setView(view);
@@ -1561,16 +1628,16 @@ void Game::pollEvents()
 					location.y = spChar.getPosition().y;
 
 					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					std::string right = "Right ";
-					right += username;
-					client.sendingpacket << username << right << location.x << location.y << chat.playerInput.toAnsiString();
+					//std::string right = "Right ";
+					//right += username;
+					//client.sendingpacket << username << right << location.x << location.y << chat.playerInput.toAnsiString();
 
 
-					//spChar.setTexture(Char4);
-					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-						std::cout << "packet 'Right' not sent";
-					}
-					client.sendingpacket.clear();
+					////spChar.setTexture(Char4);
+					//if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					////	std::cout << "packet 'Right' not sent";
+					//}
+					//client.sendingpacket.clear();
 
 					//player.actor.move(10, 0);
 					velocity.x += movementSpeed;
@@ -1701,20 +1768,20 @@ void Game::pollEvents()
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
-						if (!mouseDown)
-						{
-							mouseDown = true;
-							
-							mouseDrag.setPosition(sf::Vector2f(sf::Mouse::getPosition(*window).x, sf::Mouse::getPosition(*window).y));
-							mouseDrag.setOutlineThickness(30);
-							mouseDrag.setFillColor(sf::Color::Transparent);
-							mouseDrag.setOutlineColor(sf::Color::Yellow);
-							drawBox= true;
-						}
-						if (drawBox && mouseDown)
-						{
-							mouseDrag.setSize(sf::Vector2f(mouseDrag.getPosition().x + 50, mouseDrag.getPosition().y + 50));
-						}
+						//if (!mouseDown)
+						//{
+						//	mouseDown = true;
+						//	
+						//	mouseDrag.setPosition(sf::Vector2f(sf::Mouse::getPosition(*window).x, sf::Mouse::getPosition(*window).y));
+						//	mouseDrag.setOutlineThickness(30);
+						//	mouseDrag.setFillColor(sf::Color::Transparent);
+						//	//mouseDrag.setOutlineColor(sf::Color::Yellow);
+						//	drawBox= true;
+						//}
+						//if (drawBox && mouseDown)
+						//{
+						//	mouseDrag.setSize(sf::Vector2f(mouseDrag.getPosition().x + 50, mouseDrag.getPosition().y + 50));
+						//}
 						
 						//playerAttack = true;
 						std::cout << player.actor.getPosition().x / 100 << " y : " << player.actor.getPosition().y / 100;
@@ -2455,7 +2522,7 @@ void Game::updateEnemies()
 
 void Game::renderRain()
 {
-	int playerY = player.actor.getPosition().y;
+	/*int playerY = player.actor.getPosition().y;
 	int playerX = player.actor.getPosition().x;
 	if (part == 1) {
 		for (int i = 0; i < 300; i++) {
@@ -2496,7 +2563,7 @@ void Game::renderRain()
 			rectangle[i].move(sf::Vector2f(6, randomsp[i]));
 		}
 
-		part = 2;
+		part = 2;*/
 }
 void Game::renderEnemies()
 {
@@ -2514,33 +2581,33 @@ void Game::renderEnemies()
 void Game::renderInterface(sf::RenderTarget& target)
 {
 	uTime = timeShader.restart().asSeconds();
-/*	Rec.setSize(sf::Vector2f(40.f, 80.f));
-	Rec.setFillColor(sf::Color::Red);
-	Rec.setPosition(1090, 1560);
-	window->draw(Rec);
-	*/std::stringstream ss;
-	
-	ui[0].setPosition(sf::Mouse::getPosition(*window).x + 35, sf::Mouse::getPosition(*window).y -40);
-
-	//Two different ways to conver to string
-	//First Method, with to_string function.
-	std::string s_points = std::to_string(points);
-	ui[0].setString(s_points);
-	
-	target.draw(ui[0]);
-	s_points = std::to_string(points);
-	uiText.setString(s_points);
-	target.draw(uiText);
-	
-	//second method
-	int scoretwo = points;
-	ss << "Health: " << health;
-	this->textTwo.setString(ss.str());
-	textTwo.setPosition(0, 12);
-	textTwo.setFillColor(sf::Color::White);
-	textTwo.setFont(fontUI);
-	textTwo.setCharacterSize(12);
-	target.draw(textTwo);
+///*	Rec.setSize(sf::Vector2f(40.f, 80.f));
+//	Rec.setFillColor(sf::Color::Red);
+//	Rec.setPosition(1090, 1560);
+//	window->draw(Rec);
+//	*/std::stringstream ss;
+//	
+//	ui[0].setPosition(sf::Mouse::getPosition(*window).x + 35, sf::Mouse::getPosition(*window).y -40);
+//
+//	//Two different ways to conver to string
+//	//First Method, with to_string function.
+//	std::string s_points = std::to_string(points);
+//	ui[0].setString(s_points);
+//	
+//	target.draw(ui[0]);
+//	s_points = std::to_string(points);
+//	uiText.setString(s_points);
+//	target.draw(uiText);
+//	
+//	//second method
+//	int scoretwo = points;
+//	ss << "Health: " << health;
+//	this->textTwo.setString(ss.str());
+//	textTwo.setPosition(0, 12);
+//	textTwo.setFillColor(sf::Color::White);
+//	textTwo.setFont(fontUI);
+//	textTwo.setCharacterSize(12);
+//	target.draw(textTwo);
 }
 
 void Game::render()
@@ -2649,6 +2716,7 @@ void Game::render()
 
 		for (auto& person : humanity.people)
 		{
+			
 			vRectShapeDataVector.push_back(person.actor);
 			if (person.stopOverride)continue;
 		
@@ -2710,7 +2778,196 @@ void Game::render()
 		}
 
 
-	
+		for (auto& person : humanityChineseWomanPurple.people)
+		{
+			vRectShapeDataVector.push_back(person.actor);
+			if (person.stopOverride)continue;
+
+			if (!person.stopMove) {
+
+				//deltaTime = npcClock.restart().asSeconds();
+
+				//person.npcWalkSwitch = 0.2;
+
+				npcTimeHold += npcDelta;
+				//	if(npcTimeHold >= npcDeltaSwitch){
+				switch (person.eFacing) {
+				case Animation::East:
+					person.actor.move(1, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+					//	person.actor.setTextureRect(person.uvRect);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor,&water);
+					break;
+
+				case Animation::West:
+					person.actor.move(-1, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect); 
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor, &water);
+					break;
+
+				case Animation::North:
+					person.actor.move(0, -1);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//this->window->draw(person.actor, &water);
+				//	person.actor.setTextureRect(person.uvRect);
+					break;
+
+				case Animation::South:
+					person.actor.move(0, 1);
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect);
+					break;
+
+
+				}
+			}
+			//}
+			humanityChineseWomanPurple.createBounds();
+			//person.UpdateNpc(0, npcDelta);
+			//person.actor.setTextureRect(person.uvRect);
+			person.actor.setTextureRect(person.uvRect);
+		}
+
+
+
+		for (auto& person : humanityBlackMaleSlick.people)
+		{
+			vRectShapeDataVector.push_back(person.actor);
+			if (person.stopOverride)continue;
+
+			if (!person.stopMove) {
+
+				//deltaTime = npcClock.restart().asSeconds();
+
+				//person.npcWalkSwitch = 0.2;
+
+				npcTimeHold += npcDelta;
+				//	if(npcTimeHold >= npcDeltaSwitch){
+				switch (person.eFacing) {
+				case Animation::East:
+					person.actor.move(1, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+					//	person.actor.setTextureRect(person.uvRect);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor,&water);
+					break;
+
+				case Animation::West:
+					person.actor.move(-1, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect); 
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor, &water);
+					break;
+
+				case Animation::North:
+					person.actor.move(0, -1);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//this->window->draw(person.actor, &water);
+				//	person.actor.setTextureRect(person.uvRect);
+					break;
+
+				case Animation::South:
+					person.actor.move(0, 1);
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect);
+					break;
+
+
+				}
+			}
+			//}
+			humanityBlackMaleSlick.createBounds();
+			//person.UpdateNpc(0, npcDelta);
+			//person.actor.setTextureRect(person.uvRect);
+			person.actor.setTextureRect(person.uvRect);
+		}
+
+		for (auto& person : humanityAsianMaleSuit.people)
+		{
+			vRectShapeDataVector.push_back(person.actor);
+			if (person.stopOverride)continue;
+
+			if (!person.stopMove) {
+
+				//deltaTime = npcClock.restart().asSeconds();
+
+				//person.npcWalkSwitch = 0.2;
+
+				npcTimeHold += npcDelta;
+				//	if(npcTimeHold >= npcDeltaSwitch){
+				switch (person.eFacing) {
+				case Animation::East:
+					person.actor.move(1, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;// person.path = person.pathSearch.OnUserUpdate(0.2f);
+					//	person.actor.setTextureRect(person.uvRect);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor,&water);
+					break;
+
+				case Animation::West:
+					person.actor.move(-1, 0);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++; //person.path = person.pathSearch.OnUserUpdate(0.2f);
+				//	person.actor.setTextureRect(person.uvRect); 
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect); 
+					//this->window->draw(person.actor, &water);
+					break;
+
+				case Animation::North:
+					person.actor.move(0, -1);
+					//	std::cout << float(std::lerp(person.path[person.currentCount].x, person.path[(person.currentCount + 1)].x, 0.1f)) << "\n ";
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//this->window->draw(person.actor, &water);
+				//	person.actor.setTextureRect(person.uvRect);
+					break;
+
+				case Animation::South:
+					person.actor.move(0, 1);
+					person.lerpCount++;
+					//person.path = person.pathSearch.OnUserUpdate(0.2f);
+					npcTimeHold -= npcDelta;
+					//person.actor.setTextureRect(person.uvRect);
+					break;
+
+
+				}
+			}
+			//}
+			humanityAsianMaleSuit.createBounds();
+			//person.UpdateNpc(0, npcDelta);
+			//person.actor.setTextureRect(person.uvRect);
+			person.actor.setTextureRect(person.uvRect);
+		}
+
+
+
 
 		//deliveroo
 		for (auto& person : deliverooBike.people)
@@ -3472,6 +3729,8 @@ void Game::render()
 			dogGR.drawPeople(dayTime, uTime, dogTimeHold);
 		if (bHumans)
 		{
+			humanityChineseWomanPurple.drawPeople(dayTime, uTime, npcDelta);
+			humanityBlackMaleSlick.drawPeople(dayTime, uTime, npcDelta);
 			humanityMaleWhiteJacket.drawPeople(dayTime, uTime, npcDelta);
 			humanityMaleSandyJacket.drawPeople(dayTime, uTime, npcDelta);
 			humanityBlackMaleJacket.drawPeople(dayTime, uTime, npcDelta);
@@ -3479,6 +3738,7 @@ void Game::render()
 			humanity.drawPeople(dayTime, uTime, npcDelta);
 			humanityWomanSnugGrey.drawPeople(dayTime, uTime, npcDelta);
 			humanityWomanSnugBlack.drawPeople(dayTime, uTime, npcDelta);
+			humanityAsianMaleSuit.drawPeople(dayTime, uTime, npcDelta);
 			deliverooBike.drawPeople(dayTime, uTime, npcDelta);
 		}
 		fShaderClock = shaderClock.getElapsedTime().asSeconds();
@@ -3500,6 +3760,12 @@ void Game::render()
 		vRectShapeDataVector.push_back(recTramBus);
 		vRectShapeDataVector.push_back(recTramBus2);
 		//rendering assets will order assets and add to vector.
+		
+		
+	
+
+	
+
 		renderAssets();
 		
 		//
@@ -3510,22 +3776,22 @@ void Game::render()
 			window->draw(socialengine->partyGrid);
 			//vRectShapeDataVector.insert(vRectShapeDataVector.begin()+2, socialengine->partyGrid);
 		for (auto& npcs : vRectShapeDataVector) {
-
+			if (npcs.getPosition().x > (player.actor.getPosition().x - 2550) && npcs.getPosition().x <(player.actor.getPosition().x + 2550) && npcs.getPosition().y < (player.actor.getPosition().y + 2500)  && npcs.getPosition().y > (player.actor.getPosition().y - 2500))
 			this->window->draw(npcs);
 
 			//new bit
-			if (npcs.getPosition().x > 1 && npcs.getPosition().x < 6500 && npcs.getPosition().y > 1 && npcs.getPosition().y < 6500) {
-				point.x = npcs.getPosition().x;
-				point.y = npcs.getPosition().y;
+			//if (npcs.getPosition().x > 1 && npcs.getPosition().x < 6500 && npcs.getPosition().y > 1 && npcs.getPosition().y < 6500) {
+			//	point.x = npcs.getPosition().x;
+				///point.y = npcs.getPosition().y;
 
-				qt.insert(point);
-			}//putting data into quad tree respective to everything that moves 
+				//qt.insert(point);
+			//}//putting data into quad tree respective to everything that moves 
 		}
 		for (const auto& assets : lastAssets)
 			this->window->draw(assets);
 		
 		window->draw(WelcomeTo);
-		
+	//	std::cout << "\n" << vRectShapeDataVector.size();
 		
 		bigwheel.setPosition(4280, 2650);
 		
@@ -3543,11 +3809,16 @@ void Game::render()
 			previous = bigwheel2.getRotation();
 
 			bigwheel2.rotate(0.01);
-			rotatorbin.setPosition(bigwheel2.getOrigin().x + std::cos(bigwheel2.getRotation() ) - cos(previous) * bigwheel2.getSize().x / 2.3 *bigwheel2.getScale().x- std::cos(rotatorbin.getRotation()), bigwheel2.getOrigin().y + std::sin(bigwheel2.getRotation() ) - sin(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().y- std::sin(rotatorbin.getRotation()));
-			rotatorbin.move(2935, 610);
-
-			rotatorbin2.setPosition(bigwheel2.getOrigin().x + std::cos(bigwheel2.getRotation()) - cos(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().x - std::cos(rotatorbin2.getRotation()), bigwheel2.getOrigin().y + std::sin(bigwheel2.getRotation()) - sin(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().y - std::sin(rotatorbin2.getRotation()));
-			rotatorbin2.move(2935, 650);
+			rotatorbin.setPosition(bigwheel2.getOrigin().x + std::cos(bigwheel2.getRotation()) - cos(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().x - std::cos(bigwheel2.getRotation()), bigwheel2.getOrigin().y + std::sin(bigwheel2.getRotation()) - sin(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().y - std::sin(bigwheel2.getRotation() ));
+				rotatorbin.move(2835, 520);
+			
+			
+			
+			
+			
+			
+			//rotatorbin2.setPosition(bigwheel2.getOrigin().x + std::cos(bigwheel2.getRotation()) - cos(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().x - std::cos(rotatorbin2.getRotation()), bigwheel2.getOrigin().y + std::sin(bigwheel2.getRotation()) - sin(previous) * bigwheel2.getSize().x / 2.3 * bigwheel2.getScale().y - std::sin(rotatorbin2.getRotation()+10));
+			//rotatorbin2.move(2835, 520);
 
 
 			rotateTime = 0;
@@ -3555,16 +3826,74 @@ void Game::render()
 		carriageTime += carriageTimer.getElapsedTime().asSeconds();
 		if (carriageTime > 0.01)
 		{
-			bigwheel3.rotate(0.56);
+			bigwheel3.rotate(0.26);
 			carriageTime = 0;
 			carriageTimer.restart();
 		}
 	//rotatorbin.setPosition().y = bigwheel2.getOrigin().y + std::sin(rotatorbin.getRotation()) * bigwheel2.getSize().x / 2;
 		this->window->draw(bigwheel);
 		this->window->draw(bigwheel3);
-		this->window->draw(rotatorbin);
-		this->window->draw(rotatorbin2);
-	
+		//this->window->draw(rotatorbin);
+		
+		for (auto i = 0; i < buckets_n; i++)
+		{
+			auto pos_starting = shape.getPosition();
+
+			auto rot_deg = buckets_shift_deg * i + wheel_shift;
+			auto pos_rotated = rotatePoint(center, rot_deg, pos_starting);
+			//rotatorbin2.setScale(0.7 ,0.7);
+			rotatorbin2.setPosition(pos_rotated);
+			rotatorbin2.move(800, 400);
+			//rotatorbin2.setRadius(100);
+			/*if (i % 2 == 0) {
+				rotatorbin2.setFillColor(sf::Color::Blue);
+			}
+			else if (i % 3 == 0)
+			{
+				rotatorbin2.setFillColor(sf::Color::White);
+			}
+			else if (i % 1 == 0)
+			{
+				rotatorbin2.setFillColor(sf::Color::Red);
+			}*/
+			this->window->draw(rotatorbin2);
+			
+		}
+		wheel_shift += 0.0023	;
+		shape.setRadius(900);
+		shape.setFillColor(sf::Color::Transparent);
+		shape.setOutlineColor(sf::Color::White);
+		shape.setOutlineThickness(10);
+		//this->window->draw(shape);
+		//above shape was initial circle red dots (Now carriages), orbit)
+
+		
+		//rotatorbin.rotate(15);
+		//this->window->draw(rotatorbin2);
+		if (!movementStarted)
+		{
+			for (int i = 0; i <150; i++) {
+				
+				Boids ve(generator);
+				/*sf::Vector2f john(3, 4);
+				sf::Vector2f bill(boids.random2D(generator));*/
+				//boids.position = bill;
+			//	vex.acceleration = boids.setMag(vex., 0.6, 5, generator);
+				//magn = vex.random2D();
+				//veccy.setSize(magn);
+				//window->draw(veccy);
+				//vex.setFillColor(sf::Color::Green);
+				//veccy.setSize(boid.setMag(magn, 10, 5));
+
+				//vex.setMag(bill, 1., 3.);
+				movementStarted = true;
+				boids.boids.push_back(ve);
+			}
+		}
+		
+
+		
+		//window->draw(veccy);
 		//this->window->draw(origin);
 		window->draw(fade);
 		socialengine->drawSocial();
@@ -3576,7 +3905,7 @@ void Game::render()
 		for (auto& text : uiMessages)
 			window->draw(text);
 			//window->draw(text);
-		sf::RectangleShape rec;
+		/*sf::RectangleShape rec;
 		for (auto& point : pointsReturned) {
 			
 			std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
@@ -3585,7 +3914,7 @@ void Game::render()
 			rec.setSize(sf::Vector2f(200, 200));
 			rec.setFillColor(sf::Color::Red);
 			this->window->draw(rec);
-		}
+		}*/
 		window->draw(mouseDrag);
 	
 	//	this->window->setView(view);
@@ -3652,8 +3981,8 @@ void Game::render()
 
 		if (grid)
 		{
-			this->window->draw(npc.pathSearch.vaGrid);
-			this->window->draw(npc.pathSearch.vaLine);
+		//	this->window->draw(npc.pathSearch.vaGrid);
+		//	this->window->draw(npc.pathSearch.vaLine);
 
 		}
 
@@ -3692,6 +4021,8 @@ void Game::render()
 		
 	//	std::cout << "begin of render pop functions\n";
 
+
+		
 		ImGui::SFML::Update(*window, clockImGui.restart());
 		static std::string strengh = "Strength";
 
@@ -3769,10 +4100,11 @@ void Game::render()
 			this->window->draw(rec);
 		}
 		//sf::RectangleShape rec;
-		rec.setPosition(sf::Vector2f(0, 0));
+		//Quad tree uncomment these 3 lines and rec. stuff above
+	/*	rec.setPosition(sf::Vector2f(0, 0));
 		rec.setSize(sf::Vector2f(8200, 8200));
 		rec.setFillColor(sf::Color::Blue);
-		
+		*/
 		//qt.northeast.points.clear();
 		qt.cleanseTree();
 		ImGui::End();
@@ -3924,26 +4256,72 @@ void Game::render()
 		}	vRectShapeDataVector.clear();
 		for (auto& point : pointsReturned)
 			std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
-
-		rec.setPosition(sf::Vector2f(point.x, point.y));
+		//quadtree 
+		/*rec.setPosition(sf::Vector2f(point.x, point.y));
 		rec.setSize(sf::Vector2f(100, 100));
-		rec.setFillColor(sf::Color::White);
-		this->window->draw(rec);
+		rec.setFillColor(sf::Color::White);*/
+		//this->window->draw(rec);
 		this->window->draw(recTrees);
 		recTrees.setPosition(7751, 4029);
 		this->window->draw(recTrees);
-		recTrees.setPosition(8251, 4029);
+		recTrees.setPosition(8255, 4029);
 		this->window->draw(recTrees);
-		recTrees.setPosition(8751, 4029);
+		recTrees.setPosition(8756, 4029);
 		this->window->draw(recTrees);
 		recTrees.setPosition(9251, 4029);
 		this->window->draw(recTrees);
+
+		recVictorianPost.setPosition(7051, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(7551, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(8055, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(8556, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(9051, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(6551, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(6051, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(5551, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(5051, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(4551, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(4051, 4159);
+		this->window->draw(recVictorianPost);
 		 //Tell app that window is done drawing.
 
 		//this->window->setView(player.playerUI);
 	//	for (auto ass : player.playerUIAssets)
 	//		this->window->draw(ass);
 	//	this->window->setView(view); //back to default
+		
+
+
+		for (auto& boid : boids.boids)
+		{
+			boid.flock(boids.boids);
+			boid.update();
+			circles.push_back(boid.bird);
+			if (boid.bird.getPosition().x > 5000)
+				boid.position.x = 3000;
+			if (boid.bird.getPosition().x < 3000)
+				boid.position.x = 5000;
+			if (boid.bird.getPosition().y > 5000)
+				boid.position.y = 3000;
+			if (boid.bird.getPosition().y < 3000)
+				boid.position.y = 5000;
+		}
+			
+			this->window->draw(batchCircles(circles));
+			circles.clear();
+		/*	for (int i = 0; i < 200; i++) {
+				this->window->draw(circles[i]);
+			}*/
 		this->window->display();
 		if(!bNpcFollow )this->window->setView(view);
 		
@@ -3982,8 +4360,8 @@ void Game::login()
 {
 
 	std::cout << "\nPlease enter Character name: ";
-	std::cin >> username;
-	//username = "Ryan";
+	//std::cin >> username;
+	username = "Ryan";
 	userText.setString(username);
 }
 
@@ -4571,4 +4949,52 @@ void Game::entityMove() {
 
 	view.zoom(zoomfactor);
 	
+}
+
+
+sf::Vector2f rotatePoint(sf::Vector2f center, float angle_deg, sf::Vector2f p)
+{
+
+	float s = sin(angle_deg);
+	float c = cos(angle_deg);
+
+	//translate point back to origin. 
+
+	p.x -= center.x;
+	p.y -= center.y;
+
+	
+	//rotate point
+	float xnew = p.x * c - p.y * s;
+	float ynew = p.x * s + p.y * c;
+
+	//translate point back to center
+
+	p.x = xnew + center.x;
+	p.y = ynew + center.y;
+
+	return p;
+
+
+
+}
+
+void wheel() {
+
+}
+
+sf::VertexArray batchCircles(std::vector<sf::CircleShape>& circles) { // or std::array<sf::CircleShape, 500> &circles
+	sf::VertexArray arr(sf::Triangles, 0);
+
+	for (auto& circle : circles) {
+		auto col = circle.getFillColor();
+		auto& transform = circle.getTransform();
+		for (unsigned i = 2; i < circle.getPointCount(); i++) {
+			arr.append({ transform.transformPoint(circle.getPoint(0)), col });
+			arr.append({ transform.transformPoint(circle.getPoint(i - 0)), col });
+			arr.append({ transform.transformPoint(circle.getPoint(i - 1)), col });
+		}
+	}
+	arr.getPrimitiveType();
+	return arr;
 }

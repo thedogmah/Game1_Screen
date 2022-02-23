@@ -49,7 +49,7 @@ bool Population::populate()
 
 			//Human.actor.setTexture(&texHuman);
 			Human.ID = x;
-			Human.intelligence = 1 + rand() % (160); ;
+			Human.intelligence = 45 + rand() % (104); ;
 			Human.sexuality  =  rand() % (13); 
 			Human.married = rand() % (4);
 			Human.mindHealth = 1 + rand() % (100); 

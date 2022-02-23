@@ -11,7 +11,7 @@ class Animation
 public: 
 	Animation();
 	Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime);
-	Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<aStar::paths> path);
+	//Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, std::vector<aStar::paths> path);
 	~Animation();
 	
 	sf::Vector2i getLocality();
@@ -64,11 +64,11 @@ public:
 	sf::RectangleShape actor;	//Rectangle will display NPC image.
 	sf::IntRect uvRect;
 	aStar pathSearch;
-	aStar interactedPathSearch;
+	//aStar interactedPathSearch;
 	aStar::paths steps;
-	aStar::paths interactedSteps;
+	//aStar::paths interactedSteps;
 	std::vector<aStar::paths> path;
-	std::vector<aStar::paths> interactedPath;
+	//std::vector<aStar::paths> interactedPath;
 
 	sf::Vector2u imageCount; 
 	sf::Vector2u currentImage;
@@ -97,7 +97,7 @@ public:
 
 private:
 
-	std::vector<aStar::paths>::iterator iteratorSteps;
+	//std::vector<aStar::paths>::iterator iteratorSteps;
 	
 
 	float totalTime;

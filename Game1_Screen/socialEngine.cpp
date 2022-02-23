@@ -199,6 +199,7 @@ void socialEngine::disbandParty(std::vector<Animation*> npc) {
 
 	for (auto& person : npc)
 		std::cout << "\n\nCleared" << person->path.size() << person->stopAnimate << " " << person->stopMove;
+	this->game->zoomfactor = 1;
 }
 
 void socialEngine::worldChat(std::map<std::string, std::string> clientmap)

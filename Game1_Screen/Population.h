@@ -33,7 +33,7 @@ public:
 	void newPath(Animation& npc, sf::RectangleShape player);
 	bool moved = false;
 	virtual bool drawPeople(float, float, float);
-	aStar aStarPath;
+	//aStar aStarPath;
 
 	sf::FloatRect rt;
 	virtual void createBounds();
