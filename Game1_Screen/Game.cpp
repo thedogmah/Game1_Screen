@@ -4519,8 +4519,8 @@ void Game::render()
 		//window->draw(particleEmitter);
 		//particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
 		//window->draw(particleEmitter);/*
-		particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
-		window->draw(particleEmitter, particle);
+	//	particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
+		//window->draw(particleEmitter, particle);
 		//window->clear();
 
 		//start = no light
@@ -4615,7 +4615,7 @@ void Game::render()
 		sf::Time elapsed = particleClock.restart();
 		//std::cout << elapsed.asMicroseconds();
 		
-		particleEmitter.update(elapsed);
+		//particleEmitter.update(elapsed);
 		
 			//weather();
 		
@@ -4689,14 +4689,14 @@ void Game::dayTimeFunc()
 {
 
 	hour += npcClock.getElapsedTime().asSeconds();
-	if (hour > 3)
+	if (hour >3)
 	{
 		dayDivide++;
 		std::cout << "\nHour" << hour << ", npc clock > " << npcClock.getElapsedTime().asSeconds();
 		std::cout << "\n" << dayDivide;
 		hour = 0;
 	}
-	if (dayDivide > 11)
+	if (dayDivide > 15)
 		dayDivide = 0;
 
 
@@ -4704,58 +4704,82 @@ void Game::dayTimeFunc()
 	//Night Mood. Sunset type.
 	switch (dayDivide) {
 	case 0:
-		skyColor = sf::Color(55, 00, 150,100);
+		skyColor = sf::Color(20, 10, 40,220);
 		std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight = 255;
 		break;
 	case 1:
-		skyColor = sf::Color(55, 00, 150, 130);
+		skyColor = sf::Color(20, 10, 40,220);
 		std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight = 255;
 		break;
 	case 2:
-		skyColor = sf::Color(55, 0, 150, 170);
+		skyColor = sf::Color(40, 30, 40);
 		std::cout << "\nCase hour: " << dayDivide << "\n\n";
-		skyColorLight =  205;
+		skyColorLight =  155;
 		break;
 	case 3:
-		skyColor = sf::Color(55, 0, 150, 200);
+		skyColor = sf::Color(70, 60, 30);
 		std::cout << "\nCase hour: " << dayDivide << "\n\n";
-		skyColorLight = 150;
+		skyColorLight = 110;
 		break;
 	case 4:
-		skyColor = sf::Color(55, 0, 150, 230);
+		skyColor = sf::Color(115, 100, 0);
 		std::cout << "\nCase hour: " << dayDivide << "\n\n";
-		skyColorLight = 150;
+		skyColorLight = 40;
 		break;
 	case 5:
-		skyColor = sf::Color(55, 0, 150,255);
+		skyColor = sf::Color(175, 175, 175);
 		std::cout << "\nCase hour: " << dayDivide << "\n\n";
-		skyColorLight = 100;
+		skyColorLight = 0;
 		break;
 	case 6:
-		skyColor = sf::Color(255, 255, 255,255);
+		skyColor = sf::Color(215, 215, 215,215);
 		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		
 		break;
 	case 7:
-		skyColor = sf::Color(255, 255, 255, 255);
+		skyColor = sf::Color(255, 255, 255, 205);
 		std::cout << "\nCase hour: " << dayDivide;
 		break;
 	case 8:
-		skyColor = sf::Color(255, 255, 255, 205);
+		skyColor = sf::Color(255, 255, 255, 255);
+		//skyColorLight = 90;
 		break;
 	case 9:
-		skyColor = sf::Color(255, 255, 255, 155);
+		skyColor = sf::Color(255, 255, 255, 255);
+		//skyColorLight = 100;
 		break;
 	case 10:
-		skyColor = sf::Color(10, 10, 10);
+		skyColor = sf::Color(155, 125, 165, 205);
+		skyColorLight = 80;
+		break;
+
+	case 11:
+		skyColor = sf::Color(155, 90, 83, 205);
+		skyColorLight = 100;
 		break;
 		
-	case 11:
-		skyColor = sf::Color(10, 10, 10);break;
-		
 	case 12:
-		skyColor = sf::Color(10, 10, 10); break;
+		
+		skyColor = sf::Color(155, 90, 83, 205);
+		skyColorLight = 130; break;
+		
+	case 13:
+		skyColor = sf::Color(185, 70, 90, 205); break;
+		skyColorLight = 150;
+	case 14:
+		skyColor = sf::Color(90, 70, 125, 215); break;
+		
+	case 15:
+		skyColor = sf::Color(50, 10, 90, 220); break;
+		skyColorLight = 170;
+	case 16:
+		skyColor = sf::Color(20, 10, 40, 220); break;
+		skyColorLight = 190;
+	case 17:
+		skyColor = sf::Color(20, 10, 40, 220); break;
+		skyColorLight = 220;
 		
 	}
 	

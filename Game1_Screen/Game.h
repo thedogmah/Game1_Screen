@@ -172,7 +172,7 @@ public:
 	sf::Clock clockImGui;
 	//zoom 
 	
-	float zoomfactor =0.9; // is accessed by other classes
+	float zoomfactor =1.3; // is accessed by other classes
 	sf::RectangleShape* act;
 	//weather engine variables
 	sf::Vector2f vecWind{ 0.,0.0 };
