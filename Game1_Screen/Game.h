@@ -23,6 +23,7 @@
 #include "jediEngine.h"
 #include "boids.h"
 #include "Animation.h"
+#include "particleSystem.h"
 //#include <sstream>
 //Class as the game engine.
 class socialEngine;
@@ -30,13 +31,28 @@ class socialEngine;
 class Game
 {
 public:
+	sf::Clock particleClock;
+	ParticleSystem particleEmitter{ 432 };
+	//circle particle test
+	sf::VertexArray entity{sf::Triangles, 72};
+	sf::RenderStates particle;
 	std::random_device r;
 	std::default_random_engine generator{ r() };
 	
+	//lighting
+	sf::RenderTexture tex;
+	std::vector<sf::Vector2f> lights;
+	sf::Texture texviclight;
+	sf::RectangleShape sha; //light shaft
+	const sf::Color colors[3] = { sf::Color::Red, sf::Color::Green, sf::Color::Blue };
+
+
+
 	bool movementStarted = false;
 	sf::Vector2f magn;
 	sf::RectangleShape veccy;
-	Boids boids{ generator };
+	Boids boids{ generator,25 };
+	Boids butterflies { generator, 10 };
 	std::vector<sf::CircleShape> circles;
 	//packet movement string
 	socialEngine *socialengine;
@@ -116,7 +132,7 @@ public:
 	sf::Image npc1;
 	Animation npc;
 	std::thread collissionThread;
-	Boids vex{ generator };
+	//Boids vex{ generator,  };
 	Population humanity;
 	Population humanityChineseWomanPurple;
 	Population humanityMaleGreen;
@@ -144,7 +160,7 @@ public:
 	float scooterTimeHold;
 	float uTime;
 	float dayTime = 1.0;
-	bool bRain = false;
+	bool bRain = true;
 	bool bScooters = true;
 	bool bDrones = true;
 	bool bDogs = false;
@@ -155,10 +171,23 @@ public:
 	bool bQuadTree = false;
 	sf::Clock clockImGui;
 	//zoom 
-	float zoomfactor =1.3; // is accessed by other classes
-
+	
+	float zoomfactor =0.9; // is accessed by other classes
+	sf::RectangleShape* act;
+	//weather engine variables
+	sf::Vector2f vecWind{ 0.,0.0 };
+	bool bCloudsWindApplied = false;
+	float fWeatherTime;
+	void weather();
 	//looking class
+
+	//daytime 
+	sf::RectangleShape sky;
+	float hour;
+	int dayDivide =0;
 	sf::Sprite character;
+	sf::Color skyColor{};
+	float skyColorLight{};
 
 	//variables to offset everything (for when changing map size)
 	int offSetX{};
@@ -335,12 +364,28 @@ private:
 	int rotate = 0;
 
 	//Weather
-	int randomh, randomr, randomg, randomb, randomx, randomsp[1500];
+	int randomh, randomr, randomg, randomb, randomx, randomsp[1100];
 	int part = 1;
-
-	sf::RectangleShape rectangle[100];
-
+	//vertext test for quad loop
+	sf::VertexArray vertices;
+	sf::Vertex vv;
+	sf::Vertex vw;
+	sf::Vertex vx;
+	sf::Vertex vy;
+	bool bVertex = false;
+	sf::RectangleShape rectangle[800];
+	sf::Texture texboid;
+	sf::Texture texbutterfly;
+	sf::Image imgboid;
+	sf::Image imgbutterfly;
+	sf::IntRect boidIntRect;
+	sf::IntRect butterflyIntRect;
+	sf::Vector2u boidCurrentImage{};
+	sf::Vector2u butterflyCurrentImage{};
+	float boidSwitchTime;
+	float butterflySwitchTime;
 	//ScreenEffect Resources
+	float npcColorTimer{};
 	sf::RectangleShape fade;
 	sf::RectangleShape WelcomeTo;
 	sf::Image imgWelcomeTo;
@@ -410,7 +455,7 @@ public:
 
 	void updateEnemies();
 	void update();
-	
+	void dayTimeFunc();
 	void renderRain();
 	void renderEnemies();
 	void renderPlayers();

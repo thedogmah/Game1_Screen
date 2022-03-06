@@ -13,8 +13,32 @@
 #include "quadtree.h"
 #include "socialEngine.h"
 #include <cmath>
-sf::VertexArray batchCircles(std::vector<sf::CircleShape>& circles);
 
+sf::VertexArray batchCircles(std::vector<sf::CircleShape>& circles);
+void drawCircle(float radius);
+struct particle {
+
+	enum Type {
+
+		Propellant,
+		Smoke,
+		ParticleCount
+	};
+
+
+	sf::Vector2f position;
+	sf::Color color;
+	sf::Time lifetime;
+};
+
+struct particleData {
+
+	sf::Color color;
+	sf::Time lifetime;
+
+};
+
+class particleNode {};
 void pixelTextMove(std::vector<sf::Text>&,int);
 void pixelTextMove(std::vector <Animation*> npc, int size);
 void wheel();
@@ -46,7 +70,8 @@ void Game::initInterface()
 void Game::initVariables()
 {
 
-	
+	//particles
+	particle.blendMode = sf::BlendAlpha;
 
 	fadeClock.restart();
 	carriageTimer.restart();
@@ -76,8 +101,8 @@ void Game::initVariables()
 	//i.ehumanity.Human.socialengine = this->socialengine;
 	clockImGui.restart();
 	fShaderClock = shaderClock.restart().asSeconds();
-	screenSize.x = 2400;
-	screenSize.y = 1400;
+	screenSize.x = 1400;
+	screenSize.y = 700;
 	settings.antialiasingLevel = 8.0;
 	this->window = nullptr;
 	//resizing Players across server.
@@ -153,6 +178,9 @@ void Game::initVariables()
 	circle.setOutlineThickness(3);
 	circle.setFillColor(sf::Color::Blue);
 	circle.setScale(1.25, 0.25);
+
+	//particleEmitter(1000);
+
 	initSprites();
 
 	//load trambus
@@ -238,12 +266,16 @@ void Game::initVariables()
 
 
 		}
-		assetDataW.close();		std::sort(vStructAssets.begin(), vStructAssets.end(), [](Game::sAsset a, Game::sAsset b) {return a.ID < b.ID; });
+		assetDataW.close();		
+		std::sort(vStructAssets.begin(), vStructAssets.end(), [](Game::sAsset a, Game::sAsset b) {return a.ID < b.ID; });
 	}
 	
 
 
 
+	act = &player.actor;
+
+	//lighting
 	
 }
 
@@ -251,8 +283,8 @@ void Game::initVariables()
 void Game::initWindow()
 {
 	
-	this->videoMode.height = 1600;
-	this->videoMode.width = 3000;
+	this->videoMode.height = 1020;
+	this->videoMode.width = 1880;
 //	this->videoMode.getDesktopMode;
 	this->window = new sf::RenderWindow(this->videoMode, "The City", sf::Style::Default, settings);
 	ImGui::SFML::Init(*window);
@@ -263,7 +295,7 @@ void Game::initWindow()
 	view.setCenter(4370, 3970);
 	view.zoom(zoomfactor);
 	view.setViewport(sf::FloatRect(0, 0, 1, 1));
-	view.rotate(-3);
+	//view.rotate(-3);
 	followView.zoom(1.3);
 	followView.setViewport(sf::FloatRect(0, 0, 0.5, 0.65));
 
@@ -279,7 +311,7 @@ void Game::initWindow()
 
 			std::cout << "black slick Male  not loaded";
 	humanityChineseWomanPurple.imgHuman.createMaskFromColor(sf::Color::Black);
-	humanityChineseWomanPurple.peopleAmount = 40;
+	humanityChineseWomanPurple.peopleAmount =125;
 
 
 
@@ -294,7 +326,7 @@ void Game::initWindow()
 
 		std::cout << "black slick Male  not loaded";
 	humanityBlackMaleSlick.imgHuman.createMaskFromColor(sf::Color::White);
-	humanityBlackMaleSlick.peopleAmount = 40;
+	humanityBlackMaleSlick.peopleAmount = 30;
 
 
 
@@ -309,7 +341,7 @@ void Game::initWindow()
 
 			std::cout << "Asian Male Protagonist not loaded";
 		humanityAsianMaleSuit.imgHuman.createMaskFromColor(sf::Color::White);
-	humanityAsianMaleSuit.peopleAmount = 40;
+	humanityAsianMaleSuit.peopleAmount =30;
 
 
 
@@ -326,7 +358,7 @@ void Game::initWindow()
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 40;
+	humanityMaleGreen.peopleAmount = 30;
 	
 	 
 		
@@ -342,7 +374,7 @@ void Game::initWindow()
 
 		std::cout << "Green Protagonist not loaded";
 	humanityBlackMaleJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityBlackMaleJacket.peopleAmount = 40;
+	humanityBlackMaleJacket.peopleAmount = 27;
 	
 	 
 		
@@ -358,7 +390,7 @@ void Game::initWindow()
 		std::cout << "deliveroo not loaded";
 	//deliverooBike.imgHuman.createMaskFromColor(sf::Color::White);
 	//deliverooBike.texHuman.setSmooth(true);
-	deliverooBike.peopleAmount = 45;
+	deliverooBike.peopleAmount = 12;
 	
 	deliverooBike.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -369,7 +401,7 @@ void Game::initWindow()
 	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleSandyJacket.peopleAmount = 40;
+	humanityMaleSandyJacket.peopleAmount =25;
 
 		humanityMaleSandyJacket.populate();
 //	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -382,7 +414,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityMaleWhiteJacket.peopleAmount = 40;
+	humanityMaleWhiteJacket.peopleAmount =120;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -390,12 +422,12 @@ void Game::initWindow()
 	humanityMaleWhiteJacket.createBounds();
 
 
-	humanity.peopleAmount =20;
+	humanity.peopleAmount = 130;
 	humanity.populate();
 	
 	humanity.window = window;
 	humanity.createBounds();
-	dogGR.peopleAmount = 1;
+	dogGR.peopleAmount = 13;
 	dogGR.populate();
 	dogGR.window = window;
 
@@ -410,7 +442,7 @@ void Game::initWindow()
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 55;
+	scootersManSandyJacket.peopleAmount = 110;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
@@ -418,17 +450,19 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 10;
+	humanityWomanSnugGrey.peopleAmount = 120;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
 	//snug black coat woman population
 	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugBlack.peopleAmount = 10;
+	humanityWomanSnugBlack.peopleAmount = 120;
 	humanityWomanSnugBlack.populate();
 	humanityWomanSnugBlack.window = window;
-	humanityWomanSnugBlack.createBounds();
+	humanityWomanSnugBlack.createBounds(); 
+	//render state texture for night time
+	tex.create(9000,8000);
 }
 void Game::initEnemies()
 {
@@ -477,7 +511,27 @@ void Game::initMarketSquare() {
 	
 }
 void Game::initSprites()
-{//bigwheel
+{
+	// nightlights
+	texviclight.loadFromFile("viclight.png");
+	//vertices test
+	vertices.setPrimitiveType(sf::PrimitiveType::Quads);
+	vertices.setPrimitiveType(sf::Quads);
+	//if (!imgboid.loadFromFile("cloud.png"))
+	//	std::cout << "Didnt loud cloud";
+	//texboid.loadFromImage(imgboid);
+	//
+	texboid.loadFromFile("pigeon.png");
+	texbutterfly.loadFromFile("butterfly.png");
+	//bigwheel
+
+	//initialise rect for boids /butterfly
+	boidIntRect.width = texboid.getSize().x /4;
+	boidIntRect.height = texboid.getSize().y ;
+	
+	butterflyIntRect.width = texbutterfly.getSize().x / 4;
+	butterflyIntRect.height = texbutterfly.getSize().y;
+	
 	if (!imgVictorianPost.loadFromFile("victorianPost.png"))
 		std::cout << "Victorian Post not loaded";
 	texVictorianPost.loadFromImage(imgVictorianPost);
@@ -518,7 +572,7 @@ void Game::initSprites()
 	rotatorbin.setSize(sf::Vector2f(textrotatorbin.getSize().x, textrotatorbin.getSize().y));
 	rotatorbin.setPosition(bigwheel2.getPosition());
 	rotatorbin.setScale(0.7, 0.7);
-	//rotatorbin.setOrigin(rotatorbin.getSize().x/2, rotatorbin.getSize().y / 2);
+	//rotatorbin.setOrigin(rotatorbin.getSize()x.x/2, rotatorbin.getSize().y / 2);
 
 	rotatorbin2.setSize(sf::Vector2f(textrotatorbin.getSize().x, textrotatorbin.getSize().y));
 	rotatorbin2.setPosition(bigwheel2.getPosition());
@@ -1437,7 +1491,7 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-					view.setRotation(-4);
+				//	view.setRotation(-4);
 
 					view.zoom(zoomfactor);
 					window->setView(view);
@@ -1493,7 +1547,7 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-					view.setRotation(-4);
+					//view.setRotation(-4);
 
 					view.zoom(zoomfactor);
 					window->setView(view);
@@ -1549,7 +1603,7 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-					view.setRotation(-4);
+					//view.setRotation(-4);
 					view.zoom(zoomfactor);
 					window->setView(view);
 				}
@@ -1596,7 +1650,7 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-					view.setRotation(-4);
+					//view.setRotation(-4);
 					view.zoom(zoomfactor);
 					window->setView(view);
 				}
@@ -1650,7 +1704,7 @@ void Game::pollEvents()
 						aPosition.y = 0;
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
-					view.setRotation(-4);
+				//	view.setRotation(-4);
 					view.zoom(zoomfactor);
 					window->setView(view);
 				}
@@ -1768,6 +1822,8 @@ void Game::pollEvents()
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
+
+						lights.push_back(window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y)));
 						//if (!mouseDown)
 						//{
 						//	mouseDown = true;
@@ -2522,48 +2578,52 @@ void Game::updateEnemies()
 
 void Game::renderRain()
 {
-	/*int playerY = player.actor.getPosition().y;
+	
+	
+	
+	int playerY = player.actor.getPosition().y;
 	int playerX = player.actor.getPosition().x;
 	if (part == 1) {
-		for (int i = 0; i < 300; i++) {
-			randomh = 1 + rand() % (15);
-			randomsp[i] = 15 + rand() % (28);
-			randomx = 2700 + rand() % (2200);
+		for (int i = 0; i < 700; i++) {
+			randomh = 10 + rand() % (17);
+			randomsp[i] = 11 + rand() % (38);
+			randomx = player.actor.getPosition().x - 3000 + rand() % 3000;
 			randomr = 0 + rand() % (45);
-			randomg = 30 + rand() % (35);
+			randomg = 10 + rand() % (75);
 			randomb = 210 + rand() % (45);
-		rectangle[i].setSize(sf::Vector2f(4, randomh));
-			rectangle[i].setPosition(randomx, player.actor.getPosition().y  -200);
+		rectangle[i].setSize(sf::Vector2f(3, randomh));
+			rectangle[i].setPosition(randomx, player.actor.getPosition().y  -3000);
 			rectangle[i].setFillColor(sf::Color(randomr, randomg, randomb));
 
 
 
 		}
 	}
-	for (int i = 0; i < 300; i++)
+	for (int i = 0; i < 700; i++)
 	{
 		this->window->draw(rectangle[i]);
 	}
 
 		for (int i = 0; i < 700; i++) {
-		if (rectangle[i].getPosition().y > 2000){
-			randomx = player.actor.getPosition().x  + rand() % (2500);
-			rectangle[i].setPosition(randomx, playerY - 7);
+		if (rectangle[i].getPosition().y > player.actor.getPosition().y + 3000){
+			randomx = (player.actor.getPosition().x - 2000) + rand() % (4500);
+			rectangle[i].setPosition(randomx, playerY - 1000);
+			//rectangle[i].move(vecWind);
 			randomsp[i] = 15 + rand() % (28);
-			randomr = 0 + rand() % (45);
-			randomg = 30 + rand() % (35);
+			randomr = 0 + rand() % (25);
+			randomg = 50 + rand() % (30);
 			randomb = 210 + rand() % (45);
 		
 		}
 
 	}
 
-		for (int i = 0; i < 900; i++)
+		for (int i = 0; i < 700; i++)
 		{
-			rectangle[i].move(sf::Vector2f(6, randomsp[i]));
+			rectangle[i].move(sf::Vector2f(2, randomsp[i]));
 		}
 
-		part = 2;*/
+		part = 2;
 }
 void Game::renderEnemies()
 {
@@ -2639,7 +2699,7 @@ void Game::render()
 	
 
 			//std::cout << bNpcFollow;
-	view.setRotation(-4);
+	//view.setRotation(-4);
 	window->draw(CharBG);
 	this->renderEnemies();
 			
@@ -2663,7 +2723,7 @@ void Game::render()
 		this->renderInterface(*this->window);
 		if (bRain)
 		{
-			this->renderRain();
+			
 		}
 
 
@@ -3544,7 +3604,7 @@ void Game::render()
 				}
 
 				//}
-			//	dog.UpdateNpc(0, deltaTime);
+				dog.UpdateNpc(0, deltaTime);
 				dog.actor.setTextureRect(dog.uvRect);
 
 			}
@@ -3720,12 +3780,12 @@ void Game::render()
 			dog.actor.setTextureRect(dog.uvRect);
 
 		}
-		if (bDrones)
+		if (!bDrones)
 			drones.drawPeople(dayTime, uTime, droneTimeHold);
 		if (bScooters)
 			scooters.drawPeople(dayTime, uTime, scooterTimeHold);
 		scootersManSandyJacket.drawPeople(dayTime, uTime, scooterTimeHold);
-		if (bDogs)
+		if (!bDogs)
 			dogGR.drawPeople(dayTime, uTime, dogTimeHold);
 		if (bHumans)
 		{
@@ -3756,16 +3816,67 @@ void Game::render()
 			player.Update();
 	//	vRectShapeDataVector.push_back(rectPSword);
 		//this->window->draw(rectPSword);
-		vRectShapeDataVector.push_back(player.actor);
+	//	vRectShapeDataVector.push_back(player.actor);
+
 		vRectShapeDataVector.push_back(recTramBus);
 		vRectShapeDataVector.push_back(recTramBus2);
+		vRectShapeDataVector.push_back(player.actor);
+	
 		//rendering assets will order assets and add to vector.
 		
+		for (auto& boid : butterflies.boids)
+		{
+
+			boid.edges(player.actor.getPosition().x, player.actor.getPosition().y);
+			boid.flock(butterflies.boids);
+			boid.update();
+
+
+			boid.bird.setTextureRect(butterflyIntRect);
+			if (boid.flipped == true)
+				boid.bird.setScale(1, -1);
+
+			if (boid.flipped == false)
+				boid.bird.setScale(1, 1);
+			boid.velocity += vecWind;
+			vRectShapeDataVector.push_back(boid.bird);
+		}
 		
-	
+		for (auto& boid : boids.boids)
+			{
 
-	
+				boid.edges(player.actor.getPosition().x, player.actor.getPosition().y);
+				boid.flock(boids.boids);
+				boid.update();
 
+
+				boid.bird.setTextureRect(boidIntRect);
+				if (boid.flipped == true)
+					boid.bird.setScale(1, -1);
+
+				if (boid.flipped == false)
+					boid.bird.setScale(1, 1);
+				boid.velocity += vecWind;
+				vRectShapeDataVector.push_back(boid.bird);
+				//std::cout << boid.angle << '\n';
+			//	boid.bird.setTexture(&texboid);
+				//boid.bird.setFillColor(sf::Color::Black);
+			//	if (boid.angle < 0 && boid.angle > -181)
+					//boid.bird.setScale(1, 1);
+			//	else boid.bird.setScale(-1, 1);
+
+				//boid.bird.move(-40, -20);
+			//	boid.bird.setFillColor(sf::Color(255, 255, 255, 120));
+				//this->window->draw(boid.bird);
+				//boid.bird.setFillColor(sf::Color::Transparent.;
+				//boid.bird.move(40, 20);
+			//	sf::Color newcol = boid.bird.getFillColor();
+				//boid.bird.setFillColor(sf::Color(newcol.r, newcol.g, newcol.b, newcol.a + 1));
+				//circles.push_back(boid.bird);
+				//boid.bird.rotate(0.1 + rand() % 1);
+			}
+
+		
 		renderAssets();
 		
 		//
@@ -3776,8 +3887,11 @@ void Game::render()
 			window->draw(socialengine->partyGrid);
 			//vRectShapeDataVector.insert(vRectShapeDataVector.begin()+2, socialengine->partyGrid);
 		for (auto& npcs : vRectShapeDataVector) {
-			if (npcs.getPosition().x > (player.actor.getPosition().x - 2550) && npcs.getPosition().x <(player.actor.getPosition().x + 2550) && npcs.getPosition().y < (player.actor.getPosition().y + 2500)  && npcs.getPosition().y > (player.actor.getPosition().y - 2500))
-			this->window->draw(npcs);
+			if (npcs.getPosition().x > (player.actor.getPosition().x - 2550) && npcs.getPosition().x < (player.actor.getPosition().x + 2550) && npcs.getPosition().y < (player.actor.getPosition().y + 2500) && npcs.getPosition().y >(player.actor.getPosition().y - 2500))
+				/*if (npcs.getSize().x < 190 &&  &npcs != act)
+					npcs.setFillColor(sf::Color(10, 10, 10, 180));*/
+				
+				this->window->draw(npcs);
 
 			//new bit
 			//if (npcs.getPosition().x > 1 && npcs.getPosition().x < 6500 && npcs.getPosition().y > 1 && npcs.getPosition().y < 6500) {
@@ -3787,6 +3901,50 @@ void Game::render()
 				//qt.insert(point);
 			//}//putting data into quad tree respective to everything that moves 
 		}
+
+		
+	//	npcColorTimer += npcClock.getElapsedTime().asSeconds();
+		//for (auto& npcs : vRectShapeDataVector) {
+		//	if (npcs.getPosition().x > (player.actor.getPosition().x - 2550) 
+		//		&& npcs.getPosition().x < (player.actor.getPosition().x + 2550) 
+		//		&& npcs.getPosition().y < (player.actor.getPosition().y + 2500)
+		//		&& npcs.getPosition().y >(player.actor.getPosition().y - 2500) )
+		//	{
+		//		if (npcs.getSize().x < 190 && npcs.getPosition().x < player.actor.getPosition().x + 150 
+		//			&& npcs.getPosition().x > player.actor.getPosition().x - 150
+		//			&& npcs.getPosition().y > player.actor.getPosition().y - 150
+		//			&& npcs.getPosition().y < player.actor.getPosition().y + 150
+		//			&&npcs.getPosition().y !=  player.actor.getPosition().y
+		//			 &&npcs.getPosition().x != player.actor.getPosition().x
+		//			&& npcs.getSize().y < 250) {
+		//			npcs.move(-5, -5);
+		//			//set fill colour default here
+		//			//
+		//			
+		//			//##	npcs.setFillColor(sf::Color(rand() % 255, rand() % 255, rand() % 255, 229));
+		//			
+		//			this->window->draw(npcs);
+
+		//			npcs.move(5, 5);
+		//		}
+		//		else {
+		//			npcs.move(8, 8);
+		//			//if (npcs.getSize().x < 190) {
+		//			npcs.setFillColor(sf::Color(255, 255, 255, 255));
+		//				//this->window->draw(npcs);
+		//			}
+		//		
+		//		//set fill colour default here
+		//		//
+		//		
+		//		
+		//		if (npcs.getSize().x < 200)
+		//		{
+		//	//		##this->window->draw(npcs);
+		//		}
+		//		npcs.move(-8, -8);
+		//	}
+		//}
 		for (const auto& assets : lastAssets)
 			this->window->draw(assets);
 		
@@ -3826,7 +3984,7 @@ void Game::render()
 		carriageTime += carriageTimer.getElapsedTime().asSeconds();
 		if (carriageTime > 0.01)
 		{
-			bigwheel3.rotate(0.26);
+			bigwheel3.rotate(0.135);
 			carriageTime = 0;
 			carriageTimer.restart();
 		}
@@ -3856,8 +4014,14 @@ void Game::render()
 			{
 				rotatorbin2.setFillColor(sf::Color::Red);
 			}*/
-			this->window->draw(rotatorbin2);
+			rotatorbin2.setFillColor(sf::Color(0, 0, 0, 180));
 			
+			this->window->draw(rotatorbin2);
+			rotatorbin2.move(-12, -12);
+			rotatorbin2.setFillColor(sf::Color(255, 255, 255, 255));
+			this->window->draw(rotatorbin2);
+			rotatorbin2.move(12, 12);
+
 		}
 		wheel_shift += 0.0023	;
 		shape.setRadius(900);
@@ -3872,9 +4036,32 @@ void Game::render()
 		//this->window->draw(rotatorbin2);
 		if (!movementStarted)
 		{
-			for (int i = 0; i <150; i++) {
+			for (int i = 0; i < 8; i++) {
+
+				Boids ve(generator,13);
+				ve.bird.setTexture(&texbutterfly);
+				/*sf::Vector2f john(3, 4);
+				sf::Vector2f bill(boids.random2D(generator));*/
+				//boids.position = bill;
+			//	vex.acceleration = boids.setMag(vex., 0.6, 5, generator);
+				//magn = vex.random2D();
+				//veccy.setSize(magn);
+				//window->draw(veccy);
+				//vex.setFillColor(sf::Color::Green);
+				//veccy.setSize(boid.setMag(magn, 10, 5));
+
+				//vex.setMag(bill, 1., 3.);
 				
-				Boids ve(generator);
+				butterflies.boids.push_back(ve);
+
+			}
+		}
+		if (!movementStarted)
+		{
+			for (int i = 0; i <30; i++) {
+				
+				Boids ve(generator, 35);
+				ve.bird.setTexture(&texboid);
 				/*sf::Vector2f john(3, 4);
 				sf::Vector2f bill(boids.random2D(generator));*/
 				//boids.position = bill;
@@ -3888,14 +4075,29 @@ void Game::render()
 				//vex.setMag(bill, 1., 3.);
 				movementStarted = true;
 				boids.boids.push_back(ve);
+			
 			}
 		}
-		
+		boidSwitchTime += npcClock.getElapsedTime().asSeconds();
+		butterflySwitchTime += npcClock.getElapsedTime().asSeconds();
+		if (boidSwitchTime > 0.09) {
+			boidCurrentImage.x++;
+			boidIntRect.left = boidCurrentImage.x * boidIntRect.width;
+			boidSwitchTime -= boidSwitchTime;
+			if (boidCurrentImage.x > 2)
+				boidCurrentImage.x = 0;
+		}
 
-		
+		if (butterflySwitchTime  > 0.06) {
+			butterflyCurrentImage.x++;
+			butterflyIntRect.left = butterflyCurrentImage.x * butterflyIntRect.width;
+			butterflySwitchTime -= butterflySwitchTime;
+			if (butterflyCurrentImage.x > 2)
+				butterflyCurrentImage.x = 0;
+		}
 		//window->draw(veccy);
 		//this->window->draw(origin);
-		window->draw(fade);
+		
 		socialengine->drawSocial();
 		if (uiMessages.size() > 0)
 			pixelTextMove(uiMessages,3);
@@ -4030,6 +4232,12 @@ void Game::render()
 			socialengine->interact(socialengine->selectedNpc);
 		if (socialengine->vInteraction.size() > 0)
 			socialengine->interactParty(socialengine->vInteraction);
+
+		ImGui::Begin("slides");
+		ImGui::SliderFloat("Cohesion ", &boids.c, 0.f, 3.0f);
+		ImGui::SliderFloat("Align", &boids.a, 0.f, 3.f);
+		ImGui::SliderFloat("Separation", &boids.s, 0.f, 3.0f);
+		ImGui::End();
 		ImGui::Begin("Asset List");
 		ImGui::InputText("Asset to add", textinput , 500);
 		//ImGui::SameLine(245);
@@ -4148,7 +4356,15 @@ void Game::render()
 		ImGui::Checkbox("Reset PathFinding", &resetPath); //{std::cout <<resetPath };
 		ImGui::Checkbox("Quad Tree", &bQuadTree);
 		ImGui::Checkbox("Grid", &grid);
-		ImGui::SliderFloat("Sun Light ", &dayTime, 0.0f, 1.0f);
+		ImGui::SliderFloat("Sun Light ", &fadeTime, -50.0f, 100.f);
+		ImGui::SliderFloat("North South Wind", &vecWind.y, -1.5f, 1.5f);
+		ImGui::SliderFloat("East West Wind ", &vecWind.x, -1.5f, 1.5f);
+		
+		if (ImGui::Button("Apple Weather")) {
+			bCloudsWindApplied = false;
+
+		}
+
 		ImGui::Text("Experience (Based on scooter contact\nBut will later be based on missions\nand fighting etc.):");
 		ImGui::Text(exper.c_str());
 		{
@@ -4247,7 +4463,7 @@ void Game::render()
 			
 			for (auto &asset : vRectShapeDataVector)
 			{
-				this->window->draw(asset);
+				//this->window->draw(asset);
 			}
 			
 			
@@ -4270,7 +4486,10 @@ void Game::render()
 		this->window->draw(recTrees);
 		recTrees.setPosition(9251, 4029);
 		this->window->draw(recTrees);
-
+		
+		
+		
+		
 		recVictorianPost.setPosition(7051, 4029);
 		this->window->draw(recVictorianPost);
 		recVictorianPost.setPosition(7551, 4029);
@@ -4293,7 +4512,55 @@ void Game::render()
 		this->window->draw(recVictorianPost);
 		recVictorianPost.setPosition(4051, 4159);
 		this->window->draw(recVictorianPost);
-		 //Tell app that window is done drawing.
+	
+		//particleEmitter.setEmitter(sf::Vector2f(2000 + rand() % 250, 2500 + rand() % 270));
+		//window->draw(particleEmitter);
+		//particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
+		//window->draw(particleEmitter);
+		//particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
+		//window->draw(particleEmitter);/*
+		particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
+		window->draw(particleEmitter, particle);
+		//window->clear();
+
+		//start = no light
+		tex.clear(sf::Color(0,0,0,250));
+
+		//add the lights together
+		
+		sha.setSize(sf::Vector2f(250.f, 250.));
+		sha.setScale(1, 2.5);
+		sha.setOrigin(sha.getSize().x/2, sha.getSize().y/2);
+		sha.setPosition(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
+		sha.setTexture(&texviclight);
+		tex.draw(sha, sf::BlendAdd);
+		sf::RectangleShape tri;
+		tri.setPosition(sf::Vector2f(1331, 1026));
+		tri.setSize(sf::Vector2f(8700, 8500));
+		//float nightAlpha = 255 / dayDivide;
+		tri.setFillColor(skyColor);
+		//std::cout << skyColor.toInteger();// << "r< " << skyColor.g << "g< b.> " << skyColor.b;
+		for (int i = 0; i < lights.size(); ++i)
+		{
+			sha.setFillColor(sf::Color(sha.getFillColor().r, sha.getFillColor().r, sha.getFillColor().r, skyColorLight));
+			sha.setPosition(lights[i]);
+			
+			//sha.setFillColor(colors[i % 3]);
+			tex.draw(sha, sf::BlendAdd);
+		}
+		tex.draw(tri, sf::BlendAdd);
+	
+		tex.display();
+
+		//lit scene
+		//window->draw(sf::Sprite(pic));
+
+		//multiply by light
+		window->draw(sf::Sprite(tex.getTexture()), sf::BlendMultiply);
+		
+	
+
+		//Tell app that window is done drawing.
 
 		//this->window->setView(player.playerUI);
 	//	for (auto ass : player.playerUIAssets)
@@ -4302,26 +4569,96 @@ void Game::render()
 		
 
 
-		for (auto& boid : boids.boids)
-		{
-			boid.flock(boids.boids);
-			boid.update();
-			circles.push_back(boid.bird);
-			if (boid.bird.getPosition().x > 5000)
-				boid.position.x = 3000;
-			if (boid.bird.getPosition().x < 3000)
-				boid.position.x = 5000;
-			if (boid.bird.getPosition().y > 5000)
-				boid.position.y = 3000;
-			if (boid.bird.getPosition().y < 3000)
-				boid.position.y = 5000;
-		}
-			
-			this->window->draw(batchCircles(circles));
-			circles.clear();
+		
 		/*	for (int i = 0; i < 200; i++) {
 				this->window->draw(circles[i]);
 			}*/
+		this->renderRain();
+	
+		//	sf::RenderStates textt;
+		//	sf::Transform transform;
+		//	//transform.translate(100.0f, 100.0f);
+		////	textt.transform = transform;
+		//	textt.texture = &textsquarewall;
+			//textt.shader = &water;
+			//textt.blendMode = sf::BlendAlpha;
+
+				//this->window->draw(batchCircles(circles));
+		//for (auto& boid : boids.boids)
+		//{
+		//	if (!bCloudsWindApplied)
+		//	{		//add win
+		//		boid.velocity += vecWind;
+
+		//		//boid.velocity.y -= vecwin.y;
+		//	}
+		//	/*boid.position.x +=27;
+		//	boid.position.y += 27;
+		//	*/
+		//	//boid.bird.setFillColor(sf::Color(230, 230, 255, 20+ rand() %80));
+		//	//boid.flock(boids.boids);
+		//	boid.update();
+		//	//circles.push_back(boid.bird);
+		///*	boid.bird.setFillColor(sf::Color(245,255,245, 30));
+		//	boid.position.x -= 27;
+		//	boid.position.y -= 27;*/
+		//	this->window->draw(boid.bird);
+		//}
+		//this->window->draw(batchCircles(circles));
+		bCloudsWindApplied = true;
+
+		circles.clear();
+		
+		sf::Vector2i mouse = sf::Mouse::getPosition(*window);
+		particleEmitter.setEmitter(sf::Vector2f(player.actor.getPosition().x +46, player.actor.getPosition().y  - 3)  );
+
+		sf::Time elapsed = particleClock.restart();
+		//std::cout << elapsed.asMicroseconds();
+		
+		particleEmitter.update(elapsed);
+		
+			//weather();
+		
+		//texstate.texture = &vertexx;
+	//	this->window->draw(vertices, &vertexx);
+
+		
+		entity[0].color = sf::Color::Red;
+		for (int i = 0; i < 72; i+=3)
+		{
+			if (i == 0) {
+				entity[i].position = sf::Vector2f(4000 + (40 + 10), 3000 + (140 + 10));
+				entity[i+1].position = sf::Vector2f(entity[i].position.x + 200,  entity[i].position.y);
+				entity[i + 2].position = sf::Vector2f(4200 + (10 + 10 * i), 3170 + (5) * i);
+			}
+
+			else
+				entity[i].color = sf::Color::Red;
+				entity[i].color.a += 10;
+				//entity[i].color.r -= 20;
+			entity[i+2].color = sf::Color::Red;
+				entity[i].position = sf::Vector2f(entity[0].position.x, entity[0].position.y);
+			entity[i+1].position = sf::Vector2f(entity[i].position.x + 50 * std::cos(i-1), entity[i].position.y + 50 *  std::sin(i-1));
+			entity[i + 2].position = sf::Vector2f(entity[i].position.x + 50 * std::cos(i+5), entity[i].position.y + 50 * std::sin(i+5));
+
+		}
+
+		//entity[3].position = sf::Vector2f(4300, 3330);
+		//entity[4].position = sf::Vector2f(4400, 3440);
+		//entity[5].position = sf::Vector2f(4500, 3500);
+		//entity[6].position = sf::Vector2f(4600, 3600);
+		//entity[7].position = sf::Vector2f(4700, 3670);
+		//entity[8].position = sf::Vector2f(4800, 3750);
+		//entity[9].position = sf::Vector2f(4910, 3800);
+		//this->window->draw(entity);
+		
+		//sf::RectangleShape tri;
+	/*	tri.setPosition(sf::Vector2f(1331, 1026));
+		tri.setSize(sf::Vector2f(4700, 4500));
+		tri.setFillColor(sf::Color(30, 30, 30, 185));
+		
+		this->window->draw(particleEmitter, sf::RenderStates(sf::BlendAlpha));
+		this->window->draw(tri, sf::RenderStates(sf::BlendMultiply));*/
 		this->window->display();
 		if(!bNpcFollow )this->window->setView(view);
 		
@@ -4336,7 +4673,7 @@ void Game::render()
 
 void Game::update()
 {
-
+	
 	//Event Polling
 	this->pollEvents();
 	this->updateMousePositions();
@@ -4345,9 +4682,84 @@ void Game::update()
 	
 	client.ReceivePackets(&client.socket);
 	this->renderPlayers();
+	this->dayTimeFunc();
 }
 
+void Game::dayTimeFunc()
+{
 
+	hour += npcClock.getElapsedTime().asSeconds();
+	if (hour > 3)
+	{
+		dayDivide++;
+		std::cout << "\nHour" << hour << ", npc clock > " << npcClock.getElapsedTime().asSeconds();
+		std::cout << "\n" << dayDivide;
+		hour = 0;
+	}
+	if (dayDivide > 11)
+		dayDivide = 0;
+
+
+	//use class to generate sun affects for time of day also with a random int. (Red Sky) and strings such as
+	//Night Mood. Sunset type.
+	switch (dayDivide) {
+	case 0:
+		skyColor = sf::Color(55, 00, 150,100);
+		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 255;
+		break;
+	case 1:
+		skyColor = sf::Color(55, 00, 150, 130);
+		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 255;
+		break;
+	case 2:
+		skyColor = sf::Color(55, 0, 150, 170);
+		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight =  205;
+		break;
+	case 3:
+		skyColor = sf::Color(55, 0, 150, 200);
+		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 150;
+		break;
+	case 4:
+		skyColor = sf::Color(55, 0, 150, 230);
+		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 150;
+		break;
+	case 5:
+		skyColor = sf::Color(55, 0, 150,255);
+		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 100;
+		break;
+	case 6:
+		skyColor = sf::Color(255, 255, 255,255);
+		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		break;
+	case 7:
+		skyColor = sf::Color(255, 255, 255, 255);
+		std::cout << "\nCase hour: " << dayDivide;
+		break;
+	case 8:
+		skyColor = sf::Color(255, 255, 255, 205);
+		break;
+	case 9:
+		skyColor = sf::Color(255, 255, 255, 155);
+		break;
+	case 10:
+		skyColor = sf::Color(10, 10, 10);
+		break;
+		
+	case 11:
+		skyColor = sf::Color(10, 10, 10);break;
+		
+	case 12:
+		skyColor = sf::Color(10, 10, 10); break;
+		
+	}
+	
+}
 void Game::updateMousePositions()
 {
 	this->mousePosWindow = sf::Mouse::getPosition(*this->window);
@@ -4361,7 +4773,7 @@ void Game::login()
 
 	std::cout << "\nPlease enter Character name: ";
 	//std::cin >> username;
-	username = "Ryan";
+	username = "Beta";
 	userText.setString(username);
 }
 
@@ -4831,11 +5243,12 @@ void pixelTextMove(std::vector <sf::Text>& text, int size) {
 void Game::resetFrame() {
 	//view.rotate(-3);
 	if (fadeTime > 600)
-		
+	/*	vecWind.x = 6;
+	vecWind.y = 2;*/
 		return;
 	//std::cout <<" \nfade time " << fadeTime << "color : "<<  fade.getFillColor().Transparent.toInteger();
 	//fadeTime += fadeClock.getElapsedTime().asSeconds();
-	fadeTime = fadeTime + 0.10;
+	fadeTime = fadeTime + 0.25;
 	if (fadeTime < 513) {
 		fade.setFillColor(sf::Color(0, 0, 0, -(fadeTime / 2)));
 		WelcomeTo.setFillColor(sf::Color(0, 0, 0, -(fadeTime / 2)));
@@ -4997,4 +5410,42 @@ sf::VertexArray batchCircles(std::vector<sf::CircleShape>& circles) { // or std:
 	}
 	arr.getPrimitiveType();
 	return arr;
+}
+
+void Game::weather()
+{
+	//fWeatherTime += npcClock.getElapsedTime().asSeconds();
+	//if (fWeatherTime > 5.0)
+	//{
+	//	//view.rotate(0.3 + rand() % 2);
+	//	
+	//}
+	//if (fWeatherTime > 7.0)
+	//{
+	//	fWeatherTime = 0;
+	////	view.setRotation(0);
+	//}
+	
+}
+
+
+void drawCircle(float radius )
+{
+
+	sf::VertexArray entity(sf::TriangleFan, 30);
+	entity[0].color = sf::Color::Blue;
+	
+	entity[0].position = sf::Vector2f(4000, 3000);
+	entity[0].position = sf::Vector2f(4100, 3010);
+	entity[0].position = sf::Vector2f(4200, 3020);
+	entity[0].position = sf::Vector2f(4300, 3030);
+	entity[0].position = sf::Vector2f(4400, 3040);
+	entity[0].position = sf::Vector2f(4000, 3000);
+	entity[0].position = sf::Vector2f(4000, 3000);
+	entity[0].position = sf::Vector2f(4000, 3000);
+	entity[0].position = sf::Vector2f(4000, 3000);
+	entity[0].position = sf::Vector2f(4000, 3000);
+
+	//window->draw(entity);
+
 }

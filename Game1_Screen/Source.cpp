@@ -24,8 +24,15 @@ int main()
 	game.running();
 	
 	sf::Music music;
-	music.openFromFile("Enigma.ogg");
-	//music.play();
+	sf::Music vibe;
+	music.openFromFile("RainThunder.ogg");
+	music.setVolume(25);
+	music.play();
+	vibe.setVolume(10);
+	music.setLoop(true);
+	vibe.setLoop(true);
+	vibe.openFromFile("Violin.ogg");
+	vibe.play();
 	sf::Clock clock;
 	//game.initClient(&game.rsocket);
 	Animation character(&game.playerTexture, sf::Vector2u(4, 4), 0.14f);

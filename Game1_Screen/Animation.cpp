@@ -356,6 +356,7 @@ void Animation::UpdateNpc(int row, float deltaTime)
 			msg.setFont(fon);
 			msg.setCharacterSize(7 + rand() % (20));
 			msg.setFillColor(sf::Color(15 + rand() % (240), 15 + rand() % (240), 15 + rand() % (240)));
+			std::cout << "text bounds: " << msg.getLocalBounds().width << "\n";
 			this->stopOverride = true;
 			this->currentImage.x = 3;
 			this->path.clear();

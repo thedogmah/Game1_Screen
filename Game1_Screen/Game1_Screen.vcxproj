@@ -157,6 +157,7 @@
     <ClCompile Include="boids.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="clientside.cpp" />
+    <ClCompile Include="Effects.cpp" />
     <ClCompile Include="EngineVector.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="imgui\imgui-SFML.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="boids.h" />
     <ClInclude Include="Chat.h" />
     <ClInclude Include="clientside.h" />
+    <ClInclude Include="Effects.h" />
     <ClInclude Include="EngineVector.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="imgui\imconfig-SFML.h" />
@@ -198,6 +200,7 @@
     <ClInclude Include="login.h" />
     <ClInclude Include="multiworld.h" />
     <ClInclude Include="Network.h" />
+    <ClInclude Include="particleSystem.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Population.h" />
     <ClInclude Include="PopulationDog.h" />
