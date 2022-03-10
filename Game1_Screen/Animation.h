@@ -66,6 +66,8 @@ public:
 	aStar pathSearch;
 	//aStar interactedPathSearch;
 	aStar::paths steps;
+
+
 	//aStar::paths interactedSteps;
 	std::vector<aStar::paths> path;
 	//std::vector<aStar::paths> interactedPath;

@@ -79,9 +79,11 @@ void Game::initVariables()
 	
 	offSetX = -492;
 	offSetY = 251;
-	socialengine = new socialEngine();
-	//rotator bin test (Delete)
 	
+	
+	//social
+	socialengine = new socialEngine();
+	//Dialogue.init();
 	//bigwheel test variables
 	shape.setRadius(900);
 	shape.setPosition(4901, 2548);
@@ -311,7 +313,7 @@ void Game::initWindow()
 
 			std::cout << "black slick Male  not loaded";
 	humanityChineseWomanPurple.imgHuman.createMaskFromColor(sf::Color::Black);
-	humanityChineseWomanPurple.peopleAmount =125;
+	humanityChineseWomanPurple.peopleAmount =15;
 
 
 
@@ -414,7 +416,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityMaleWhiteJacket.peopleAmount =120;
+	humanityMaleWhiteJacket.peopleAmount =50;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -422,7 +424,7 @@ void Game::initWindow()
 	humanityMaleWhiteJacket.createBounds();
 
 
-	humanity.peopleAmount = 130;
+	humanity.peopleAmount = 30;
 	humanity.populate();
 	
 	humanity.window = window;
@@ -442,7 +444,7 @@ void Game::initWindow()
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 110;
+	scootersManSandyJacket.peopleAmount = 20;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
@@ -450,19 +452,19 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 120;
+	humanityWomanSnugGrey.peopleAmount = 20;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
 	//snug black coat woman population
 	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugBlack.peopleAmount = 120;
+	humanityWomanSnugBlack.peopleAmount = 40;
 	humanityWomanSnugBlack.populate();
 	humanityWomanSnugBlack.window = window;
 	humanityWomanSnugBlack.createBounds(); 
 	//render state texture for night time
-	tex.create(9000,8000);
+	tex.create(11000,9000);
 }
 void Game::initEnemies()
 {
@@ -1413,7 +1415,7 @@ ImGui::PopStyleColor(1);
 
 void Game::initConnection()
 {
-	return;	bool connect = false;
+		bool connect = false;
 	while (!connect)
 		if (client.socket.connect(client.ip, 2000) == sf::Socket::Done)
 		{
@@ -1521,19 +1523,19 @@ void Game::pollEvents()
 					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 
 					//###Need to send packet less often.### Maybe on a delta time check.
-					//std::string down = "Down ";
-					//down += username;
-					//client.sendingpacket << username << down << location.x << location.y << chat.playerInput.toAnsiString();
-					////DEBUG COMMENTS std::cout << "Printing message from Game.dowNkey function: " << chat.playerInput.toAnsiString();
+					std::string down = "Down ";
+					down += username;
+					client.sendingpacket << down << username << location.x << location.y << chat.playerInput.toAnsiString();
+					//DEBUG COMMENTS std::cout << "Printing meusernassage from Game.dowNkey function: " << chat.playerInput.toAnsiString();
 
-					//movement = "Down ";
-					//movement += username;
-					//client.sendingpacket << movement;
+					movement = "Down ";
+					movement += username;
+					client.sendingpacket << movement;
 
-					//if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					//	//std::cout << "packet 'Down' not sent";
-					//}
-					//client.sendingpacket.clear();
+					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+						//std::cout << "packet 'Down' not sent";
+					}
+					client.sendingpacket.clear();
 
 
 
@@ -1584,15 +1586,15 @@ void Game::pollEvents()
 					location.x = spChar.getPosition().x;
 					location.y = spChar.getPosition().y;
 
-					//DEBUG COMMENTSstd::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					//std::string left = "Left ";
-					//left += username;
-					//client.sendingpacket << username << left << location.x << location.y << chat.playerInput.toAnsiString();
+					std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
+					std::string left = "Left ";
+					left += username;
+					client.sendingpacket << left << username << location.x << location.y << chat.playerInput.toAnsiString();
 
-					//if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					//	//std::cout << "packet 'Left' not sent";
-					//}
-					//client.sendingpacket.clear();
+					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+						//std::cout << "packet 'Left' not sent";
+					}
+					client.sendingpacket.clear();
 
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
@@ -1630,15 +1632,15 @@ void Game::pollEvents()
 					location.y = spChar.getPosition().y;
 
 					//DEBUG COMMENTS  std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					//std::string up = "Up ";
-					//up += username;
-					//client.sendingpacket << username << up << location.x << location.y << chat.playerInput.toAnsiString();
+					std::string up = "Up ";
+					up += username;
+					client.sendingpacket << up << username << location.x << location.y << chat.playerInput.toAnsiString();
 
-					////spChar.setTexture(Char4);
-					//if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					//	//std::cout << "packet 'Up' not sent";
-					//}
-					//client.sendingpacket.clear();
+					//spChar.setTexture(Char4);
+					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+						//std::cout << "packet 'Up' not sent";
+					}
+					client.sendingpacket.clear();
 
 
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
@@ -1682,16 +1684,16 @@ void Game::pollEvents()
 					location.y = spChar.getPosition().y;
 
 					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					//std::string right = "Right ";
-					//right += username;
-					//client.sendingpacket << username << right << location.x << location.y << chat.playerInput.toAnsiString();
+					std::string right = "Right ";
+					right += username;
+					client.sendingpacket << right << username << location.x << location.y << chat.playerInput.toAnsiString();
 
 
-					////spChar.setTexture(Char4);
-					//if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					////	std::cout << "packet 'Right' not sent";
-					//}
-					//client.sendingpacket.clear();
+					//spChar.setTexture(Char4);
+					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					//	std::cout << "packet 'Right' not sent";
+					}
+					client.sendingpacket.clear();
 
 					//player.actor.move(10, 0);
 					velocity.x += movementSpeed;
@@ -2734,7 +2736,7 @@ void Game::render()
 		//window->draw(spChar);
 
 		//window->draw(actorMain);
-		this->renderPlayers();
+		
 
 		//routefind.
 		// _AStar();delta
@@ -3901,7 +3903,7 @@ void Game::render()
 				//qt.insert(point);
 			//}//putting data into quad tree respective to everything that moves 
 		}
-
+		this->renderPlayers();
 		
 	//	npcColorTimer += npcClock.getElapsedTime().asSeconds();
 		//for (auto& npcs : vRectShapeDataVector) {
@@ -4534,9 +4536,9 @@ void Game::render()
 		sha.setPosition(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
 		sha.setTexture(&texviclight);
 		tex.draw(sha, sf::BlendAdd);
-		sf::RectangleShape tri;
+		
 		tri.setPosition(sf::Vector2f(1331, 1026));
-		tri.setSize(sf::Vector2f(8700, 8500));
+		tri.setSize(sf::Vector2f(10700, 9500));
 		//float nightAlpha = 255 / dayDivide;
 		tri.setFillColor(skyColor);
 		//std::cout << skyColor.toInteger();// << "r< " << skyColor.g << "g< b.> " << skyColor.b;
@@ -4687,7 +4689,8 @@ void Game::update()
 
 void Game::dayTimeFunc()
 {
-
+	
+	
 	hour += npcClock.getElapsedTime().asSeconds();
 	if (hour >3)
 	{
@@ -4696,51 +4699,52 @@ void Game::dayTimeFunc()
 		std::cout << "\n" << dayDivide;
 		hour = 0;
 	}
-	if (dayDivide > 15)
+	if (dayDivide > 20)
 		dayDivide = 0;
-
+	dayDivide = client.worldTime;
 
 	//use class to generate sun affects for time of day also with a random int. (Red Sky) and strings such as
 	//Night Mood. Sunset type.
 	switch (dayDivide) {
 	case 0:
 		skyColor = sf::Color(20, 10, 40,220);
-		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight = 255;
 		break;
 	case 1:
 		skyColor = sf::Color(20, 10, 40,220);
-		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight = 255;
 		break;
 	case 2:
-		skyColor = sf::Color(40, 30, 40);
-		std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColor = sf::Color(35, 30, 50);
+		////std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight =  155;
 		break;
 	case 3:
-		skyColor = sf::Color(70, 60, 30);
-		std::cout << "\nCase hour: " << dayDivide << "\n\n";
-		skyColorLight = 110;
+		skyColor = sf::Color(70, 60, 50);
+		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 90;
 		break;
 	case 4:
-		skyColor = sf::Color(115, 100, 0);
-		std::cout << "\nCase hour: " << dayDivide << "\n\n";
-		skyColorLight = 40;
+		skyColor = sf::Color(115, 100, 50);
+		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 35;
 		break;
 	case 5:
-		skyColor = sf::Color(175, 175, 175);
-		std::cout << "\nCase hour: " << dayDivide << "\n\n";
-		skyColorLight = 0;
+		skyColor = sf::Color(105, 105, 90);
+	//	std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 28;
 		break;
 	case 6:
 		skyColor = sf::Color(215, 215, 215,215);
-		std::cout << "\nCase hour: " << dayDivide << "\n\n";
-		
+		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 15;
 		break;
 	case 7:
 		skyColor = sf::Color(255, 255, 255, 205);
-		std::cout << "\nCase hour: " << dayDivide;
+		//std::cout << "\nCase hour: " << dayDivide;
+		skyColorLight = 0;
 		break;
 	case 8:
 		skyColor = sf::Color(255, 255, 255, 255);
@@ -4748,39 +4752,67 @@ void Game::dayTimeFunc()
 		break;
 	case 9:
 		skyColor = sf::Color(255, 255, 255, 255);
-		//skyColorLight = 100;
+		skyColorLight = 20;
 		break;
+
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	
+	
 	case 10:
-		skyColor = sf::Color(155, 125, 165, 205);
+		skyColor = sf::Color(215, 215, 215, 215);
+	//	std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 0;
+		break;
+	/// 
+	case 11:
+		skyColor = sf::Color(105, 105, 90);
+	//	std::cout << "\nCase hour: " << dayDivide << "\n\n";
+		skyColorLight = 28;
+		break;
+	case 12:
+		skyColor = sf::Color(115, 105, 115, 205);
 		skyColorLight = 80;
 		break;
 
-	case 11:
-		skyColor = sf::Color(155, 90, 83, 205);
+	case 13:
+		skyColor = sf::Color(100, 90, 113, 205);
 		skyColorLight = 100;
 		break;
 		
-	case 12:
+	case 14:
 		
-		skyColor = sf::Color(155, 90, 83, 205);
+		skyColor = sf::Color(60, 60, 125, 205);
 		skyColorLight = 130; break;
 		
-	case 13:
-		skyColor = sf::Color(185, 70, 90, 205); break;
-		skyColorLight = 150;
-	case 14:
-		skyColor = sf::Color(90, 70, 125, 215); break;
-		
 	case 15:
-		skyColor = sf::Color(50, 10, 90, 220); break;
-		skyColorLight = 170;
+		skyColor = sf::Color(60, 60, 125, 205); break;
+		skyColorLight = 150;
 	case 16:
+		skyColor = sf::Color(52, 50, 105, 215); break;
+
+	case 17:
+		skyColor = sf::Color(33, 30, 89, 220); break;
+		skyColorLight = 170;
+		
+	case 18:
+		skyColor = sf::Color(30, 10, 80, 220); break;
+		skyColorLight = 170;
+	case 19:
 		skyColor = sf::Color(20, 10, 40, 220); break;
 		skyColorLight = 190;
-	case 17:
+	case 20:
 		skyColor = sf::Color(20, 10, 40, 220); break;
 		skyColorLight = 220;
 		
+	case 21:
+		skyColor = sf::Color(20, 10, 40, 220); break;
+		skyColorLight = 240;
+
+		//20, 10, 40, 220
 	}
 	
 }
@@ -4796,8 +4828,8 @@ void Game::login()
 {
 
 	std::cout << "\nPlease enter Character name: ";
-	//std::cin >> username;
-	username = "Beta";
+	std::cin >> username;
+	//username = "Beta";
 	userText.setString(username);
 }
 
@@ -4807,8 +4839,8 @@ void Game::renderPlayers()
 
 	std::string text;
 	
-	if (socialengine->vInteraction.size() > 0)
-	{
+//	if (socialengine->vInteraction.size() > 0)
+	//{
 
 		
 		for (auto& e : client.PlayerMap)
@@ -4842,7 +4874,7 @@ void Game::renderPlayers()
 		}
 
 	
-	}
+	
 		/*	for (auto& f : client.ChatMap)
 			{
 				std::cout << e.first << f.first << f.second << std::endl;
@@ -4903,25 +4935,25 @@ void Game::renderPlayers()
 	}
 	//rectPSword.setRotation()
 	vRectShapeDataVector.push_back(rectPSword);
-	//client.vPlayers.clear();
-	
-
-	player.battleTime = player.combatClock.getElapsedTime().asSeconds();
-	//std::cout << player.combatClock.getElapsedTime().asSeconds();	
-	if (player.battleTime > 5 || player.vCombatText.size()> 3) {
-		player.vCombatText.clear();
-		player.battleTime = 0;
-		player.combatClock.restart();
-	}
-
-	//render XP Bar.
-	player.playerXpBar.setPosition(10,10);
-	player.playerXpBar.setFillColor(sf::Color::Green);
-	player.playerXpBar.setSize(sf::Vector2f(player.profile.xp * 25, 25));
-	player.playerUIAssets.push_back(player.playerXpBar);
-	//vRectShapeDataVector.push_back(player.playerXpBar);
-	*/
-	resetFrame();
+	*/client.vPlayers.clear();
+//	
+//
+//	player.battleTime = player.combatClock.getElapsedTime().asSeconds();
+//	//std::cout << player.combatClock.getElapsedTime().asSeconds();	
+//	if (player.battleTime > 5 || player.vCombatText.size()> 3) {
+//		player.vCombatText.clear();
+//		player.battleTime = 0;
+//		player.combatClock.restart();
+//	}
+//
+//	//render XP Bar.
+//	player.playerXpBar.setPosition(10,10);
+//	player.playerXpBar.setFillColor(sf::Color::Green);
+//	player.playerXpBar.setSize(sf::Vector2f(player.profile.xp * 25, 25));
+//	player.playerUIAssets.push_back(player.playerXpBar);
+//	//vRectShapeDataVector.push_back(player.playerXpBar);
+//	*/
+////	resetFrame();
 	return;
 
 }

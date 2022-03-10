@@ -74,45 +74,58 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		std::string port;
 		std::string username;
 		std::string message;
+		int worldT;
 		sf::Vector2i  location;
-		packet >> username >> data >> location.x >> location.y >> message >> ip >> port ;
-	//	std::cout << "From server data: " << data << " now at: " << location.x << ", " << location.y << std::endl;
-		//DEBUG COMMENTS std::cout << "Printing message from clientside function: " << message ;
-		iPlayers.loadFromFile("RyanChar2.png");
-		iPlayers.createMaskFromColor(sf::Color::Black);
-		tPlayers.loadFromImage(iPlayers);
-		sPlayers.setTexture(tPlayers);
-		
-		sPlayers.setPosition(float(location.x), float(location.y));
-	//	vPlayers.push_back(sPlayers);
-		PlayerMap.insert(std::pair<std::string, sf::Sprite>(username, sPlayers));
+		//int header2
+		int header;
+		packet >> header >> worldT;
 
-
-		//loop through vector and
-		std::map<std::string, sf::Sprite>::iterator it = PlayerMap.find(username);
-		if (it != PlayerMap.end())
-			it->second = sPlayers;
-
-
-		ChatMap.insert(std::pair<std::string, std::string>(username, message));
-
-		std::map<std::string, std::string>::iterator it2 = ChatMap.find(username);
-		if (it2 != ChatMap.end())
-			it2->second = message;
-
-
-		for (auto e : ChatMap)
+		if (header == 1)
 		{
-			//DEBUG COMMENTS std::cout << "\n " << e.first;
-			//DEBUG COMMENTS std::cout << "\n " << e.second;
-		}		
-		/*for (auto e : vPlayers)
-		{
-			if e.id
-		}*/
-		//if ID found, update position, if not found, push back.
+			packet >> header >> worldTime;
+			worldTime = worldT;
+		}
+			else {
+			packet >> data >> username >> location.x >> location.y >> message >> ip >> port;
+			std::cout << "size of packet: " << packet.getDataSize();
+			std::cout << "\ndata:"<< data << "user: "<< username << "locations: "<< location.x << location.y << message << ip << port;
+			//	std::cout << "From server data: " << data << " now at: " << location.x << ", " << location.y << std::endl;
+				//DEBUG COMMENTS std::cout << "Printing message from clientside function: " << message ;
+			iPlayers.loadFromFile("RyanChar2.png");
+			iPlayers.createMaskFromColor(sf::Color::Black);
+			tPlayers.loadFromImage(iPlayers);
+			sPlayers.setTexture(tPlayers);
+
+			sPlayers.setPosition(float(location.x), float(location.y));
+				//vPlayers.push_back(sPlayers);
+			PlayerMap.insert(std::pair<std::string, sf::Sprite>(username, sPlayers));
 
 
+			//loop through vector and
+			std::map<std::string, sf::Sprite>::iterator it = PlayerMap.find(username);
+			if (it != PlayerMap.end())
+				it->second = sPlayers;
+
+
+			ChatMap.insert(std::pair<std::string, std::string>(username, message));
+
+			std::map<std::string, std::string>::iterator it2 = ChatMap.find(username);
+			if (it2 != ChatMap.end())
+				it2->second = message;
+
+
+			for (auto e : ChatMap)
+			{
+				//DEBUG COMMENTS std::cout << "\n " << e.first;
+				//DEBUG COMMENTS std::cout << "\n " << e.second;
+			}
+			/*for (auto e : vPlayers)
+			{
+				if e.id
+			}*/
+			//if ID found, update position, if not found, push back.
+
+		}
 		packet.clear();
 	}
 	

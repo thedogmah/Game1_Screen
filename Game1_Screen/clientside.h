@@ -17,6 +17,9 @@ public:
 	std::map<std::string, sf::Sprite>PlayerMap;
 	std::map<std::string, std::string>ChatMap;
 
+	//worldSync Variables
+	int worldTime{}; //the world time taken from the server and passed to game.cpp on a world sync event
+
 	//Image resources for storing online players to draw and place in map (above) - within receive packet function
 	std::vector<sf::Sprite> vPlayers;
 	sf::Image iPlayers;

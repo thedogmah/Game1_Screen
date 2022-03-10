@@ -59,6 +59,7 @@ void socialEngine::interact(Animation* npc)
 					//partyGrid.setOrigin((partyGridi)
 			}
 			if (!npc->arrived) {
+				//game->Dialogue.performDialogue();
 				npc->stopOverride = true;
 
 				npc->currentImage.x = 3;

@@ -172,7 +172,7 @@ public:
 	sf::Clock clockImGui;
 	//zoom 
 	
-	float zoomfactor =1.3; // is accessed by other classes
+	float zoomfactor =1.45; // is accessed by other classes
 	sf::RectangleShape* act;
 	//weather engine variables
 	sf::Vector2f vecWind{ 0.,0.0 };
@@ -184,11 +184,11 @@ public:
 	//daytime 
 	sf::RectangleShape sky;
 	float hour;
-	int dayDivide =0;
+	int dayDivide =11;
 	sf::Sprite character;
 	sf::Color skyColor{};
 	float skyColorLight{};
-
+	sf::RectangleShape tri; //variable for drawing the sky and night onto the black render text.
 	//variables to offset everything (for when changing map size)
 	int offSetX{};
 	int offSetY{};
@@ -434,10 +434,10 @@ private:
 	std::string npcCareer(Animation person);
 	std::string npcVibe(Animation person);
 	std::string npcReligion(Animation person);
-	void checkCollide();
+	
 public:
 	void initClient(sf::TcpSocket* rsocket);
-	
+	void checkCollide();
 	//Constructors / Destructors
 	Game();
 	virtual ~Game();
