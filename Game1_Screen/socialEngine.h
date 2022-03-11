@@ -18,17 +18,23 @@
 #include "Population.h"
 //#include "Game.h"
 
-class Game;
-class DialogueNode;
+namespace social {
+	class DialogueNode;
+	class DialogueTree;
+	class DialogueOption;
+}
 
+class Game;
+class DialogueTree;
 class socialEngine
 {
 public:
 
-	socialEngine();
+	socialEngine(social::DialogueTree* dialogue);
 	bool bShowInteract = false;
 	//aStar astar{};
 	Game* game;
+	social::DialogueTree* dialoguetreePtr;
 	void interact(Animation* npc);
 	void interactParty(std::vector<Animation*> npc);
 	void disbandParty(std::vector<Animation*> npc);
@@ -73,15 +79,19 @@ public:
 
 };
 
+namespace social {
+	class DialogueNode;
 	
+
 	class DialogueOption {
 
 	public:
 
-		DialogueOption(std::string Text, int ReturnCode, DialogueNode* NextNode); 
+		DialogueOption(std::string Text, int ReturnCode, DialogueNode* parentNode, DialogueNode* NextNode);
 		std::string text;
 		int returncode;
 		DialogueNode* nextNode;
+		DialogueNode* parentNode;
 	};
 
 	class DialogueNode {
@@ -101,71 +111,157 @@ public:
 		void init();
 		void destroyTree();
 
-		int performDialogue();
+		//visuals
+		sf::Text nodetext;
+		sf::Font fontname;
+		sf::RectangleShape chatbox;
+		
+		std::vector<sf::Text> vecText;
 
-	private:
-
+		//int intCurrentNode{};
+		int intOption{};
+		sf::Text optiontext;
+		int performDialogue(sf::RenderWindow* dwindow, Animation* npc);
+		void dialogueSelect(social::DialogueNode* currentnode, int option);
+		//socialEngine* socialengine;
+		
+		DialogueNode* currentnode;
+		DialogueNode* resetnode; //this address will always hold some form of node0, where as currentnode may ocassionaly hold nullptr (to end the interaction)
+		bool end = false;
 		std::vector<DialogueNode*> dialogueNodes;
 
+
+		
 	};
 
-	DialogueTree::DialogueTree() {
-	
+	inline DialogueTree::DialogueTree() {
+		fontname.loadFromFile("Arial.ttf");
+		
+		nodetext.setFont(fontname);
+		chatbox.setFillColor(sf::Color(0, 0, 0, 200));
+		chatbox.setSize(sf::Vector2f(120, 200));
 	}
 
-	void DialogueTree::init() {
-	
+	inline void DialogueTree::init() {
+		
 		DialogueNode* node0 = new DialogueNode("Hi, are you wanting directions?");
 		DialogueNode* node1 = new DialogueNode("Come back if I can help you.");
-		DialogueNode* node2 = new DialogueNode("I can help you get to St Marys of The Castle");
-		DialogueNode* node3 = new DialogueNode("For the castle, you need to follow the Tram, then...");
-	//	DialogueNode* node4 = new DialogueNode;
+		DialogueNode* node2 = new DialogueNode("I can help you get to St Marys or The Castle");
+		DialogueNode* node3 = new DialogueNode("For the castle, follow the Tram past starbucks then its signed!");
+		DialogueNode* node4 = new DialogueNode("For St Marys, follow the tram up the hill then its signed.");
+		DialogueNode* node5 = new DialogueNode("Not exactly what I meant!");
+		//	DialogueNode* node4 = new DialogueNode;
+		
+		//initialise starting nodeSt 
+		currentnode = node0;
+		resetnode = node0;
+			//Node 0
+		node0->dialogueOptions.push_back(DialogueOption("No, sorry.", 0, node0, node1));
+		node0->dialogueOptions.push_back(DialogueOption("Yes!", 0, node0, node2));
+		node0->dialogueOptions.push_back(DialogueOption("I don't know what to do with my life", 0, node0, node5));
 
-		//Node 0
-		node0->dialogueOptions.push_back(DialogueOption("No, sorry.", 0, node1));
-		node0->dialogueOptions.push_back(DialogueOption("Yes!", 0, node2));
 		dialogueNodes.push_back(node0);
-		
+
 		//Node 1
-		node1->dialogueOptions.push_back(DialogueOption("No, sorry.", 0, nullptr));
+		node1->dialogueOptions.push_back(DialogueOption("Got it!", 0, node1, nullptr));
 		dialogueNodes.push_back(node1);
-		
+
 		// Node 2
-		node2->dialogueOptions.push_back(DialogueOption("The Castle", 0, node3));
+		node2->dialogueOptions.push_back(DialogueOption("The Castle", 0, node2, node3));
+		node2->dialogueOptions.push_back(DialogueOption("St Marys", 0, node2, node4));
+		node2->dialogueOptions.push_back(DialogueOption("Back up a sec...", 0, node2, node0));
 		dialogueNodes.push_back(node2);
-		
+
 		//Node 3
-		node3->dialogueOptions.push_back(DialogueOption("Got it", 1, nullptr));
+		node3->dialogueOptions.push_back(DialogueOption("Got it", 1, node3, nullptr));
 		dialogueNodes.push_back(node3);
+
+		//Node 4
+		node4->dialogueOptions.push_back(DialogueOption("Thanks", 1, node4, nullptr));
+		dialogueNodes.push_back(node4);
+
+		//Node 5
+		node5->dialogueOptions.push_back(DialogueOption("...Helpful", 1, node5, nullptr));
+		dialogueNodes.push_back(node5);
 	}
 
-	void DialogueTree::destroyTree() {
-	
+	inline void DialogueTree::destroyTree() {
+
 	}
 
 
-	int DialogueTree::performDialogue() {
+	inline int DialogueTree::performDialogue(sf::RenderWindow* dwindow, Animation* npc) {
+		
+		
+		if (dialogueNodes.empty() || currentnode == nullptr)
+		{
+			
 
-		if (dialogueNodes.empty())
-		{		return -1;
+			currentnode = resetnode;
+			intOption = 0;
+			end = true;
+			return -1;
+		
 		}
+		sf::Vector2f position = npc->actor.getPosition();
+		DialogueNode* currentNode = currentnode;
+		int width;
+		
+		dwindow->draw(chatbox);
+		nodetext.setString(currentNode->text);
+		nodetext.setPosition(npc->actor.getPosition().x - 100 , npc->actor.getPosition().y - 50);
+		nodetext.setCharacterSize(16);
+		nodetext.setFillColor(sf::Color::White);
+		dwindow->draw(nodetext);
+		optiontext.setPosition(nodetext.getPosition());
+		optiontext.setCharacterSize(15);
+		width = nodetext.getLocalBounds().width;
+		width = width + 60;
 
-		DialogueNode* currentNode = dialogueNodes[0];
+		//clear the options vector before checking collide in the game.cpp functions
+		vecText.clear();
+		
+		for (int i = 0; i < currentNode->dialogueOptions.size(); i++)
+		{
+			optiontext.setFont(fontname);
+			
+			optiontext.setFont(fontname);
+			optiontext.setString(currentNode->dialogueOptions[i].text);
+			optiontext.setPosition(optiontext.getPosition().x,optiontext.getPosition().y + 25);
+			optiontext.setFillColor(sf::Color::Green);
+			dwindow->draw(optiontext);
+			vecText.push_back(optiontext);
+		if (optiontext.getLocalBounds().width > width)
+			width = nodetext.getLocalBounds().width;
+		}
+		chatbox.setSize(sf::Vector2f(width, chatbox.getSize().y));
+		chatbox.setPosition(position);
+		chatbox.move(-100, -50);
+		chatbox.setSize(sf::Vector2f(width, 50 + (25 * currentNode->dialogueOptions.size())) );
+		
 
-		std::cout << currentNode->text << "\n";
+
+		return 1;
 	}
 
-	DialogueOption::DialogueOption(std::string Text, int ReturnCode, DialogueNode* NextNode) {
-	
+	inline void DialogueTree::dialogueSelect(social::DialogueNode* parentnode, int option) {
+		intOption = option;
+		currentnode = currentnode->dialogueOptions[option].nextNode;
+		
+	}
+	inline DialogueOption::DialogueOption(std::string Text, int ReturnCode, DialogueNode* parentnode, DialogueNode* NextNode) {
+
 		text = Text;
 		returncode = ReturnCode;
 		nextNode = NextNode;
+		parentNode = parentnode;
 	}
 
 
-	DialogueNode::DialogueNode(std::string Text) {
+	inline DialogueNode::DialogueNode(std::string Text) {
 
 		text = Text;
 	}
 
 
+}

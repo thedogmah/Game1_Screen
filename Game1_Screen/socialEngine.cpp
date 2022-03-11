@@ -1,9 +1,16 @@
 #include "socialEngine.h"
-#include "Animation.h"
+//#include "Animation.h"
 #include "Game.h"
 #include "Population.h"
 #include <math.h>
-socialEngine::socialEngine(){
+
+namespace social {
+	class DialogueNode;
+	class DialogueTree;
+	class DialogueOption;
+}
+
+socialEngine::socialEngine(social::DialogueTree* dialogue){
 
 //	initialise images. Mustn't be local since they will go out of scope for sprites (no reference)
 	
@@ -16,7 +23,7 @@ socialEngine::socialEngine(){
 	bubbleTexture7.loadFromFile("sbubble7.png");
 	bubbleTexture8.loadFromFile("sbubble8.png");
 	bubbleTexture9.loadFromFile("sbubble9.png");
-	
+	dialoguetreePtr = dialogue;
 }
 
 
@@ -59,9 +66,9 @@ void socialEngine::interact(Animation* npc)
 					//partyGrid.setOrigin((partyGridi)
 			}
 			if (!npc->arrived) {
-				//game->Dialogue.performDialogue();
+				
 				npc->stopOverride = true;
-
+				
 				npc->currentImage.x = 3;
 				npc->currentImage.y = 3;
 
@@ -89,6 +96,7 @@ void socialEngine::interact(Animation* npc)
 				npc->currentImage.x = rand() % 4;
 
 			}
+			
 		}
 		else {
 		
@@ -105,7 +113,8 @@ void socialEngine::interact(Animation* npc)
 
 
 	ImGui::End();
-	title = "";
+	
+	
 }
 
 void socialEngine::interactParty(std::vector<Animation*> npc)
@@ -117,7 +126,7 @@ void socialEngine::interactParty(std::vector<Animation*> npc)
 	partyStarted = true;
 	partyTime = socialPartyTimer.restart().asSeconds();
 	}
-	this->game->zoomfactor = 0.7;
+	this->game->zoomfactor = 0.85;
 	std::string text{};
 	ImGui::Begin("Your Squad", &bShowInteract);
 	if (ImGui::Button("End Interaction")) {
@@ -162,11 +171,13 @@ void socialEngine::interactParty(std::vector<Animation*> npc)
 }
 
 void socialEngine::disbandParty(std::vector<Animation*> npc) {
-
+	dialoguetreePtr->end = true;
+	//dialoguetreePtr->intCurrentNode = 0;
 	for (auto& person : npc)
 		std::cout << person->path.size() << person->stopAnimate << " " << person->stopMove;
 	for (auto& person : npc)
 	{
+		
 		int start = 180 + rand() % (4750);
 		int end = 180 + rand() % (4700);
 		int buffer = int(person->pathSearch.nodeEnd);

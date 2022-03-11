@@ -14,6 +14,16 @@
 #include "socialEngine.h"
 #include <cmath>
 
+
+namespace social {
+class DialogueNode;
+class DialogueTree;
+class DialogueOption;
+}
+class DialogueNode;
+class DialogueTree;
+class DialogueOption;
+
 sf::VertexArray batchCircles(std::vector<sf::CircleShape>& circles);
 void drawCircle(float radius);
 struct particle {
@@ -82,8 +92,10 @@ void Game::initVariables()
 	
 	
 	//social
-	socialengine = new socialEngine();
-	//Dialogue.init();
+	dialogue = new social::DialogueTree;
+	dialogue->init();
+	socialengine = new socialEngine(dialogue);
+	
 	//bigwheel test variables
 	shape.setRadius(900);
 	shape.setPosition(4901, 2548);
@@ -416,7 +428,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityMaleWhiteJacket.peopleAmount =50;
+	humanityMaleWhiteJacket.peopleAmount =30;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -437,7 +449,7 @@ void Game::initWindow()
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount =55;
+	scooters.peopleAmount =25;
 	scooters.populate();
 	scooters.window = window;
 
@@ -1824,8 +1836,32 @@ void Game::pollEvents()
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
+						if (socialengine->bShowInteract) {
+							if (socialengine->selectedNpc != nullptr && socialengine->selectedNpc->arrived)
+							{
+								
+								
+								//for loop on all dialogue options to check clicks
+								//then call a clicked function on the option within dialogue.
+								dialogue->intOption = 0;
+								int it = 0;
+								worldPos = window->mapPixelToCoords(XY, this->window->getView());
+								for (auto text : dialogue->vecText) {
+									
+									if (text.getGlobalBounds().contains(worldPos))
+									{
+										dialogue->dialogueSelect(dialogue->dialogueNodes[it]->dialogueOptions[it].parentNode, it);
+										std::cout << "\nSelected option: " << it + 1;
+										std::cout << "\nMouse was at : " << ev.mouseButton.x << ", " << ev.mouseButton.y;
+									}
 
-						lights.push_back(window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y)));
+									//increase loop iterator to pass to dialogue select function.
+									it++;
+								}
+
+							}
+						}
+						//lights.push_back(window->mapPixelToCoords(sf::Vector2i(ev.mouseButton.x, ev.mouseButton.y)));
 						//if (!mouseDown)
 						//{
 						//	mouseDown = true;
@@ -1853,7 +1889,7 @@ void Game::pollEvents()
 						//std::cout << "\nNew Node Start is: " << routefind.nodeStart->x << ", " << routefind.nodeStart->y << "\n";
 						//std::cout << "Original end node is: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 					//	bool found = false;
-
+						
 						if (!playerAttack)
 						{
 
@@ -4060,7 +4096,7 @@ void Game::render()
 		}
 		if (!movementStarted)
 		{
-			for (int i = 0; i <30; i++) {
+			for (int i = 0; i <25; i++) {
 				
 				Boids ve(generator, 35);
 				ve.bird.setTexture(&texboid);
@@ -4230,8 +4266,16 @@ void Game::render()
 		ImGui::SFML::Update(*window, clockImGui.restart());
 		static std::string strengh = "Strength";
 
+		//social engine  variables /imgui visiblity, and end of conversations / resetting dialgoue
+		if (dialogue->end)
+		{
+			socialengine->disbandParty(socialengine->vInteraction);
+			dialogue->end = false;
+			dialogue->currentnode = dialogue->resetnode;
+		}
 		if(socialengine->bShowInteract)
 			socialengine->interact(socialengine->selectedNpc);
+			
 		if (socialengine->vInteraction.size() > 0)
 			socialengine->interactParty(socialengine->vInteraction);
 
@@ -4535,7 +4579,7 @@ void Game::render()
 		sha.setOrigin(sha.getSize().x/2, sha.getSize().y/2);
 		sha.setPosition(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
 		sha.setTexture(&texviclight);
-		tex.draw(sha, sf::BlendAdd);
+		//tex.draw(sha, sf::BlendAdd);
 		
 		tri.setPosition(sf::Vector2f(1331, 1026));
 		tri.setSize(sf::Vector2f(10700, 9500));
@@ -4661,6 +4705,16 @@ void Game::render()
 		
 		this->window->draw(particleEmitter, sf::RenderStates(sf::BlendAlpha));
 		this->window->draw(tri, sf::RenderStates(sf::BlendMultiply));*/
+
+		//draw Dialogue Trees.
+		if (socialengine->bShowInteract)
+			socialengine->interact(socialengine->selectedNpc);
+		if (socialengine->selectedNpc != nullptr && socialengine->selectedNpc->arrived)
+		{
+			dialogue->performDialogue(window, socialengine->selectedNpc);
+		}
+
+
 		this->window->display();
 		if(!bNpcFollow )this->window->setView(view);
 		
@@ -5236,7 +5290,7 @@ void Game::treeAssetSave()
 void Game::interact()
 
 {
-
+	std::cout << "Eremiell\n";
 }
 
 void Game::renderAssets()

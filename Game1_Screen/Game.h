@@ -26,6 +26,12 @@
 #include "particleSystem.h"
 //#include <sstream>
 //Class as the game engine.
+
+namespace social {
+	class DialogueNode;
+	class DialogueTree;
+	class DialogueOption;
+}
 class socialEngine;
 
 class Game
@@ -56,6 +62,7 @@ public:
 	std::vector<sf::CircleShape> circles;
 	//packet movement string
 	socialEngine *socialengine;
+	social::DialogueTree* dialogue;
 	aStar routefind;
 	aStar setObstacles;
 	std::vector<std::vector<char>> vPathCollide; 

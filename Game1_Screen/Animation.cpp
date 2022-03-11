@@ -1,7 +1,7 @@
 #include "Animation.h"
 #include <iostream>
 #include "socialEngine.h"
-class socialEngine;
+//class socialEngine;
 Animation::Animation()
 {
 	//socialengine = new socialEngine();
