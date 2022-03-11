@@ -78,15 +78,16 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		sf::Vector2i  location;
 		//int header2
 		int header;
-		packet >> header >> worldT;
+		packet >> header;//>> worldT;
 
 		if (header == 1)
 		{
-			packet >> header >> worldTime;
+			packet >> worldT;// worldTime;
 			worldTime = worldT;
 		}
-			else {
-			packet >> data >> username >> location.x >> location.y >> message >> ip >> port;
+			else if (header == 2)
+				{
+				packet >> data >> username >> location.x >> location.y >> message >> ip >> port;
 			std::cout << "size of packet: " << packet.getDataSize();
 			std::cout << "\ndata:"<< data << "user: "<< username << "locations: "<< location.x << location.y << message << ip << port;
 			//	std::cout << "From server data: " << data << " now at: " << location.x << ", " << location.y << std::endl;

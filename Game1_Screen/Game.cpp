@@ -303,7 +303,7 @@ void Game::initWindow()
 	this->window = new sf::RenderWindow(this->videoMode, "The City", sf::Style::Default, settings);
 	ImGui::SFML::Init(*window);
 	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	this->window->setFramerateLimit(120);
 
 	view.setCenter(4370, 3970);
@@ -1537,12 +1537,11 @@ void Game::pollEvents()
 					//###Need to send packet less often.### Maybe on a delta time check.
 					std::string down = "Down ";
 					down += username;
-					client.sendingpacket << down << username << location.x << location.y << chat.playerInput.toAnsiString();
+					int data = 2; //packet type 
+					client.sendingpacket << data << down << username << location.x << location.y << chat.playerInput.toAnsiString();
 					//DEBUG COMMENTS std::cout << "Printing meusernassage from Game.dowNkey function: " << chat.playerInput.toAnsiString();
 
-					movement = "Down ";
-					movement += username;
-					client.sendingpacket << movement;
+					
 
 					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
 						//std::cout << "packet 'Down' not sent";
@@ -1601,7 +1600,8 @@ void Game::pollEvents()
 					std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 					std::string left = "Left ";
 					left += username;
-					client.sendingpacket << left << username << location.x << location.y << chat.playerInput.toAnsiString();
+					int data = 2; //packet type 
+					client.sendingpacket << data << left << username << location.x << location.y << chat.playerInput.toAnsiString();
 
 					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
 						//std::cout << "packet 'Left' not sent";
@@ -1646,7 +1646,9 @@ void Game::pollEvents()
 					//DEBUG COMMENTS  std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 					std::string up = "Up ";
 					up += username;
-					client.sendingpacket << up << username << location.x << location.y << chat.playerInput.toAnsiString();
+
+					int data = 2; //packet type 
+					client.sendingpacket << data << up << username << location.x << location.y << chat.playerInput.toAnsiString();
 
 					//spChar.setTexture(Char4);
 					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
@@ -1698,7 +1700,8 @@ void Game::pollEvents()
 					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 					std::string right = "Right ";
 					right += username;
-					client.sendingpacket << right << username << location.x << location.y << chat.playerInput.toAnsiString();
+					int data = 2; //packet type 
+					client.sendingpacket << data << right << username << location.x << location.y << chat.playerInput.toAnsiString();
 
 
 					//spChar.setTexture(Char4);
@@ -4262,7 +4265,113 @@ void Game::render()
 	//	std::cout << "begin of render pop functions\n";
 
 
-		
+		if (bDroneFollow) {
+
+			flyingView.setViewport(sf::FloatRect(0.8, 0, 1., 0.2));
+			flyingView.setCenter(droneFollowPointer->actor.getPosition().x, droneFollowPointer->actor.getPosition().y);
+			this->window->setView(flyingView);
+			//this->window->draw(CharBG, &water);
+			sprTramBus.setPosition(droneFollowPointer->actor.getPosition());
+
+			for (auto& asset : vRectShapeDataVector)
+			{
+				//this->window->draw(asset);
+			}
+
+
+			bufferDroneSwitch = false;
+			bDroneFollow = true;
+		}	vRectShapeDataVector.clear();
+		for (auto& point : pointsReturned)
+			std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
+		//quadtree 
+		/*rec.setPosition(sf::Vector2f(point.x, point.y));
+		rec.setSize(sf::Vector2f(100, 100));
+		rec.setFillColor(sf::Color::White);*/
+		//this->window->draw(rec);
+		this->window->draw(recTrees);
+		recTrees.setPosition(7751, 4029);
+		this->window->draw(recTrees);
+		recTrees.setPosition(8255, 4029);
+		this->window->draw(recTrees);
+		recTrees.setPosition(8756, 4029);
+		this->window->draw(recTrees);
+		recTrees.setPosition(9251, 4029);
+		this->window->draw(recTrees);
+
+
+
+
+		recVictorianPost.setPosition(7051, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(7551, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(8055, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(8556, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(9051, 4029);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(6551, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(6051, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(5551, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(5051, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(4551, 4159);
+		this->window->draw(recVictorianPost);
+		recVictorianPost.setPosition(4051, 4159);
+		this->window->draw(recVictorianPost);
+
+		//particleEmitter.setEmitter(sf::Vector2f(2000 + rand() % 250, 2500 + rand() % 270));
+		//window->draw(particleEmitter);
+		//particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
+		//window->draw(particleEmitter);
+		//particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
+		//window->draw(particleEmitter);/*
+	//	particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
+		//window->draw(particleEmitter, particle);
+		//window->clear();
+
+		//start = no light
+		tex.clear(sf::Color(0, 0, 0, 250));
+
+		//add the lights together
+
+		sha.setSize(sf::Vector2f(250.f, 250.));
+		sha.setScale(1, 2.5);
+		sha.setOrigin(sha.getSize().x / 2, sha.getSize().y / 2);
+		sha.setPosition(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
+		sha.setTexture(&texviclight);
+		//tex.draw(sha, sf::BlendAdd);
+
+		tri.setPosition(sf::Vector2f(1331, 1026));
+		tri.setSize(sf::Vector2f(10700, 9500));
+		//float nightAlpha = 255 / dayDivide;
+		tri.setFillColor(skyColor);
+		//std::cout << skyColor.toInteger();// << "r< " << skyColor.g << "g< b.> " << skyColor.b;
+		for (int i = 0; i < lights.size(); ++i)
+		{
+			sha.setFillColor(sf::Color(sha.getFillColor().r, sha.getFillColor().r, sha.getFillColor().r, skyColorLight));
+			sha.setPosition(lights[i]);
+
+			//sha.setFillColor(colors[i % 3]);
+			tex.draw(sha, sf::BlendAdd);
+		}
+		tex.draw(tri, sf::BlendAdd);
+
+		tex.display();
+
+		//lit scene
+		//window->draw(sf::Sprite(pic));
+
+		//multiply by light
+		window->draw(sf::Sprite(tex.getTexture()), sf::BlendMultiply);
+
+
+
 		ImGui::SFML::Update(*window, clockImGui.restart());
 		static std::string strengh = "Strength";
 
@@ -4417,10 +4526,7 @@ void Game::render()
 
 		}
 
-		for (auto& spy : vNPCLookingGlass) {
-			npcLookingGlass(spy);
-			// use similar function for multiple select?
-		}
+	
 
 		ImGui::End();
 		ImGui::PopStyleColor(1);
@@ -4487,7 +4593,10 @@ void Game::render()
 		ImGui::Text(labelinstinct.c_str());
 		ImGui::SameLine(171); ImGui::Text("  /100");
 
-
+		for (auto& spy : vNPCLookingGlass) {
+			npcLookingGlass(spy);
+			// use similar function for multiple select?
+		}
 
 
 		//	ImGui::PopStyleColor(1);
@@ -4499,113 +4608,7 @@ void Game::render()
 		//std::cout << "just before imgui sfml render\n";
 		ImGui::SFML::Render(*window);
 
-		if (bDroneFollow) {
-			
-			flyingView.setViewport(sf::FloatRect(0.8, 0, 1., 0.2));
-			flyingView.setCenter(droneFollowPointer->actor.getPosition().x, droneFollowPointer->actor.getPosition().y);
-			this->window->setView(flyingView);
-			//this->window->draw(CharBG, &water);
-			sprTramBus.setPosition(droneFollowPointer->actor.getPosition());
-			
-			for (auto &asset : vRectShapeDataVector)
-			{
-				//this->window->draw(asset);
-			}
-			
-			
-			bufferDroneSwitch = false;
-			bDroneFollow = true;
-		}	vRectShapeDataVector.clear();
-		for (auto& point : pointsReturned)
-			std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
-		//quadtree 
-		/*rec.setPosition(sf::Vector2f(point.x, point.y));
-		rec.setSize(sf::Vector2f(100, 100));
-		rec.setFillColor(sf::Color::White);*/
-		//this->window->draw(rec);
-		this->window->draw(recTrees);
-		recTrees.setPosition(7751, 4029);
-		this->window->draw(recTrees);
-		recTrees.setPosition(8255, 4029);
-		this->window->draw(recTrees);
-		recTrees.setPosition(8756, 4029);
-		this->window->draw(recTrees);
-		recTrees.setPosition(9251, 4029);
-		this->window->draw(recTrees);
-		
-		
-		
-		
-		recVictorianPost.setPosition(7051, 4029);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(7551, 4029);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(8055, 4029);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(8556, 4029);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(9051, 4029);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(6551, 4159);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(6051, 4159);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(5551, 4159);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(5051, 4159);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(4551, 4159);
-		this->window->draw(recVictorianPost);
-		recVictorianPost.setPosition(4051, 4159);
-		this->window->draw(recVictorianPost);
 	
-		//particleEmitter.setEmitter(sf::Vector2f(2000 + rand() % 250, 2500 + rand() % 270));
-		//window->draw(particleEmitter);
-		//particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
-		//window->draw(particleEmitter);
-		//particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
-		//window->draw(particleEmitter);/*
-	//	particleEmitter.setEmitter(sf::Vector2f(3000 + rand() % 200, 2500 + rand() % 200));
-		//window->draw(particleEmitter, particle);
-		//window->clear();
-
-		//start = no light
-		tex.clear(sf::Color(0,0,0,250));
-
-		//add the lights together
-		
-		sha.setSize(sf::Vector2f(250.f, 250.));
-		sha.setScale(1, 2.5);
-		sha.setOrigin(sha.getSize().x/2, sha.getSize().y/2);
-		sha.setPosition(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
-		sha.setTexture(&texviclight);
-		//tex.draw(sha, sf::BlendAdd);
-		
-		tri.setPosition(sf::Vector2f(1331, 1026));
-		tri.setSize(sf::Vector2f(10700, 9500));
-		//float nightAlpha = 255 / dayDivide;
-		tri.setFillColor(skyColor);
-		//std::cout << skyColor.toInteger();// << "r< " << skyColor.g << "g< b.> " << skyColor.b;
-		for (int i = 0; i < lights.size(); ++i)
-		{
-			sha.setFillColor(sf::Color(sha.getFillColor().r, sha.getFillColor().r, sha.getFillColor().r, skyColorLight));
-			sha.setPosition(lights[i]);
-			
-			//sha.setFillColor(colors[i % 3]);
-			tex.draw(sha, sf::BlendAdd);
-		}
-		tex.draw(tri, sf::BlendAdd);
-	
-		tex.display();
-
-		//lit scene
-		//window->draw(sf::Sprite(pic));
-
-		//multiply by light
-		window->draw(sf::Sprite(tex.getTexture()), sf::BlendMultiply);
-		
-	
-
 		//Tell app that window is done drawing.
 
 		//this->window->setView(player.playerUI);
@@ -4667,27 +4670,27 @@ void Game::render()
 		
 		//texstate.texture = &vertexx;
 	//	this->window->draw(vertices, &vertexx);
-
+		//particles below/ enttite
 		
-		entity[0].color = sf::Color::Red;
-		for (int i = 0; i < 72; i+=3)
-		{
-			if (i == 0) {
-				entity[i].position = sf::Vector2f(4000 + (40 + 10), 3000 + (140 + 10));
-				entity[i+1].position = sf::Vector2f(entity[i].position.x + 200,  entity[i].position.y);
-				entity[i + 2].position = sf::Vector2f(4200 + (10 + 10 * i), 3170 + (5) * i);
-			}
+		//entity[0].color = sf::Color::Red;
+		//for (int i = 0; i < 72; i+=3)
+		//{
+		//	if (i == 0) {
+		//		entity[i].position = sf::Vector2f(4000 + (40 + 10), 3000 + (140 + 10));
+		//		entity[i+1].position = sf::Vector2f(entity[i].position.x + 200,  entity[i].position.y);
+		//		entity[i + 2].position = sf::Vector2f(4200 + (10 + 10 * i), 3170 + (5) * i);
+		//	}
 
-			else
-				entity[i].color = sf::Color::Red;
-				entity[i].color.a += 10;
-				//entity[i].color.r -= 20;
-			entity[i+2].color = sf::Color::Red;
-				entity[i].position = sf::Vector2f(entity[0].position.x, entity[0].position.y);
-			entity[i+1].position = sf::Vector2f(entity[i].position.x + 50 * std::cos(i-1), entity[i].position.y + 50 *  std::sin(i-1));
-			entity[i + 2].position = sf::Vector2f(entity[i].position.x + 50 * std::cos(i+5), entity[i].position.y + 50 * std::sin(i+5));
+		//	else
+		//		entity[i].color = sf::Color::Red;
+		//		entity[i].color.a += 10;
+		//		//entity[i].color.r -= 20;
+		//	entity[i+2].color = sf::Color::Red;
+		//		entity[i].position = sf::Vector2f(entity[0].position.x, entity[0].position.y);
+		//	entity[i+1].position = sf::Vector2f(entity[i].position.x + 50 * std::cos(i-1), entity[i].position.y + 50 *  std::sin(i-1));
+		//	entity[i + 2].position = sf::Vector2f(entity[i].position.x + 50 * std::cos(i+5), entity[i].position.y + 50 * std::sin(i+5));
 
-		}
+		//}
 
 		//entity[3].position = sf::Vector2f(4300, 3330);
 		//entity[4].position = sf::Vector2f(4400, 3440);
@@ -4989,7 +4992,7 @@ void Game::renderPlayers()
 	}
 	//rectPSword.setRotation()
 	vRectShapeDataVector.push_back(rectPSword);
-	*/client.vPlayers.clear();
+	*///client.vPlayers.clear();
 //	
 //
 //	player.battleTime = player.combatClock.getElapsedTime().asSeconds();
