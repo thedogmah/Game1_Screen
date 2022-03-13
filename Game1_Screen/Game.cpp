@@ -1515,6 +1515,7 @@ void Game::pollEvents()
 				this->window->close();*/
 			if (this->ev.key.code == sf::Keyboard::Down)
 			{//stops follow npc
+				
 				still = false;
 				moving_down = true;
 				player.stopped = false;
@@ -1535,19 +1536,26 @@ void Game::pollEvents()
 					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 
 					//###Need to send packet less often.### Maybe on a delta time check.
-					std::string down = "Down ";
-					down += username;
-					int data = 2; //packet type 
-					client.sendingpacket << data << down << username << location.x << location.y << chat.playerInput.toAnsiString();
-					//DEBUG COMMENTS std::cout << "Printing meusernassage from Game.dowNkey function: " << chat.playerInput.toAnsiString();
+					//if (player.direction != player.Down)
+					//{
+					//	player.previousdirection = player.direction;
+					//	player.direction = player.Down;
 
-					
+					//	std::string down = "Down ";
+					//	down += username;
 
-					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-						//std::cout << "packet 'Down' not sent";
-					}
-					client.sendingpacket.clear();
 
+					//	int data = 2; //packet type 
+					//	client.sendingpacket << data << down << username << location.x << location.y << chat.playerInput.toAnsiString();
+					//	//DEBUG COMMENTS std::cout << "Printing meusernassage from Game.dowNkey function: " << chat.playerInput.toAnsiString();
+
+
+
+					//	if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					//		//std::cout << "packet 'Down' not sent";
+					//	}
+					//	client.sendingpacket.clear();
+					//}
 
 
 					//player.actor.move(0, 10);
@@ -1597,17 +1605,23 @@ void Game::pollEvents()
 					location.x = spChar.getPosition().x;
 					location.y = spChar.getPosition().y;
 
-					std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					std::string left = "Left ";
-					left += username;
-					int data = 2; //packet type 
-					client.sendingpacket << data << left << username << location.x << location.y << chat.playerInput.toAnsiString();
+					//std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
 
-					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-						//std::cout << "packet 'Left' not sent";
-					}
-					client.sendingpacket.clear();
+					//if (player.direction != player.Left)
+					//{
+					//	player.previousdirection = player.direction;
+					//	player.direction = player.Left;
 
+					//	std::string left = "Left ";
+					//	left += username;
+					//	int data = 2; //packet type 
+					//	client.sendingpacket << data << left << username << location.x << location.y << chat.playerInput.toAnsiString();
+
+					//	if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					//		//std::cout << "packet 'Left' not sent";
+					//	}
+					//	client.sendingpacket.clear();
+					//}
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
 
@@ -1644,18 +1658,24 @@ void Game::pollEvents()
 					location.y = spChar.getPosition().y;
 
 					//DEBUG COMMENTS  std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					std::string up = "Up ";
-					up += username;
+				
+					//if (player.direction != player.Up)
+					//{
+					//	player.previousdirection = player.direction;
+					//	player.direction = player.Up;
 
-					int data = 2; //packet type 
-					client.sendingpacket << data << up << username << location.x << location.y << chat.playerInput.toAnsiString();
+					//	std::string up = "Up ";
+					//	up += username;
 
-					//spChar.setTexture(Char4);
-					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-						//std::cout << "packet 'Up' not sent";
-					}
-					client.sendingpacket.clear();
+					//	int data = 2; //packet type 
+					//	client.sendingpacket << data << up << username << location.x << location.y << chat.playerInput.toAnsiString();
 
+					//	//spChar.setTexture(Char4);
+					//	if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					//		//std::cout << "packet 'Up' not sent";
+					//	}
+					//	client.sendingpacket.clear();
+					//}
 
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
@@ -1698,18 +1718,23 @@ void Game::pollEvents()
 					location.y = spChar.getPosition().y;
 
 					//DEBUG COMMENTS std::cout << "Direct location: " << location.x << ", " << location.y << std::endl;
-					std::string right = "Right ";
-					right += username;
-					int data = 2; //packet type 
-					client.sendingpacket << data << right << username << location.x << location.y << chat.playerInput.toAnsiString();
+					//if (player.direction != player.Right)
+					//{
+					//	player.previousdirection = player.direction;
+					//	player.direction = player.Right;
+
+					//	std::string right = "Right ";
+					//	right += username;
+					//	int data = 2; //packet type 
+					//	client.sendingpacket << data << right << username << location.x << location.y << chat.playerInput.toAnsiString();
 
 
-					//spChar.setTexture(Char4);
-					if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
-					//	std::cout << "packet 'Right' not sent";
-					}
-					client.sendingpacket.clear();
-
+					//	//spChar.setTexture(Char4);
+					//	if (client.socket.send(client.sendingpacket) != sf::Socket::Done) {
+					//		//	std::cout << "packet 'Right' not sent";
+					//	}
+					//	client.sendingpacket.clear();
+					//}
 					//player.actor.move(10, 0);
 					velocity.x += movementSpeed;
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
@@ -2512,6 +2537,7 @@ void Game::pollEvents()
 
 			}
 			entityMove();
+			player.direction = 0;
 		//	player.actor.move(velocity);
 			//std::cout << 
 		//	spChar.move(velocity);
@@ -2519,6 +2545,7 @@ void Game::pollEvents()
 			velocity.y = 0;
 			//set text name locations
 			userText.setPosition(spChar.getPosition().x - 15, spChar.getPosition().y - 65);
+			
 			
 		}
 		void Game::initClient(sf::TcpSocket* rsocket)
@@ -4433,7 +4460,7 @@ void Game::render()
 		ImGui::EndCombo();
 		
 		
-	}
+	}	
 	for (auto text : player.vCombatText)
 		this->window->draw(text);
 	std::string current = "Currently Selected: " + jediengine.currentAsset;
@@ -4447,30 +4474,30 @@ void Game::render()
 		ImGui::InputText("Quadtree query H", qt.qtqueryh, 100);
 		ImGui::InputText("Quadtree query W", qt.qtqueryw, 100);
 		//ImGui::SameLine(245);
-		if (ImGui::Button("Query")) {
-			sf::RectangleShape rec;
-			rec.setPosition(sf::Vector2f(0,0));
-			rec.setSize(sf::Vector2f(8200,8200));
-			rec.setFillColor(sf::Color::Blue);
-			//this->window->draw(rec);
-			pointsReturned = qt.query(rec, qt.qpoints);
-			for (auto &point : pointsReturned)
-				std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
-			
-			rec.setPosition(sf::Vector2f(point.x,point.y));
-			rec.setSize(sf::Vector2f(100,100));
-			rec.setFillColor(sf::Color::White);
-			this->window->draw(rec);
-		}
-		//sf::RectangleShape rec;
-		//Quad tree uncomment these 3 lines and rec. stuff above
-	/*	rec.setPosition(sf::Vector2f(0, 0));
-		rec.setSize(sf::Vector2f(8200, 8200));
-		rec.setFillColor(sf::Color::Blue);
-		*/
-		//qt.northeast.points.clear();
-		qt.cleanseTree();
-		ImGui::End();
+	//	if (ImGui::Button("Query")) {
+	//		sf::RectangleShape rec;
+	//		rec.setPosition(sf::Vector2f(0,0));
+	//		rec.setSize(sf::Vector2f(8200,8200));
+	//		rec.setFillColor(sf::Color::Blue);
+	//		//this->window->draw(rec);
+	//		pointsReturned = qt.query(rec, qt.qpoints);
+	//		for (auto &point : pointsReturned)
+	//			std::cout << "\n" << "found x " << point.x << ", y  " << point.y << " ";
+	//		
+	//		rec.setPosition(sf::Vector2f(point.x,point.y));
+	//		rec.setSize(sf::Vector2f(100,100));
+	//		rec.setFillColor(sf::Color::White);
+	//		this->window->draw(rec);
+	//	}
+	////	//sf::RectangleShape rec;
+	////	//Quad tree uncomment these 3 lines and rec. stuff above
+	/////*	rec.setPosition(sf::Vector2f(0, 0));
+	////	rec.setSize(sf::Vector2f(8200, 8200));
+	////	rec.setFillColor(sf::Color::Blue);
+	////	*/
+	////	//qt.northeast.points.clear();
+	//	qt.cleanseTree();
+	//	ImGui::End();
 
 
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 55));
@@ -4592,18 +4619,24 @@ void Game::render()
 		labelinstinct = std::to_string(static_cast<int>(player.profile.hunger));
 		ImGui::Text(labelinstinct.c_str());
 		ImGui::SameLine(171); ImGui::Text("  /100");
-
+		ImGui::End();
 		for (auto& spy : vNPCLookingGlass) {
 			npcLookingGlass(spy);
 			// use similar function for multiple select?
 		}
-
+	
+		if (socialengine->bShowInteract)
+		//	socialengine->interact(socialengine->selectedNpc);
+		if (socialengine->selectedNpc != nullptr && socialengine->selectedNpc->arrived)
+		{
+			dialogue->performDialogue(window, socialengine->selectedNpc);
+		}
 
 		//	ImGui::PopStyleColor(1);
 			//ImGui::
 			//ImGui::Text(exper.c_str());
 			//ImGui::DrawRect(sf::FloatRect(sf::Vector2f(3000., 7000.), (sf::Vector2f(300., 700.))), sf::Color::Blue);
-		ImGui::End();
+	
 		
 		//std::cout << "just before imgui sfml render\n";
 		ImGui::SFML::Render(*window);
@@ -4622,7 +4655,7 @@ void Game::render()
 		/*	for (int i = 0; i < 200; i++) {
 				this->window->draw(circles[i]);
 			}*/
-		this->renderRain();
+		//this->renderRain();
 	
 		//	sf::RenderStates textt;
 		//	sf::Transform transform;
@@ -4710,12 +4743,7 @@ void Game::render()
 		this->window->draw(tri, sf::RenderStates(sf::BlendMultiply));*/
 
 		//draw Dialogue Trees.
-		if (socialengine->bShowInteract)
-			socialengine->interact(socialengine->selectedNpc);
-		if (socialengine->selectedNpc != nullptr && socialengine->selectedNpc->arrived)
-		{
-			dialogue->performDialogue(window, socialengine->selectedNpc);
-		}
+	
 
 
 		this->window->display();
@@ -4764,12 +4792,12 @@ void Game::dayTimeFunc()
 	//Night Mood. Sunset type.
 	switch (dayDivide) {
 	case 0:
-		skyColor = sf::Color(20, 10, 40,220);
+		skyColor = sf::Color(30, 10, 80, 150);
 		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight = 255;
 		break;
 	case 1:
-		skyColor = sf::Color(20, 10, 40,220);
+		skyColor = sf::Color(30, 10, 80, 150);
 		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight = 255;
 		break;
@@ -4852,21 +4880,21 @@ void Game::dayTimeFunc()
 		skyColor = sf::Color(52, 50, 105, 215); break;
 
 	case 17:
-		skyColor = sf::Color(33, 30, 89, 220); break;
+		skyColor = sf::Color(33, 30, 89, 150); break;
 		skyColorLight = 170;
 		
 	case 18:
-		skyColor = sf::Color(30, 10, 80, 220); break;
+		skyColor = sf::Color(30, 10, 80, 150); break;
 		skyColorLight = 170;
 	case 19:
-		skyColor = sf::Color(20, 10, 40, 220); break;
+		skyColor = sf::Color(30, 10, 80, 150); break;
 		skyColorLight = 190;
 	case 20:
-		skyColor = sf::Color(20, 10, 40, 220); break;
+		skyColor = sf::Color(30, 10, 80, 150); break;
 		skyColorLight = 220;
 		
 	case 21:
-		skyColor = sf::Color(20, 10, 40, 220); break;
+		skyColor = sf::Color(30, 10, 80, 155); break;
 		skyColorLight = 240;
 
 		//20, 10, 40, 220
@@ -4898,7 +4926,7 @@ void Game::renderPlayers()
 	
 //	if (socialengine->vInteraction.size() > 0)
 	//{
-
+	
 		
 		for (auto& e : client.PlayerMap)
 		{
@@ -5436,29 +5464,57 @@ void Game::entityMove() {
 	faceDown = false;
 	faceRight = false;
 	faceUp = false;
-	
+//	std::cout << "\nBefore:" << static_cast<int>(player.direction);
 	if (moving_left)
-	{velocity.x += -movementSpeed;
+	{
+		
+		velocity.x += -movementSpeed;
 	still = false;
+	player.direction |= player.Left;
 }
 	if (moving_down)
 	{
 		faceDown = true;
 		velocity.y += movementSpeed;
 		still = false;
+		player.direction |= player.Down;
 	}
 	if (moving_up)
 	{
 		velocity.y += -movementSpeed;
 		faceUp = true;
 		still = false;
+		player.direction |= player.Up;
 	}
 	if (moving_right)
 	{
 		velocity.x += movementSpeed;
 		faceRight = true;
 		still = false;
+		player.direction |= player.Right;	
 	}
+
+	if (still)
+		player.direction |= player.Stop;
+	
+	//if no key is pressed, and player was not already still, then player is still / stopped and previous direction is set. 
+	//
+	if (player.direction != player.previousdirection) 
+
+	{
+		player.previousdirection = player.direction;
+		//packet type 
+		int data = 2; 
+		client.sendingpacket.clear();
+		client.sendingpacket << data << player.direction << username << chat.playerInput.toAnsiString();
+		std::cout << "Data SENT: " << data << ", " << "player.direction: " << static_cast<unsigned int>(player.direction) << ", user: " << username;
+		if (client.socket.send(client.sendingpacket) != sf::Socket::Done)
+		{
+			std::cout << "Data not sent, are you connected?";
+		}
+		std::cout << "\nafter send: " << player.direction;
+	} 
+	//std::cout << "\nAfter cast" << static_cast<unsigned int>(player.direction);
 //	std::cout << "\nvelocity x : "<< velocity.x << " : y" << velocity.y;
 	player.actor.move(velocity);
 	spChar.move(velocity);

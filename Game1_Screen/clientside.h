@@ -11,11 +11,39 @@
 #include <map>
 #include <string>
 class clientside {
-
+	struct Players;
 public:
 	//map for storing players
-	std::map<std::string, sf::Sprite>PlayerMap;
+	std::map<std::string, Players>PlayerMap;
 	std::map<std::string, std::string>ChatMap;
+
+	
+	enum Status : unsigned char {
+
+		Available = 0,
+		Busy = 1 << 0,
+		Talking = 1 << 1,
+		Transaction = 1 << 2,
+		Loading = 1 << 3
+	}; 
+
+	struct Players {
+
+		sf::Vector2f direction;
+		Status status;
+		short level;
+
+	} playerData;
+
+	//player received packet enum
+	enum Direction : unsigned char {
+		Stop = 0,
+		Right = 1 << 0,
+		Left = 1 << 1,
+		Up = 1 << 2,
+		Down = 1 << 3
+	};
+	unsigned char direction;
 
 	//worldSync Variables
 	int worldTime{}; //the world time taken from the server and passed to game.cpp on a world sync event

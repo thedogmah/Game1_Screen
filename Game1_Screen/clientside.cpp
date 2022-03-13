@@ -74,8 +74,9 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		std::string port;
 		std::string username;
 		std::string message;
+		sf::Vector2f movement{};
 		int worldT;
-		sf::Vector2i  location;
+		unsigned char  location;
 		//int header2
 		int header;
 		packet >> header;//>> worldT;
@@ -87,25 +88,52 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		}
 			else if (header == 2)
 				{
-				packet >> data >> username >> location.x >> location.y >> message >> ip >> port;
+			//packet >> data >> location >> username >> received_message
+				packet >> location >> username>> message >> ip >> port;
 			std::cout << "size of packet: " << packet.getDataSize();
-			std::cout << "\ndata:"<< data << "user: "<< username << "locations: "<< location.x << location.y << message << ip << port;
+			std::cout << "\ndata:"<< data << "user: "<< username << "locations: "<< location << "after cast: " << static_cast<int>(location) << ", message: " << message << ip << port;
 			//	std::cout << "From server data: " << data << " now at: " << location.x << ", " << location.y << std::endl;
 				//DEBUG COMMENTS std::cout << "Printing message from clientside function: " << message ;
 			iPlayers.loadFromFile("RyanChar2.png");
 			iPlayers.createMaskFromColor(sf::Color::Black);
 			tPlayers.loadFromImage(iPlayers);
 			sPlayers.setTexture(tPlayers);
+			
+			if (location & Right)
+			{
+				movement.x += 1;
+			}
 
-			sPlayers.setPosition(float(location.x), float(location.y));
+			if (location & Up)
+			{	
+				movement.y -= 1;
+			}
+
+			if (location & Down)
+			{
+				movement.y += 1;
+			}
+
+			if (location & Left)
+			{
+				movement.x -= 1;
+			}
+
+			std::cout << "\nmovement vector: " << movement.x << ", " << movement.y;
+			//sPlayers.move(float(location.x), float(location.y));
 				//vPlayers.push_back(sPlayers);
-			PlayerMap.insert(std::pair<std::string, sf::Sprite>(username, sPlayers));
+
+			playerData.direction = movement;
+			playerData.status = Available;
+			playerData.level = 1 + rand() % 9; //random level for testing features such as not being able to itneraact with certain levels etc.
+		
+			PlayerMap.insert(std::pair<std::string, Players>(username, playerData));
 
 
 			//loop through vector and
-			std::map<std::string, sf::Sprite>::iterator it = PlayerMap.find(username);
+			std::map<std::string, Players>::iterator it = PlayerMap.find(username);
 			if (it != PlayerMap.end())
-				it->second = sPlayers;
+				it->second = playerData;
 
 
 			ChatMap.insert(std::pair<std::string, std::string>(username, message));
