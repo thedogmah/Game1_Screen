@@ -36,6 +36,7 @@ class socialEngine;
 
 class Game
 {
+	friend class socialEngine;
 public:
 	sf::Clock particleClock;
 	ParticleSystem particleEmitter{ 432 };
@@ -112,7 +113,7 @@ public:
 	bool still;
 	sf::Packet rpacket;
 	sf::TcpSocket rsocket;
-	std::string username;
+	std::string username{};
 
 	sf::Shader water;
 	sf::Shader sFountain;
@@ -205,7 +206,10 @@ public:
 	//player statistics
 	int experience = 0;
 	std::string exper="";
+
+
 	sf::RenderWindow* window;
+	bool wndFocus;
 
 	//mouse drag box/
 	sf::RectangleShape mouseDrag;
@@ -245,6 +249,7 @@ private:
 	float fShaderClock;
 	//Camera
 	sf::View view;
+	//main view declared elsewhere (public, for social engine access)
 	sf::View followView;
 	sf::View flyingView;
 	bool bNpcFollow = false;
@@ -325,7 +330,7 @@ private:
 	sf::Texture textrotatorbin;//to test ferris wheel bins. (Keep going , this is exciting)
 	float rotateTime;
 	//Network
-	
+	float worldsync;
 	//Chat instance
 	Chat chat;
 	
@@ -387,6 +392,7 @@ private:
 	sf::Image imgbutterfly;
 	sf::IntRect boidIntRect;
 	sf::IntRect butterflyIntRect;
+	sf::IntRect onlineRect;
 	sf::Vector2u boidCurrentImage{};
 	sf::Vector2u butterflyCurrentImage{};
 	float boidSwitchTime;
@@ -433,7 +439,9 @@ private:
 	void resetFrame();
 	void playerCollide(sf::Vector2i);
 
-	
+	//network member functions
+	void worldSync();
+	void clientSendID();
 	void npcLookingGlass(Animation npc);
 	std::vector<Animation> vNPCLookingGlass;
 	std::string npcMarried(Animation person);
@@ -452,6 +460,8 @@ public:
 	//Accessors
 	
 	const bool running() const;
+	//imgui io
+	ImGuiIO& io = ImGui::GetIO();
 
 
 	//Functions

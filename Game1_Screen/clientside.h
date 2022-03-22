@@ -10,6 +10,8 @@
 #include <thread>
 #include <map>
 #include <string>
+
+class socialEngine;
 class clientside {
 	struct Players;
 public:
@@ -17,6 +19,8 @@ public:
 	std::map<std::string, Players>PlayerMap;
 	std::map<std::string, std::string>ChatMap;
 
+	//social enginge pointer
+	socialEngine* social;
 	
 	enum Status : unsigned char {
 
@@ -32,7 +36,8 @@ public:
 		sf::Vector2f direction;
 		Status status;
 		short level;
-
+		sf::Sprite avatar;
+		sf::Vector2f position;
 	} playerData;
 
 	//player received packet enum
@@ -58,6 +63,7 @@ public:
 	sf::Packet rpacket; //receving packet
 	clientside(); //connects to server?
 	sf::IpAddress ip = sf::IpAddress::getLocalAddress();
+	sf::IpAddress xip;
 	sf::TcpSocket socket;
 	sf::TcpSocket rsocket;
 
@@ -65,6 +71,7 @@ public:
 
 	//initialisers
 	void startThreads();
+	void getIP();
 };
 
 sf::Packet& operator << (sf::Packet& packet, sf::Vector2i& location);

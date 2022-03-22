@@ -19,7 +19,7 @@ int main()
 	std::srand(static_cast<unsigned>(time(NULL)));
 	Game game;
 
-	game.login();
+//	game.login();
 	//Game Loop
 	game.running();
 	
@@ -27,12 +27,12 @@ int main()
 	sf::Music vibe;
 	music.openFromFile("RainThunder.ogg");
 	music.setVolume(25);
-	//music.play();
+	music.play();
 	vibe.setVolume(10);
 	music.setLoop(true);
 	vibe.setLoop(true);
 	vibe.openFromFile("Violin.ogg");
-	//vibe.play();
+	vibe.play();
 	sf::Clock clock;
 	//game.initClient(&game.rsocket);
 	Animation character(&game.playerTexture, sf::Vector2u(4, 4), 0.14f);

@@ -24,6 +24,30 @@ socialEngine::socialEngine(social::DialogueTree* dialogue){
 	bubbleTexture8.loadFromFile("sbubble8.png");
 	bubbleTexture9.loadFromFile("sbubble9.png");
 	dialoguetreePtr = dialogue;
+
+
+	//Initialise text labels for interact menu;
+	interactFont.loadFromFile("Arial.ttf");
+	InteractMenu[0].setString("Choose interaction");
+	InteractMenu[1].setString("Say Hi");
+	InteractMenu[2].setString("Trade");
+	InteractMenu[3].setString("Private DM");
+	InteractMenu[4].setString("Walk Together");
+	InteractMenu[5].setString("Hug");
+
+	InteractMenu[0].setFont(interactFont);
+	InteractMenu[1].setFont(interactFont);
+	InteractMenu[2].setFont(interactFont);
+	InteractMenu[3].setFont(interactFont);
+	InteractMenu[4].setFont(interactFont);
+	InteractMenu[5].setFont(interactFont);
+
+	InteractMenu[0].setFillColor(sf::Color::White);
+	InteractMenu[1].setFillColor(sf::Color::White);
+	InteractMenu[2].setFillColor(sf::Color::White);
+	InteractMenu[3].setFillColor(sf::Color::White);
+	InteractMenu[4].setFillColor(sf::Color::White);
+	InteractMenu[5].setFillColor(sf::Color::White);
 }
 
 
@@ -350,4 +374,152 @@ void socialEngine::moveNPCs(std::vector<Animation*> npc)
 		else
 			person->actor.move(0 , yy);*/
 	//}
+}
+
+void socialEngine::showTradeRequest()
+{
+
+
+
+	//std::cout << "\n\n\nReceived trade request from";// << username;
+	ImGui::Begin("title");
+	
+	ImGui::Text("Select what you would like to trade.");
+	//ImGui::Text(title.c_str());
+	if (ImGui::Button("Close Trade Interaction")) {
+		bShowTradeRequest = false;
+	}
+
+	
+
+	ImGui::End();
+
+}
+
+void socialEngine::checkWindows()
+{
+
+	if (bShowTradeRequest) {
+	
+		showTradeRequest();
+	}
+	if (bShowServerInteract)
+		serverInteract(interactPlayerPosition);
+
+}
+
+void socialEngine::serverClientTrade(std::string username)
+{
+	
+	std::cout << "\nStarted Trade request";
+	std::string user;
+	user = username;
+	int header = 4; // trade /connection header
+	sf::Packet tradepacket;
+	tradepacket << header << user;
+	if (client->socket.send(tradepacket) != sf::Socket::Done)
+	{
+		std::cout << "\nWorld update packet [header 4]not sent";
+	}
+	else {
+		std::cout << "\nTrade requestpacket [header 4] sent. Header is: " << header << '\n';
+		//	std::cout << header << " " << username << '\n';
+	}
+	tradepacket.clear();
+
+}
+
+void socialEngine::serverTradeRequest(std::string username)
+{
+	std::string title;
+	title = "Trade request from " + username;
+
+	bShowTradeRequest = true;
+
+	
+
+
+}
+
+void socialEngine::serverInteract(sf::Vector2f position)
+{
+	std::string title;
+	//title = "Trade request from " + username;
+	interactPlayerPosition = position;
+	sf::RectangleShape interactBox;
+	interactBox.setFillColor(sf::Color(20, 190, 100, 160));
+	interactBox.setPosition(interactPlayerPosition);
+	interactBox.setSize(sf::Vector2f(300,290));
+	game->window->draw(interactBox);
+	InteractMenu[0].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 20);
+	InteractMenu[1].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 45);
+	InteractMenu[2].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 70);
+	InteractMenu[3].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 95);
+	InteractMenu[4].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 120);
+	InteractMenu[5].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 145);
+	for (auto menu : InteractMenu) {
+		game->window->draw(menu);
+	
+	}
+	
+	collisionDetect();
+
+	//call (after I create it) collission detection on above menu since the text has global scope within the social class... which may look like
+
+	//if serverInteract == visible
+		//if click on any text label
+			//initiate relevant server function between two clients
+}
+
+void socialEngine::collisionDetect()
+{
+	//do collision detect on all active UI's based on bool switches
+	sf::Vector2i XY = sf::Mouse::getPosition(*game->window);
+	//int nSelectedNodeY = sf::Mouse::getPosition(window) ;
+
+
+	sf::Vector2f worldPos = game->window->mapPixelToCoords(XY, game->view);
+	//collision detection for serverInteract menu
+	if (bShowServerInteract)
+	{
+		for (auto& menu : InteractMenu)
+		{
+			if (menu.getGlobalBounds().contains(worldPos))
+			{
+				menu.setFillColor(sf::Color::Yellow);
+				//std::cout << "Mouse Over " << menu.getString().toAnsiString();
+
+			}
+			else
+			{
+				menu.setFillColor(sf::Color::White);
+			}
+		}if (optMouseLocation && socialTakeClicks)
+			for (auto& menu : InteractMenu)
+			{
+
+				{
+					sf::Vector2f worldPoss = game->window->mapPixelToCoords(sf::Vector2i(optMouseLocation.value()), game->view);
+					std::cout << "\nOptional mouse location true:\n";
+					if (menu.getGlobalBounds().contains(worldPoss) && menu.getString() == "Trade")
+					{
+						serverClientTrade(serverUsername);
+						std::cout << "\nClick";
+						bShowServerInteract = false;
+						socialTakeClicks = false;
+					}
+				}
+			}
+		else
+			socialTakeClicks = true;
+		//HERE
+		
+			
+		
+	}
+}
+
+void socialEngine::socialReset()
+{
+	optMouseLocation.reset();
 }

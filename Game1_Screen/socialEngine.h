@@ -17,7 +17,7 @@
 #include "aStar.h"
 #include "Population.h"
 //#include "Game.h"
-
+#include "clientside.h"
 namespace social {
 	class DialogueNode;
 	class DialogueTree;
@@ -28,12 +28,24 @@ class Game;
 class DialogueTree;
 class socialEngine
 {
-public:
 
+	friend class Game;
+public:
+	std::string serverUsername{};
 	socialEngine(social::DialogueTree* dialogue);
 	bool bShowInteract = false;
+	bool bShowTradeRequest = false;
+	bool bShowServerInteract = false;
+	bool socialTakeClicks = false;
+	// bool bSocialClicked = false;
+	std::optional<sf::Vector2f>optMouseLocation;
+	//menu resources
+	sf::Vector2f interactPlayerPosition;
+	sf::Text InteractMenu[6];
+	sf::Font interactFont;
 	//aStar astar{};
 	Game* game;
+	clientside* client;
 	social::DialogueTree* dialoguetreePtr;
 	void interact(Animation* npc);
 	void interactParty(std::vector<Animation*> npc);
@@ -43,6 +55,14 @@ public:
 	void drawGrid();
 	void drawSocial();
 	void moveNPCs(std::vector<Animation*> npc);
+	void showTradeRequest();
+	void checkWindows();
+	void serverClientTrade(std::string username);
+	void serverTradeRequest(std::string username);
+	void serverInteract(sf::Vector2f position);
+
+	void collisionDetect(); 
+	void socialReset();
 	//get the currently selected npc
 	Animation* selectedNpc;
 	//Animation selectedClone;

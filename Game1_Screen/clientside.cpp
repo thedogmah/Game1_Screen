@@ -11,6 +11,7 @@
 #include "clientside.h"
 #include <thread>
 #include <mutex>
+#include "socialEngine.h"
 
 sf::Packet& operator << (sf::Packet& packet, sf::Vector2i& location)
 
@@ -26,12 +27,29 @@ sf::Packet& operator >> (sf::Packet& packet, sf::Vector2i& location)
 	return packet >> location.x << location.y;
 }
 
+sf::Packet& operator << (sf::Packet& packet, sf::Vector2f& location)
+
+{
+	return packet << location.x << location.y;
+}
+
+
+sf::Packet& operator >> (sf::Packet& packet, sf::Vector2f& location)
+
+{
+
+	return packet >> location.x << location.y;
+}
+
 
 
 sf::Text message;
 clientside::clientside()
 {
-
+	sPlayers.setPosition(4637, 3000);
+	playerData.avatar = sPlayers;
+	playerData.position.x = 4636;
+	playerData.position.y = 3000;
 	//enum class CommandsToServer {
 	//	Connect, // empty
 	//	Disconnect, // empty
@@ -63,11 +81,11 @@ clientside::clientside()
 
 void clientside::ReceivePackets(sf::TcpSocket* socket)
 {
-	
+
 	sf::Packet packet;
 	//while (true) {
 	socket->setBlocking(false);
-	if (socket->receive(packet) == sf::Socket::Done)
+	while (socket->receive(packet) == sf::Socket::Done)
 	{
 		std::string data;
 		std::string ip;
@@ -86,54 +104,60 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 			packet >> worldT;// worldTime;
 			worldTime = worldT;
 		}
-			else if (header == 2)
-				{
+		else if (header == 2)
+		{
 			//packet >> data >> location >> username >> received_message
-				packet >> location >> username>> message >> ip >> port;
-			std::cout << "size of packet: " << packet.getDataSize();
-			std::cout << "\ndata:"<< data << "user: "<< username << "locations: "<< location << "after cast: " << static_cast<int>(location) << ", message: " << message << ip << port;
+			packet >> location >> username >> message >> ip >> port;
+			//std::cout << "size of packet: " << packet.getDataSize();
+		//	std::cout << "\ndata:"<< data << "user: "<< username << "locations: "<< location << "after cast: " << static_cast<int>(location) << ", message: " << message << ip << port;
 			//	std::cout << "From server data: " << data << " now at: " << location.x << ", " << location.y << std::endl;
 				//DEBUG COMMENTS std::cout << "Printing message from clientside function: " << message ;
 			iPlayers.loadFromFile("RyanChar2.png");
 			iPlayers.createMaskFromColor(sf::Color::Black);
 			tPlayers.loadFromImage(iPlayers);
 			sPlayers.setTexture(tPlayers);
-			
+			//playerData.avatar.setPosition(playerData.position);
 			if (location & Right)
 			{
-				movement.x += 1;
+				movement.x += 1.1;
 			}
 
 			if (location & Up)
-			{	
-				movement.y -= 1;
+			{
+				movement.y -= 1.1;
 			}
 
 			if (location & Down)
 			{
-				movement.y += 1;
+				movement.y += 1.1;
 			}
 
 			if (location & Left)
 			{
-				movement.x -= 1;
+				movement.x -= 1.1;
 			}
 
-			std::cout << "\nmovement vector: " << movement.x << ", " << movement.y;
-			//sPlayers.move(float(location.x), float(location.y));
-				//vPlayers.push_back(sPlayers);
+			//	std::cout << "\nmovement vector: " << movement.x << ", " << movement.y;
+				//sPlayers.move(float(location.x), float(location.y));
+					//vPlayers.push_back(sPlayers);
 
-			playerData.direction = movement;
+			playerData.direction.x = movement.x;
+			playerData.direction.y = movement.y;
 			playerData.status = Available;
 			playerData.level = 1 + rand() % 9; //random level for testing features such as not being able to itneraact with certain levels etc.
-		
+	//		std::cout << "\nBefore Insert" << playerData.position.x << ", " << playerData.position.y;
 			PlayerMap.insert(std::pair<std::string, Players>(username, playerData));
 
 
 			//loop through vector and
 			std::map<std::string, Players>::iterator it = PlayerMap.find(username);
-			if (it != PlayerMap.end())
-				it->second = playerData;
+			if (it != PlayerMap.end()) {
+				it->second.direction = movement;
+				it->second.avatar.setPosition(it->second.position);
+				//it->second.avatar.setPosition(it->second.position);
+				//std::cout << "\after Insert" << it->second.position.x << ", " << it->second.position.y;
+			}
+
 
 
 			ChatMap.insert(std::pair<std::string, std::string>(username, message));
@@ -155,11 +179,32 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 			//if ID found, update position, if not found, push back.
 
 		}
-		packet.clear();
+
+
+		else if (header == 3) {
+			sf::Vector2f positionUpdate;
+			//	std::cout << "\nPositions received.";
+			packet >> username >> positionUpdate.x >> positionUpdate.y;
+			std::map<std::string, Players>::iterator it = PlayerMap.find(username);
+			if (it != PlayerMap.end()) {
+
+				it->second.position.x = positionUpdate.x;
+				it->second.position.y = positionUpdate.y;
+				//it->second.position.x = positionUpdate.x;
+			//	it->second.position.y = positionUpdate.y;
+			}
+		}
+			else if (header == 20)
+			{
+				std::string username;
+				packet >> username;
+				this->social->serverTradeRequest(username);
+			}
+			packet.clear();
+			//		std::this_thread::sleep_for((std::chrono::milliseconds)10);
+				//}
+		
 	}
-	
-//		std::this_thread::sleep_for((std::chrono::milliseconds)10);
-	//}
 }
 
 void clientside::startThreads()
@@ -168,5 +213,12 @@ void clientside::startThreads()
 
 	
 	
+}
+
+void clientside::getIP()
+{
+	return;
+	std::cout << "Enter Host IP:";
+		std::cin >> ip;
 }
 

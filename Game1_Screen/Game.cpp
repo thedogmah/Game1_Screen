@@ -79,7 +79,7 @@ void Game::initInterface()
 //Private member functions
 void Game::initVariables()
 {
-
+	//ImGuiIO& io = ImGui::GetIO();
 	//particles
 	particle.blendMode = sf::BlendAlpha;
 
@@ -95,7 +95,8 @@ void Game::initVariables()
 	dialogue = new social::DialogueTree;
 	dialogue->init();
 	socialengine = new socialEngine(dialogue);
-	
+	socialengine->client = &client;
+	client.social = socialengine;
 	//bigwheel test variables
 	shape.setRadius(900);
 	shape.setPosition(4901, 2548);
@@ -122,10 +123,10 @@ void Game::initVariables()
 	//resizing Players across server.
 	client.sPlayers.setScale(0.21, 0.21);
 	// fill rectangle colours for rain
-	/*for (int i = 0; i < 500; i++)
+	for (int i = 0; i < 500; i++)
 	{
 		this->rectangle[i].setFillColor(sf::Color(235, 149, 13));
-	}*/
+	}
 
 	jediengine.loadAssetFile();
 	this->points = 0;
@@ -291,18 +292,22 @@ void Game::initVariables()
 
 	//lighting
 	
+	//online data
+	onlineRect.height = 200;
+	onlineRect.width = 120;
+	
 }
 
 
 void Game::initWindow()
 {
 	
-	this->videoMode.height = 1020;
-	this->videoMode.width = 1880;
+	this->videoMode.height = 1080;
+	this->videoMode.width = 1660;
 //	this->videoMode.getDesktopMode;
 	this->window = new sf::RenderWindow(this->videoMode, "The City", sf::Style::Default, settings);
 	ImGui::SFML::Init(*window);
-	ImGuiIO& io = ImGui::GetIO();
+	//ImGuiIO& io = ImGui::GetIO();
 	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	this->window->setFramerateLimit(120);
 
@@ -1050,6 +1055,8 @@ void Game::checkCollide()
 
 			//}
 		}
+
+		
 	}
 
 
@@ -1428,17 +1435,21 @@ ImGui::PopStyleColor(1);
 void Game::initConnection()
 {
 		bool connect = false;
+		client.getIP();
 	while (!connect)
 		if (client.socket.connect(client.ip, 2000) == sf::Socket::Done)
 		{
 			connect = true;
 			std::cout << "Connection made\n ";
 			std::cout << "Connected to server \n " << client.socket.getRemoteAddress();
-
+			std::cout << "\nLocal port: " << client.socket.getLocalPort();
+			login();
+			
 		}
 		else
 			std::cout << "probing for server\n / Connection needed to be established to run = false (edit InitConnection fuinction in game.cpp to change) " << sf::IpAddress::LocalHost << "3000\n";
-	}
+	clientSendID();
+}
 
 void Game::initNPC()
 {
@@ -1474,14 +1485,23 @@ void Game::pollEvents()
 {
 
 
-	ImGui::SFML::ProcessEvent(ev);
 	while (this->window->pollEvent(this->ev)) {
-		
+
+		ImGui::SFML::ProcessEvent(*this->window, ev);
+		ImGuiIO& io = ImGui::GetIO();
 		//velocity.x = 0.;
 	//	velocity.y = 0;
 		switch (this->ev.type)
 		{
 
+		case	sf::Event::GainedFocus:
+			std::cout << "Gained" << std::endl;
+			wndFocus = true;
+			break;
+
+		case	sf::Event::LostFocus:
+			wndFocus = false;
+				std::cout << "Lost" << std::endl;
 			//Takes text for chat client. Small delete key deletes current text (once player presses it then moves location by one pixel, it will delete).
 		case sf::Event::TextEntered:
 			if (ev.text.unicode < 128)
@@ -1736,7 +1756,7 @@ void Game::pollEvents()
 					//	client.sendingpacket.clear();
 					//}
 					//player.actor.move(10, 0);
-					velocity.x += movementSpeed;
+					//velocity.x += movementSpeed;
 					aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
 					aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
 
@@ -1788,6 +1808,9 @@ void Game::pollEvents()
 
 		case::sf::Event::MouseButtonReleased:
 			mouseDown = false;
+			if (ev.mouseButton.button == sf::Mouse::Left) {
+				
+			}
 			break;
 		case sf::Event::KeyReleased:
 		
@@ -1858,12 +1881,29 @@ void Game::pollEvents()
 			if (ev.type == sf::Event::MouseButtonPressed) // 
 			{
 
+			
+
 				//routefind.nodeEnd->x = (worldPos.x / 100);
 				// routefind.nodeEnd->y =( worldPos.y / 100);
 				// std::cout << "\nNew node end: " << routefind.nodeEnd->x << ", " << routefind.nodeEnd->y << "\n";
 				{
 					if (ev.mouseButton.button == sf::Mouse::Left)
 					{
+						
+						//check whether clicking clients // considering doing this within local region.
+						for (auto clients : client.PlayerMap) {
+							if (clients.second.avatar.getGlobalBounds().contains(worldPos) && clients.first != username && !io.WantCaptureMouse) {
+								//socialengine->serverClientTrade(clients.first);
+								socialengine->optMouseLocation.emplace(ev.mouseButton.x, ev.mouseButton.y);
+								socialengine->serverUsername = clients.first;
+								socialengine->bShowServerInteract = true;
+								socialengine->interactPlayerPosition = clients.second.avatar.getPosition();
+								
+	//							socialengine->serverInteract(clients.second.avatar.getPosition());
+							}
+						}
+
+
 						if (socialengine->bShowInteract) {
 							if (socialengine->selectedNpc != nullptr && socialengine->selectedNpc->arrived)
 							{
@@ -4104,7 +4144,7 @@ void Game::render()
 		//this->window->draw(rotatorbin2);
 		if (!movementStarted)
 		{
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < 0; i++) {
 
 				Boids ve(generator,13);
 				ve.bird.setTexture(&texbutterfly);
@@ -4126,7 +4166,7 @@ void Game::render()
 		}
 		if (!movementStarted)
 		{
-			for (int i = 0; i <25; i++) {
+			for (int i = 0; i <45; i++) {
 				
 				Boids ve(generator, 35);
 				ve.bird.setTexture(&texboid);
@@ -4372,7 +4412,7 @@ void Game::render()
 		sha.setOrigin(sha.getSize().x / 2, sha.getSize().y / 2);
 		sha.setPosition(window->mapPixelToCoords(sf::Mouse::getPosition(*window)));
 		sha.setTexture(&texviclight);
-		//tex.draw(sha, sf::BlendAdd);
+		tex.draw(sha, sf::BlendAdd);
 
 		tri.setPosition(sf::Vector2f(1331, 1026));
 		tri.setSize(sf::Vector2f(10700, 9500));
@@ -4538,7 +4578,7 @@ void Game::render()
 		ImGui::Checkbox("Reset PathFinding", &resetPath); //{std::cout <<resetPath };
 		ImGui::Checkbox("Quad Tree", &bQuadTree);
 		ImGui::Checkbox("Grid", &grid);
-		ImGui::SliderFloat("Sun Light ", &fadeTime, -50.0f, 100.f);
+	//	ImGui::SliderFloat("Sun Light ", &fadeTime, -50.0f, 100.f);
 		ImGui::SliderFloat("North South Wind", &vecWind.y, -1.5f, 1.5f);
 		ImGui::SliderFloat("East West Wind ", &vecWind.x, -1.5f, 1.5f);
 		
@@ -4637,7 +4677,8 @@ void Game::render()
 			//ImGui::Text(exper.c_str());
 			//ImGui::DrawRect(sf::FloatRect(sf::Vector2f(3000., 7000.), (sf::Vector2f(300., 700.))), sf::Color::Blue);
 	
-		
+		socialengine->checkWindows();
+		socialengine->socialReset();
 		//std::cout << "just before imgui sfml render\n";
 		ImGui::SFML::Render(*window);
 
@@ -4655,7 +4696,7 @@ void Game::render()
 		/*	for (int i = 0; i < 200; i++) {
 				this->window->draw(circles[i]);
 			}*/
-		//this->renderRain();
+		this->renderRain();
 	
 		//	sf::RenderStates textt;
 		//	sf::Transform transform;
@@ -4770,6 +4811,7 @@ void Game::update()
 	client.ReceivePackets(&client.socket);
 	this->renderPlayers();
 	this->dayTimeFunc();
+	this->worldSync();
 }
 
 void Game::dayTimeFunc()
@@ -4792,12 +4834,12 @@ void Game::dayTimeFunc()
 	//Night Mood. Sunset type.
 	switch (dayDivide) {
 	case 0:
-		skyColor = sf::Color(30, 10, 80, 150);
+		skyColor = sf::Color(30, 40, 80, 100);
 		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight = 255;
 		break;
 	case 1:
-		skyColor = sf::Color(30, 10, 80, 150);
+		skyColor = sf::Color(30, 40, 80, 100);
 		//std::cout << "\nCase hour: " << dayDivide << "\n\n";
 		skyColorLight = 255;
 		break;
@@ -4880,21 +4922,21 @@ void Game::dayTimeFunc()
 		skyColor = sf::Color(52, 50, 105, 215); break;
 
 	case 17:
-		skyColor = sf::Color(33, 30, 89, 150); break;
+		skyColor = sf::Color(43, 40, 89, 150); break;
 		skyColorLight = 170;
 		
 	case 18:
-		skyColor = sf::Color(30, 10, 80, 150); break;
+		skyColor = sf::Color(40, 40, 80, 100); break;
 		skyColorLight = 170;
 	case 19:
-		skyColor = sf::Color(30, 10, 80, 150); break;
+		skyColor = sf::Color(40, 40, 80, 100); break;
 		skyColorLight = 190;
 	case 20:
-		skyColor = sf::Color(30, 10, 80, 150); break;
+		skyColor = sf::Color(40, 40, 80, 100); break;
 		skyColorLight = 220;
 		
 	case 21:
-		skyColor = sf::Color(30, 10, 80, 155); break;
+		skyColor = sf::Color(40, 40, 80, 100); break;
 		skyColorLight = 240;
 
 		//20, 10, 40, 220
@@ -4911,9 +4953,10 @@ void Game::updateMousePositions()
 
 void Game::login()
 {
-
-	std::cout << "\nPlease enter Character name: ";
+	std::cout << "\n " << username;
+	std::cout << "\nPlease enter Character name: " << std::endl;
 	std::cin >> username;
+	std::cout << "\n" << username;
 	//username = "Beta";
 	userText.setString(username);
 }
@@ -4931,9 +4974,22 @@ void Game::renderPlayers()
 		for (auto& e : client.PlayerMap)
 		{
 			//std::cout << "\n" << e.getPosition().x << ", " << e.getPosition().y << std::endl;
-			if (e.first != username)
+			
 			{
-				this->window->draw(e.second);
+
+				e.second.avatar.move(e.second.direction);
+				//std::cout << "dir: " << e.second.direction.x << ", y " << e.second.direction.y;
+				e.second.avatar.setTexture(playerTexture);
+				e.second.avatar.setTextureRect(onlineRect);
+				//e.second.position = e.second.avatar.getPosition();
+				//e.second.direction.x = 0;
+				//e.second.direction.y = 0;
+				//client.sPlayers.setPosition(e.second.avatar.getPosition().x, e.second.avatar.getPosition().y);
+			//	client.PlayerMap[e.first].position = e.second.avatar.getPosition();
+				
+				//client.sPlayers.move(e.second.direction.x * 9, e.second.direction.y * 9);
+				if(e.first != username)//dont draw this client twice
+					this->window->draw(e.second.avatar);
 				for (auto& f : client.ChatMap)
 
 				{
@@ -4946,7 +5002,7 @@ void Game::renderPlayers()
 						sf::Text playerText;
 						playerText.setString(playerInput);
 						playerText.setCharacterSize(15);
-						playerText.setPosition(e.second.getPosition().x, e.second.getPosition().y + 220);
+						playerText.setPosition(e.second.avatar.getPosition().x, e.second.avatar.getPosition().y + 220);
 						playerText.setFont(fontUI);
 						this->window->draw(playerText);
 						
@@ -5433,13 +5489,61 @@ void Game::playerCollide(sf::Vector2i movement)
 				player.actor.move(0, 25);
 				spChar.move(0, 25);
 				std::cout << "up\n";
-				
 			}
 		}
 		else {
 			playerLastLocation = this->player.actor.getPosition();
 			
 		}
+	}
+}
+
+void Game::worldSync()
+{
+	//return;
+	worldsync += npcClock.getElapsedTime().asSeconds(); // worldsync float updated, to measure against went to send certain sync packets out.
+
+	//player position update packet
+	if (worldsync > 0.5)
+	{
+		worldsync = 0;
+		int header = 3;
+		sf::Packet syncpacket;
+		syncpacket << header << username << player.actor.getPosition().x << player.actor.getPosition().y ;
+		if (client.socket.send(syncpacket) != sf::Socket::Done)
+		{
+			std::cout << "\nWorld update packet [header 3]not sent";
+		}
+		else {
+		//	std::cout << "\nWorld update packet [header 3] sent. Header is: ";
+		//	std::cout << header << " " << username << '\n';
+		}
+		syncpacket.clear();
+	}
+
+
+
+	//	int data = 2;
+	//client.sendingpacket.clear();
+	//client.sendingpacket << data << player.direction << username << chat.playerInput.toAnsiString();
+	//	std::cout << "Data SENT: " << data << ", " << "player.direction: " << static_cast<unsigned int>(player.direction) << ", user: " << username;
+	
+}
+
+void Game::clientSendID()
+{
+	sf::Packet IDpacket;
+	int id = 5 ;
+	
+	IDpacket << id << username;
+	if (client.socket.send(IDpacket) != sf::Socket::Done)
+	{
+		std::cout << "\nID packet not sent. Are you still connected?";
+
+	}
+	else
+	{
+		std::cout << "ID packet sent" << id << ", " << username;
 	}
 }
 
@@ -5464,68 +5568,101 @@ void Game::entityMove() {
 	faceDown = false;
 	faceRight = false;
 	faceUp = false;
-//	std::cout << "\nBefore:" << static_cast<int>(player.direction);
-	if (moving_left)
-	{
-		
-		velocity.x += -movementSpeed;
-	still = false;
-	player.direction |= player.Left;
-}
-	if (moving_down)
-	{
-		faceDown = true;
-		velocity.y += movementSpeed;
-		still = false;
-		player.direction |= player.Down;
-	}
-	if (moving_up)
-	{
-		velocity.y += -movementSpeed;
-		faceUp = true;
-		still = false;
-		player.direction |= player.Up;
-	}
-	if (moving_right)
-	{
-		velocity.x += movementSpeed;
-		faceRight = true;
-		still = false;
-		player.direction |= player.Right;	
+	if (wndFocus) {
+		//	std::cout << "\nBefore:" << static_cast<int>(player.direction);
+		if (moving_left)
+		{
+
+			velocity.x += -movementSpeed;
+			still = false;
+			player.direction |= player.Left;
+		}
+		if (moving_down)
+		{
+			faceDown = true;
+			velocity.y += movementSpeed;
+			still = false;
+			player.direction |= player.Down;
+		}
+		if (moving_up)
+		{
+			velocity.y += -movementSpeed;
+			faceUp = true;
+			still = false;
+			player.direction |= player.Up;
+		}
+		if (moving_right)
+		{
+			velocity.x += movementSpeed;
+			faceRight = true;
+			still = false;
+			player.direction |= player.Right;
+		}
+
+		if (still)
+			player.direction |= player.Stop;
+
+		//if no key is pressed, and player was not already still, then player is still / stopped and previous direction is set. 
+		//
+		if (player.direction != player.previousdirection)
+			//	std::cout << "\n move speed: " << movementSpeed;
+		{
+			player.previousdirection = player.direction;
+			//packet type 
+			int data = 2;
+			client.sendingpacket.clear();
+			client.sendingpacket << data << player.direction << username << chat.playerInput.toAnsiString();
+			//	std::cout << "Data SENT: " << data << ", " << "player.direction: " << static_cast<unsigned int>(player.direction) << ", user: " << username;
+			if (client.socket.send(client.sendingpacket) != sf::Socket::Done)
+			{
+				std::cout << "Data not sent, are you connected?";
+			}
+			client.sendingpacket.clear();
+			//	std::cout << "\nafter send: " << player.direction;
+		}
+		//std::cout << "\nAfter cast" << static_cast<unsigned int>(player.direction);
+	//	std::cout << "\nvelocity x : "<< velocity.x << " : y" << velocity.y;
+		player.actor.move(velocity);
+		//std::cout << "\nVelocity is " << velocity.x << ", " << velocity.y;
+		spChar.move(velocity);
+		aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
+		aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
+
+		if (aPosition.x < 0)
+			aPosition.x = 0;
+		if (aPosition.y < 0)
+			aPosition.y = 0;
 	}
 
-	if (still)
-		player.direction |= player.Stop;
-	
-	//if no key is pressed, and player was not already still, then player is still / stopped and previous direction is set. 
+
+	//if lost focus tell server to stop.
+
 	//
-	if (player.direction != player.previousdirection) 
-
+	if (player.direction != player.previousdirection && wndFocus != true)
+		//	std::cout << "\n move speed: " << movementSpeed;
 	{
+		player.direction = 0;
+		player.direction = player.Stop;
 		player.previousdirection = player.direction;
 		//packet type 
-		int data = 2; 
+		int data = 2;
 		client.sendingpacket.clear();
 		client.sendingpacket << data << player.direction << username << chat.playerInput.toAnsiString();
-		std::cout << "Data SENT: " << data << ", " << "player.direction: " << static_cast<unsigned int>(player.direction) << ", user: " << username;
+		//	std::cout << "Data SENT: " << data << ", " << "player.direction: " << static_cast<unsigned int>(player.direction) << ", user: " << username;
 		if (client.socket.send(client.sendingpacket) != sf::Socket::Done)
 		{
 			std::cout << "Data not sent, are you connected?";
 		}
-		std::cout << "\nafter send: " << player.direction;
-	} 
-	//std::cout << "\nAfter cast" << static_cast<unsigned int>(player.direction);
-//	std::cout << "\nvelocity x : "<< velocity.x << " : y" << velocity.y;
-	player.actor.move(velocity);
-	spChar.move(velocity);
-	aPosition.x = spChar.getPosition().x + 25 - (screenSize.x / 2);
-	aPosition.y = spChar.getPosition().y + 25 - (screenSize.y / 2);
-
-	if (aPosition.x < 0)
-		aPosition.x = 0;
-	if (aPosition.y < 0)
-		aPosition.y = 0;
-
+		client.sendingpacket.clear();
+		velocity.x = 0;
+		velocity.y = 0;
+		moving_down = false;
+		moving_left = false;
+		moving_right = false;
+		moving_up = false;
+		//	std::cout << "\nafter send: " << player.direction;
+	}
+	//std::
 	view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
 
 
