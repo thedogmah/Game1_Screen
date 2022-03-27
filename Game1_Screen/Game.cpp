@@ -13,7 +13,7 @@
 #include "quadtree.h"
 #include "socialEngine.h"
 #include <cmath>
-
+#include "AnimatedGIF.h"
 
 namespace social {
 class DialogueNode;
@@ -79,6 +79,11 @@ void Game::initInterface()
 //Private member functions
 void Game::initVariables()
 {
+	
+	gif = new AnimatedGIF("1.gif");
+	//animated meme
+	
+
 	//ImGuiIO& io = ImGui::GetIO();
 	//particles
 	particle.blendMode = sf::BlendAlpha;
@@ -294,7 +299,7 @@ void Game::initVariables()
 	
 	//online data
 	onlineRect.height = 200;
-	onlineRect.width = 120;
+	onlineRect.width = 100;
 	
 }
 
@@ -330,7 +335,7 @@ void Game::initWindow()
 
 			std::cout << "black slick Male  not loaded";
 	humanityChineseWomanPurple.imgHuman.createMaskFromColor(sf::Color::Black);
-	humanityChineseWomanPurple.peopleAmount =15;
+	humanityChineseWomanPurple.peopleAmount =45;
 
 
 
@@ -345,7 +350,7 @@ void Game::initWindow()
 
 		std::cout << "black slick Male  not loaded";
 	humanityBlackMaleSlick.imgHuman.createMaskFromColor(sf::Color::White);
-	humanityBlackMaleSlick.peopleAmount = 30;
+	humanityBlackMaleSlick.peopleAmount = 80;
 
 
 
@@ -360,7 +365,7 @@ void Game::initWindow()
 
 			std::cout << "Asian Male Protagonist not loaded";
 		humanityAsianMaleSuit.imgHuman.createMaskFromColor(sf::Color::White);
-	humanityAsianMaleSuit.peopleAmount =30;
+	humanityAsianMaleSuit.peopleAmount =70;
 
 
 
@@ -377,7 +382,7 @@ void Game::initWindow()
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 30;
+	humanityMaleGreen.peopleAmount = 90;
 	
 	 
 		
@@ -393,7 +398,7 @@ void Game::initWindow()
 
 		std::cout << "Green Protagonist not loaded";
 	humanityBlackMaleJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityBlackMaleJacket.peopleAmount = 27;
+	humanityBlackMaleJacket.peopleAmount = 127;
 	
 	 
 		
@@ -409,7 +414,7 @@ void Game::initWindow()
 		std::cout << "deliveroo not loaded";
 	//deliverooBike.imgHuman.createMaskFromColor(sf::Color::White);
 	//deliverooBike.texHuman.setSmooth(true);
-	deliverooBike.peopleAmount = 12;
+	deliverooBike.peopleAmount = 32;
 	
 	deliverooBike.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -420,7 +425,7 @@ void Game::initWindow()
 	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleSandyJacket.peopleAmount =25;
+	humanityMaleSandyJacket.peopleAmount =85;
 
 		humanityMaleSandyJacket.populate();
 //	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -433,7 +438,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityMaleWhiteJacket.peopleAmount =30;
+	humanityMaleWhiteJacket.peopleAmount =130;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -441,7 +446,7 @@ void Game::initWindow()
 	humanityMaleWhiteJacket.createBounds();
 
 
-	humanity.peopleAmount = 30;
+	humanity.peopleAmount = 90;
 	humanity.populate();
 	
 	humanity.window = window;
@@ -450,11 +455,11 @@ void Game::initWindow()
 	dogGR.populate();
 	dogGR.window = window;
 
-	drones.peopleAmount = 3;
+	drones.peopleAmount = 23;
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount =25;
+	scooters.peopleAmount =75;
 	scooters.populate();
 	scooters.window = window;
 
@@ -1589,7 +1594,7 @@ void Game::pollEvents()
 
 					view.reset(sf::FloatRect(aPosition.x, aPosition.y, screenSize.x, screenSize.y));
 					//view.setRotation(-4);
-
+					
 					view.zoom(zoomfactor);
 					window->setView(view);
 				}
@@ -1844,11 +1849,11 @@ void Game::pollEvents()
 		
 		case sf::Event::MouseWheelMoved:
 		{
-			vZoom = 1.0;
-			vZoom -= 0.02 * ev.mouseWheel.delta;
+			//vZoom = 1.0;
+			zoomfactor -= 0.04 * ev.mouseWheel.delta;
 			//std::cout << vZoom <<std::endl; //uncomment to display zoom level to console
-			view.zoom(vZoom);
-			window->setView(view);
+			view.zoom(zoomfactor);
+			//window->setView(view);
 			std::cout << vZoom;
 			break;
 		}
@@ -4696,6 +4701,10 @@ void Game::render()
 		/*	for (int i = 0; i < 200; i++) {
 				this->window->draw(circles[i]);
 			}*/
+
+		gifSprite.setPosition(3900, 3900);
+		gif->update(gifSprite);
+		window->draw(gifSprite);
 		this->renderRain();
 	
 		//	sf::RenderStates textt;
@@ -4788,8 +4797,8 @@ void Game::render()
 
 
 		this->window->display();
-		if(!bNpcFollow )this->window->setView(view);
-		
+	//	if(!bNpcFollow )this->window->setView(view);
+	//	view.zoom(zoomfactor);
 		this->window->clear();
 		if(!initialised)
 		initialised = true;

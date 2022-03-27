@@ -200,6 +200,16 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 				packet >> username;
 				this->social->serverTradeRequest(username);
 			}
+
+			//header 21 for receiving hug
+			else if (header == 21)
+		{
+		std::string username;
+		packet >> username;
+		this->social->serverHugReceived(username);
+		std::cout << "\nReceived hug from " << username;
+		}
+
 			packet.clear();
 			//		std::this_thread::sleep_for((std::chrono::milliseconds)10);
 				//}

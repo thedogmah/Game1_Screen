@@ -37,6 +37,7 @@ public:
 	bool bShowTradeRequest = false;
 	bool bShowServerInteract = false;
 	bool socialTakeClicks = false;
+	bool bShowHug = false;
 	// bool bSocialClicked = false;
 	std::optional<sf::Vector2f>optMouseLocation;
 	//menu resources
@@ -57,9 +58,19 @@ public:
 	void moveNPCs(std::vector<Animation*> npc);
 	void showTradeRequest();
 	void checkWindows();
+
+	//members for client to client interacdtion through server.
 	void serverClientTrade(std::string username);
+	void serverClientHug(std::string username);
 	void serverTradeRequest(std::string username);
 	void serverInteract(sf::Vector2f position);
+
+	void serverHugReceived(std::string username);
+	//variables for hug display.
+	sf::Clock hugDisplay;
+	float hugTimeout;
+	sf::Text HugText;
+	std::string hugSender{};
 
 	void collisionDetect(); 
 	void socialReset();

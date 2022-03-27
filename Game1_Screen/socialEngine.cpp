@@ -25,7 +25,9 @@ socialEngine::socialEngine(social::DialogueTree* dialogue){
 	bubbleTexture9.loadFromFile("sbubble9.png");
 	dialoguetreePtr = dialogue;
 
-
+	HugText.setCharacterSize(150);
+	HugText.setFont(interactFont);
+	HugText.setFillColor(sf::Color::Yellow);
 	//Initialise text labels for interact menu;
 	interactFont.loadFromFile("Arial.ttf");
 	InteractMenu[0].setString("Choose interaction");
@@ -33,7 +35,7 @@ socialEngine::socialEngine(social::DialogueTree* dialogue){
 	InteractMenu[2].setString("Trade");
 	InteractMenu[3].setString("Private DM");
 	InteractMenu[4].setString("Walk Together");
-	InteractMenu[5].setString("Hug");
+	InteractMenu[5].setString("Send Hug");
 
 	InteractMenu[0].setFont(interactFont);
 	InteractMenu[1].setFont(interactFont);
@@ -405,7 +407,8 @@ void socialEngine::checkWindows()
 	}
 	if (bShowServerInteract)
 		serverInteract(interactPlayerPosition);
-
+	if (bShowHug)
+		serverHugReceived("");
 }
 
 void socialEngine::serverClientTrade(std::string username)
@@ -429,6 +432,22 @@ void socialEngine::serverClientTrade(std::string username)
 
 }
 
+void socialEngine::serverClientHug(std::string username)
+{
+
+	sf::Packet hugPacket;
+	int header = 21;
+	hugPacket << header << username;
+	if (client->socket.send(hugPacket) != sf::Socket::Done)
+	{
+		std::cout << "\nHug failed to send\n";
+	}
+	else
+	{
+	
+	}
+}
+
 void socialEngine::serverTradeRequest(std::string username)
 {
 	std::string title;
@@ -447,16 +466,24 @@ void socialEngine::serverInteract(sf::Vector2f position)
 	//title = "Trade request from " + username;
 	interactPlayerPosition = position;
 	sf::RectangleShape interactBox;
+
+	interactBox.setFillColor(sf::Color(200,200,0,160));
+	interactBox.setPosition(interactPlayerPosition.x - 20, interactPlayerPosition.y - 20);
+	interactBox.setSize(sf::Vector2f(340, 330));
+	game->window->draw(interactBox);
 	interactBox.setFillColor(sf::Color(20, 190, 100, 160));
 	interactBox.setPosition(interactPlayerPosition);
 	interactBox.setSize(sf::Vector2f(300,290));
 	game->window->draw(interactBox);
+
 	InteractMenu[0].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 20);
 	InteractMenu[1].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 45);
 	InteractMenu[2].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 70);
 	InteractMenu[3].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 95);
 	InteractMenu[4].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 120);
 	InteractMenu[5].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 145);
+	
+
 	for (auto menu : InteractMenu) {
 		game->window->draw(menu);
 	
@@ -469,6 +496,35 @@ void socialEngine::serverInteract(sf::Vector2f position)
 	//if serverInteract == visible
 		//if click on any text label
 			//initiate relevant server function between two clients
+}
+
+void socialEngine::serverHugReceived(std::string username)
+{
+	if (username.size() > 0) {
+		hugSender = username;
+	}
+	if (!bShowHug)
+	{
+		hugTimeout = hugDisplay.restart().asSeconds();
+		HugText.setPosition(game->player.actor.getPosition().x - HugText.getGlobalBounds().width / 2, game->player.actor.getPosition().y + 150);
+		bShowHug = true;
+	}
+	else {
+		
+		hugTimeout += hugDisplay.getElapsedTime().asSeconds();
+		std::string msg;
+		msg = hugSender + " Sent a Hug!";
+		HugText.setString(msg);
+		HugText.setPosition(game->player.actor.getPosition().x - HugText.getGlobalBounds().width / 2, HugText.getPosition().y - 1);
+		game->window->draw(HugText);
+		std::cout << hugTimeout;
+		HugText.setFillColor(sf::Color(0 + rand() % 255, 0 + rand() % 255, 0 + rand() % 255, 70 + rand() %135));
+		if (hugTimeout > 300)
+		{
+			bShowHug = false;
+			hugTimeout = 0;
+		}
+	}
 }
 
 void socialEngine::collisionDetect()
@@ -501,10 +557,22 @@ void socialEngine::collisionDetect()
 				{
 					sf::Vector2f worldPoss = game->window->mapPixelToCoords(sf::Vector2i(optMouseLocation.value()), game->view);
 					std::cout << "\nOptional mouse location true:\n";
+
+					//Check whether 'Trade has been clcicked by client
 					if (menu.getGlobalBounds().contains(worldPoss) && menu.getString() == "Trade")
 					{
 						serverClientTrade(serverUsername);
 						std::cout << "\nClick";
+				
+						//turn UI off and its ability to receive clicks
+						bShowServerInteract = false;
+						socialTakeClicks = false;
+					}
+					//Check whether send hug has been clicked by client
+					if (menu.getGlobalBounds().contains(worldPoss) && menu.getString() == "Send Hug")
+					{
+					//Code for sending hug.
+						serverClientHug(serverUsername);
 						bShowServerInteract = false;
 						socialTakeClicks = false;
 					}

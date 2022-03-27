@@ -1,0 +1,8 @@
+{
+	"Ryan": "password1",
+	"Rhys": "password2",
+	"Alan": "passwordAlan",
+	"Ryans":  "hey",
+	"ZArray": [ "Ryan", "Ryan", "John" ],
+	"Jade": ["Nurse", 31, "England"]
+}

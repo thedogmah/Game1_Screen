@@ -90,6 +90,9 @@
     <ClCompile Include="Effects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AnimatedGIF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -179,6 +182,15 @@
     <ClInclude Include="particleSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimatedGIF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\char.png">
@@ -190,6 +202,9 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="sFountain.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="users.json">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

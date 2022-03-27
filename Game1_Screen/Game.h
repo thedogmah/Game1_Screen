@@ -24,6 +24,7 @@
 #include "boids.h"
 #include "Animation.h"
 #include "particleSystem.h"
+#include "AnimatedGIF.h"
 //#include <sstream>
 //Class as the game engine.
 
@@ -38,6 +39,12 @@ class Game
 {
 	friend class socialEngine;
 public:
+
+	//meme resources
+	//AnimatedGIF giff;
+	AnimatedGIF* gif = NULL;
+	sf::Sprite gifSprite;
+
 	sf::Clock particleClock;
 	ParticleSystem particleEmitter{ 432 };
 	//circle particle test
@@ -180,7 +187,7 @@ public:
 	sf::Clock clockImGui;
 	//zoom 
 	
-	float zoomfactor =1.45; // is accessed by other classes
+	float zoomfactor =1.15; // is accessed by other classes
 	sf::RectangleShape* act;
 	//weather engine variables
 	sf::Vector2f vecWind{ 0.,0.0 };
