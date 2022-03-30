@@ -80,7 +80,7 @@ void Game::initInterface()
 void Game::initVariables()
 {
 	
-	gif = new AnimatedGIF("1.gif");
+//	gif = new AnimatedGIF("1.gif");
 	//animated meme
 	
 
@@ -311,8 +311,11 @@ void Game::initWindow()
 	this->videoMode.width = 1660;
 //	this->videoMode.getDesktopMode;
 	this->window = new sf::RenderWindow(this->videoMode, "The City", sf::Style::Default, settings);
+
 	ImGui::SFML::Init(*window);
-	//ImGuiIO& io = ImGui::GetIO();
+	
+	 //io = ImGui::GetIO();
+	
 	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	this->window->setFramerateLimit(120);
 
@@ -350,7 +353,7 @@ void Game::initWindow()
 
 		std::cout << "black slick Male  not loaded";
 	humanityBlackMaleSlick.imgHuman.createMaskFromColor(sf::Color::White);
-	humanityBlackMaleSlick.peopleAmount = 80;
+	humanityBlackMaleSlick.peopleAmount = 30;
 
 
 
@@ -365,7 +368,7 @@ void Game::initWindow()
 
 			std::cout << "Asian Male Protagonist not loaded";
 		humanityAsianMaleSuit.imgHuman.createMaskFromColor(sf::Color::White);
-	humanityAsianMaleSuit.peopleAmount =70;
+	humanityAsianMaleSuit.peopleAmount =30;
 
 
 
@@ -382,7 +385,7 @@ void Game::initWindow()
 	if (!humanityMaleGreen.imgHuman.loadFromFile("protagonistgreen.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleGreen.peopleAmount = 90;
+	humanityMaleGreen.peopleAmount = 20;
 	
 	 
 		
@@ -398,7 +401,7 @@ void Game::initWindow()
 
 		std::cout << "Green Protagonist not loaded";
 	humanityBlackMaleJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityBlackMaleJacket.peopleAmount = 127;
+	humanityBlackMaleJacket.peopleAmount = 27;
 	
 	 
 		
@@ -414,7 +417,7 @@ void Game::initWindow()
 		std::cout << "deliveroo not loaded";
 	//deliverooBike.imgHuman.createMaskFromColor(sf::Color::White);
 	//deliverooBike.texHuman.setSmooth(true);
-	deliverooBike.peopleAmount = 32;
+	deliverooBike.peopleAmount = 12;
 	
 	deliverooBike.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -425,7 +428,7 @@ void Game::initWindow()
 	if (!humanityMaleSandyJacket.imgHuman.loadFromFile("protagonistsandy.png"))
 
 		std::cout << "Green Protagonist not loaded";
-	humanityMaleSandyJacket.peopleAmount =85;
+	humanityMaleSandyJacket.peopleAmount =35;
 
 		humanityMaleSandyJacket.populate();
 //	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -438,7 +441,7 @@ void Game::initWindow()
 		std::cout << "Green Protagonist not loaded";
 	sf::Color customBlue(255, 0, 0);
 	humanityMaleWhiteJacket.imgHuman.createMaskFromColor(sf::Color::Red);
-	humanityMaleWhiteJacket.peopleAmount =130;
+	humanityMaleWhiteJacket.peopleAmount =50;
 	
 	humanityMaleWhiteJacket.populate();
 	//	humanityMaleGreen.texHuman.loadFromImage(humanityMaleGreen.imgHuman);
@@ -446,7 +449,7 @@ void Game::initWindow()
 	humanityMaleWhiteJacket.createBounds();
 
 
-	humanity.peopleAmount = 90;
+	humanity.peopleAmount = 20;
 	humanity.populate();
 	
 	humanity.window = window;
@@ -459,14 +462,14 @@ void Game::initWindow()
 	drones.populate();
 	drones.window = window;
 
-	scooters.peopleAmount =75;
+	scooters.peopleAmount =25;
 	scooters.populate();
 	scooters.window = window;
 
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 20;
+	scootersManSandyJacket.peopleAmount = 10;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
@@ -474,14 +477,14 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 20;
+	humanityWomanSnugGrey.peopleAmount = 10;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
 	//snug black coat woman population
 	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugBlack.peopleAmount = 40;
+	humanityWomanSnugBlack.peopleAmount = 10;
 	humanityWomanSnugBlack.populate();
 	humanityWomanSnugBlack.window = window;
 	humanityWomanSnugBlack.createBounds(); 
@@ -1493,7 +1496,8 @@ void Game::pollEvents()
 	while (this->window->pollEvent(this->ev)) {
 
 		ImGui::SFML::ProcessEvent(*this->window, ev);
-		ImGuiIO& io = ImGui::GetIO();
+		//ImGuiIO& 
+		//	io = ImGui::GetIO();
 		//velocity.x = 0.;
 	//	velocity.y = 0;
 		switch (this->ev.type)
@@ -1897,7 +1901,7 @@ void Game::pollEvents()
 						
 						//check whether clicking clients // considering doing this within local region.
 						for (auto clients : client.PlayerMap) {
-							if (clients.second.avatar.getGlobalBounds().contains(worldPos) && clients.first != username && !io.WantCaptureMouse) {
+							if (clients.second.avatar.getGlobalBounds().contains(worldPos) && clients.first != username ) {
 								//socialengine->serverClientTrade(clients.first);
 								socialengine->optMouseLocation.emplace(ev.mouseButton.x, ev.mouseButton.y);
 								socialengine->serverUsername = clients.first;
@@ -1907,8 +1911,20 @@ void Game::pollEvents()
 	//							socialengine->serverInteract(clients.second.avatar.getPosition());
 							}
 						}
+						if (socialengine->bShowMeme) {
+							{
+							if(socialengine->MemeRect.getGlobalBounds().contains(worldPos))
+								socialengine->optMouseLocation.emplace(ev.mouseButton.x, ev.mouseButton.y);
+							}
 
+						}
 
+						if(socialengine->bShowMemeList)
+							{
+							for(int i = 0; i<5; i++)
+							if (socialengine->showSprite[i]->getGlobalBounds().contains(worldPos))
+								socialengine->optMouseLocation.emplace(ev.mouseButton.x, ev.mouseButton.y);
+						}
 						if (socialengine->bShowInteract) {
 							if (socialengine->selectedNpc != nullptr && socialengine->selectedNpc->arrived)
 							{
@@ -4518,7 +4534,7 @@ void Game::render()
 		ImGui::InputText("Quadtree query Y", qt.qtqueryy, 100);
 		ImGui::InputText("Quadtree query H", qt.qtqueryh, 100);
 		ImGui::InputText("Quadtree query W", qt.qtqueryw, 100);
-		//ImGui::SameLine(245);
+		////ImGui::SameLine(245);
 	//	if (ImGui::Button("Query")) {
 	//		sf::RectangleShape rec;
 	//		rec.setPosition(sf::Vector2f(0,0));
@@ -4542,7 +4558,7 @@ void Game::render()
 	////	*/
 	////	//qt.northeast.points.clear();
 	//	qt.cleanseTree();
-	//	ImGui::End();
+		ImGui::End();
 
 
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, (ImVec4)ImColor::ImColor(50, 110, 110, 55));
@@ -4702,15 +4718,13 @@ void Game::render()
 				this->window->draw(circles[i]);
 			}*/
 
-		gifSprite.setPosition(3900, 3900);
-		gif->update(gifSprite);
-		window->draw(gifSprite);
+		
 		this->renderRain();
 	
 		//	sf::RenderStates textt;
 		//	sf::Transform transform;
 		//	//transform.translate(100.0f, 100.0f);
-		////	textt.transform = transform;
+		////	textt.transform = tdransform;
 		//	textt.texture = &textsquarewall;
 			//textt.shader = &water;
 			//textt.blendMode = sf::BlendAlpha;

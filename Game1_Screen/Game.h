@@ -468,7 +468,7 @@ public:
 	
 	const bool running() const;
 	//imgui io
-	ImGuiIO& io = ImGui::GetIO();
+	//ImGuiIO& io = ImGui::GetIO();
 
 
 	//Functions

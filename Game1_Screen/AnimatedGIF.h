@@ -14,7 +14,7 @@ public:
     const sf::Vector2i& getSize(void);
     void update(sf::Sprite& sprite);
 
-private:
+
     sf::Vector2i size;
     sf::Clock clock;
     sf::Time startTime;

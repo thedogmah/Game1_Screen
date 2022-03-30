@@ -3,7 +3,16 @@
 #include "Game.h"
 #include "Population.h"
 #include <math.h>
+#include <curl/curl.h>
+#include <cpr/cpr.h>
+#include "json.hpp"
+#include <thread>
+#include <mutex>
 
+#include <filesystem>
+namespace fs = std::filesystem;
+
+using json = nlohmann::json;
 namespace social {
 	class DialogueNode;
 	class DialogueTree;
@@ -36,6 +45,7 @@ socialEngine::socialEngine(social::DialogueTree* dialogue){
 	InteractMenu[3].setString("Private DM");
 	InteractMenu[4].setString("Walk Together");
 	InteractMenu[5].setString("Send Hug");
+	InteractMenu[6].setString("Send Meme");
 
 	InteractMenu[0].setFont(interactFont);
 	InteractMenu[1].setFont(interactFont);
@@ -43,6 +53,8 @@ socialEngine::socialEngine(social::DialogueTree* dialogue){
 	InteractMenu[3].setFont(interactFont);
 	InteractMenu[4].setFont(interactFont);
 	InteractMenu[5].setFont(interactFont);
+	InteractMenu[6].setFont(interactFont);
+
 
 	InteractMenu[0].setFillColor(sf::Color::White);
 	InteractMenu[1].setFillColor(sf::Color::White);
@@ -50,6 +62,46 @@ socialEngine::socialEngine(social::DialogueTree* dialogue){
 	InteractMenu[3].setFillColor(sf::Color::White);
 	InteractMenu[4].setFillColor(sf::Color::White);
 	InteractMenu[5].setFillColor(sf::Color::White);
+	InteractMenu[6].setFillColor(sf::Color::White);
+
+	MemeMenu[0].setString("Hi");
+	MemeMenu[1].setString("Yo");
+	MemeMenu[2].setString("Yes");
+	MemeMenu[3].setString("No");
+	MemeMenu[4].setString("Hug");
+	MemeMenu[5].setString("Smile");
+	MemeMenu[6].setString("Shock");
+	MemeMenu[7].setString("Kiss");
+	MemeMenu[8].setString("Wave");
+	MemeMenu[9].setString("Heart");
+	MemeMenu[10].setString("Dance");
+	MemeMenu[11].setString("Laugh");
+	MemeMenu[12].setString("Thumbs Up");
+	MemeMenu[13].setString("Role Eyes");
+	MemeMenu[14].setString("ROFL");
+	MemeMenu[15].setString("Folded Hands");
+	MemeMenu[16].setString("Friends");
+	MemeMenu[17].setString("Co Op?");
+	MemeMenu[18].setString("Goodbye");
+	MemeMenu[19].setString("Busy");
+
+	for (auto& item : MemeMenu)
+	{
+	item.setFont(interactFont);
+	item.setFillColor(sf::Color::White);
+	
+	}
+
+	//final meme list colours and size
+	memelist.setFillColor(sf::Color(200, 200, 0, 230));
+	memelist.setPosition(interactPlayerPosition.x - 20, interactPlayerPosition.y - 20);
+	memelist.setSize(sf::Vector2f(540, 530));
+
+	for (int i = 0; i < 5; i++)
+	{
+		showSprite[i] = nullptr;
+		showGif[i] = nullptr;
+	}
 }
 
 
@@ -409,6 +461,14 @@ void socialEngine::checkWindows()
 		serverInteract(interactPlayerPosition);
 	if (bShowHug)
 		serverHugReceived("");
+	if (bShowMeme)
+		serverChooseMeme("");
+	if (bServerSendMeme)
+		serverMemeSend(memestring);
+	if (bShowMemeList)
+	{
+		serverShowMemeList();
+	}
 }
 
 void socialEngine::serverClientTrade(std::string username)
@@ -482,6 +542,7 @@ void socialEngine::serverInteract(sf::Vector2f position)
 	InteractMenu[3].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 95);
 	InteractMenu[4].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 120);
 	InteractMenu[5].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 145);
+	InteractMenu[6].setPosition(interactBox.getPosition().x + 20, interactBox.getPosition().y + 170);
 	
 
 	for (auto menu : InteractMenu) {
@@ -524,6 +585,46 @@ void socialEngine::serverHugReceived(std::string username)
 			bShowHug = false;
 			hugTimeout = 0;
 		}
+	}
+}
+
+void socialEngine::serverShowMemeList()
+{
+	
+	
+	
+	game->window->draw(memelist);
+	if (bMemeCreated) {
+		int loop = 0;
+		for (int i = memeNaming - 5; i < memeNaming; i++) {
+			
+			std::string name = std::to_string(i) + "MemeBomb.gif";
+			if (std::filesystem::exists(name)) {
+				if (!memesDrawn) {
+					if (showGif[loop] != nullptr)
+					{
+						delete showGif[loop];
+					//	delete showSprite[loop];
+					}
+					showSprite[loop] = new sf::Sprite();
+					showGif[loop] = new AnimatedGIF(name.c_str());
+					
+					showSprite[loop]->setPosition(4200 + (250 * loop), 3400);
+					//std::cout << "\nlooping through showmeme list." << loop << memeNaming << "\nName of file is : " << name.c_str() << '\n';
+				}
+
+				showGif[loop]->update(*this->showSprite[loop]);
+
+				game->window->draw(*this->showSprite[loop]);
+				
+
+			}
+			loop++;
+		}
+
+		memesDrawn = true;
+		collisionDetect();
+	
 	}
 }
 
@@ -576,18 +677,216 @@ void socialEngine::collisionDetect()
 						bShowServerInteract = false;
 						socialTakeClicks = false;
 					}
+
+					if (menu.getGlobalBounds().contains(worldPoss) && menu.getString() == "Send Meme")
+					{
+						bShowMeme = true;
+						socialTakeClicks = false;
+						bShowServerInteract = false;
+						memeTakeClicks = false;
+						//optMouseLocation.reset();
+						serverChooseMeme("");
+						
+
+						//turn UI off and its ability to receive clicks
+						
+						
+					}
 				}
 			}
 		else
 			socialTakeClicks = true;
+		//Check collision detection for memes
+		
 		//HERE
 		
 			
 		
+	}
+	if (bShowMeme) {
+		if ( memeTakeClicks && optMouseLocation)
+			for (const auto option : MemeMenu)
+			{
+
+				if (option.getGlobalBounds().contains(worldPos)) {
+					std::cout << "\n\n" << option.getString().toAnsiString() << "\n\n";
+					
+						
+					
+					bServerSendMeme = true;
+					bGotMeme = true;
+					memestring = option.getString().toAnsiString();
+					bShowMeme = false;
+					memeTakeClicks = false;
+					serverMemeSend(option.getString().toAnsiString());
+					//close meme window and display option to console. change shortly to start to request then display memes to send.
+
+				}
+			}
+
+		else {
+			memeTakeClicks = true; // this means meme wont take clicks on first turn around
+		}
+	}
+
+	if (bShowMemeList && optMouseLocation)
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			if (showSprite[i]->getGlobalBounds().contains(worldPos))
+			{
+				std::cout << "\nClicked Meme: " << i << "\n";
+				bShowMemeList = false;
+			}
+		}
 	}
 }
 
 void socialEngine::socialReset()
 {
 	optMouseLocation.reset();
+}
+
+
+void socialEngine::serverChooseMeme(std::string option)
+{
+	
+	bMemeCreated = false;
+	//std::cout << "\n\nServer Meme Received Function\n\n";
+	bShowServerInteract = false;
+	bShowMeme = true;
+	
+	MemeRect.setFillColor(sf::Color(20, 190, 100, 160));
+	MemeRect.setPosition(interactPlayerPosition);
+	MemeRect.setSize(sf::Vector2f(330, 710));
+	sf::Vector2f optionAnchor;
+	MemeMenu[0].setPosition(MemeRect.getPosition().x + 20, MemeRect.getPosition().y + 20);
+	optionAnchor.x = MemeMenu[0].getPosition().x;
+	optionAnchor.y = MemeMenu[0].getPosition().y;
+	int axisCount = 0;
+	game->window->draw(MemeRect);
+	for (auto& option : MemeMenu)
+	{
+		
+		
+		option.setPosition(optionAnchor.x, optionAnchor.y);
+		optionAnchor.y += 25;
+		
+		
+		if (axisCount == 10) {
+			axisCount = 0;
+			optionAnchor.x += 135; 
+			optionAnchor.y = MemeMenu[0].getPosition().y;
+		}
+		game->window->draw(option);
+		axisCount++;
+	}
+	
+	collisionDetect();
+	optMouseLocation.reset();
+	
+	//Display Meme Labels.
+	//Hi
+
+}
+
+void socialEngine::serverMemeSend(std::string option) {
+	bShowMeme = true;
+	bMemeCreated = false;
+	//bShowMeme = false;
+	if (bGotMeme)
+	{
+		bGotMeme = false;
+		bShowMeme = false;
+	//	memeNaming++;
+		std::thread threadDL(&socialEngine::serverDownloadMeme, this, option);
+		threadDL.detach();
+		
+		
+	}
+	//std::thread j;
+	//j = std::thread(&socialEngine::serverDownloadMeme, option);
+
+
+
+
+	//if (bMemeCreated) {
+	//	std::string newest = std::to_string(memeNaming-1) + "MemeBomb.gif";
+	//	if (std::filesystem::exists(newest)) {
+	//	//	MemeGif = new AnimatedGIF(newest.c_str());
+	//		bMemeCreated = false;
+	//		bShowMeme = false;
+
+	//		if (memeNaming > 0) {
+
+	//			std::string newest = std::to_string(memeNaming-1) + "MemeBomb.gif";
+	//			if (std::filesystem::exists(newest)) {
+	//				//MemeGifDisplay = new AnimatedGIF(newest.c_str());
+	//			}
+	//		}
+
+	//		
+
+	//		if (bMemeCreated)
+	//		{
+	//		}
+
+
+			bServerSendMeme = false;
+		}
+	
+
+	/*if (MemeGifDisplay != nullptr) {
+		MemeGif->update(this->MemeDisplaySprite);
+		MemeSprite.setPosition(4200, 3400);
+		game->window->draw(this->MemeDisplaySprite);
+	}*/
+
+void socialEngine::serverDownloadMeme(std::string option)
+{
+	cpr::Response r = cpr::Get(cpr::Url{ "http://api.giphy.com/v1/gifs/search" },
+		//cpr::Authentication{ "user", "pass" },
+		cpr::Parameters{
+			{"q", option},
+			{"api_key", "4DAR2TmOOAwSfxiBAicf73seLkJgKYS7"},
+			{"limit","5" }
+		});
+	r.status_code;                  // 200
+	r.header["content-type"];       // application/json; charset=utf-8
+	r.text;                         // JSON text string
+
+	json j;
+	j = r.text;
+	if (r.status_code == 200) 
+	for (int i=0; i<5; i++)
+	{
+		auto a = json::parse(r.text);
+		
+								
+			std::string name = std::to_string(memeNaming)+ "MemeBomb.gif";
+
+			json content = a;
+			json data = content["data"][i]["images"]["downsized"]["url"];
+			//	json zeroeth = data[arr];
+				//json images = zeroeth["images"];
+				//json downsized = images["downsized"];
+				//json url = downsized["url"];
+			std::string url_s = data.get<std::string>();
+			std::ofstream of(name, std::ios::binary);
+			cpr::Response rDL = cpr::Download(of, cpr::Url{ url_s });
+			//	pGif = new AnimatedGIF("MemeBomb.gif");
+			while (rDL.status_code != 200) { std::cout << "\nwaiting on d/l\n"; }
+			of.close();
+				std::cout << "http status code = " << rDL.status_code << std::endl << std::endl;
+				
+			std::cout << url_s << "\n\n\n";
+			
+			
+			
+			memeNaming++;
+			
+	}
+	bShowMemeList = true; //displays memes to screen
+	memesDrawn = false; //not yet displayed to screen (i.e another load have been downloaded in this function / user interaction taken place to download more
+	bMemeCreated = true; //memes have been created, just not displayed (see above comment)
 }

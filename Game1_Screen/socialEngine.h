@@ -4,6 +4,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
+#define STB_IMAGE_IMPLEMENTATION
 
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
@@ -18,6 +19,10 @@
 #include "Population.h"
 //#include "Game.h"
 #include "clientside.h"
+#include "AnimatedGIF.h"
+#include "json.hpp"
+
+using json = nlohmann::json;
 namespace social {
 	class DialogueNode;
 	class DialogueTree;
@@ -33,16 +38,22 @@ class socialEngine
 public:
 	std::string serverUsername{};
 	socialEngine(social::DialogueTree* dialogue);
+
+	//booleans for CheckWindow function and others
 	bool bShowInteract = false;
 	bool bShowTradeRequest = false;
 	bool bShowServerInteract = false;
 	bool socialTakeClicks = false;
+	bool memeTakeClicks = false;
 	bool bShowHug = false;
+	bool bShowMeme = false;
+	bool bServerSendMeme = false;
+	bool bShowMemeList = false; //final list of memes to choose from.
 	// bool bSocialClicked = false;
 	std::optional<sf::Vector2f>optMouseLocation;
 	//menu resources
 	sf::Vector2f interactPlayerPosition;
-	sf::Text InteractMenu[6];
+	sf::Text InteractMenu[7];
 	sf::Font interactFont;
 	//aStar astar{};
 	Game* game;
@@ -66,12 +77,38 @@ public:
 	void serverInteract(sf::Vector2f position);
 
 	void serverHugReceived(std::string username);
+	
+	void serverShowMemeList();
+	AnimatedGIF* showGif[5];
+	sf::Sprite* showSprite[5];
+	bool memesDrawn = false;
+	sf::RectangleShape memelist;
 	//variables for hug display.
 	sf::Clock hugDisplay;
 	float hugTimeout;
 	sf::Text HugText;
 	std::string hugSender{};
 
+	void serverChooseMeme(std::string option);
+	sf::Sprite  MemeSprite; //sprite to display meme.
+	sf::Sprite MemeDisplaySprite; //sprite to display selected meme.
+	AnimatedGIF* pGif = nullptr;
+	sf::RectangleShape MemeRect;
+	json j;
+	sf::Text MemeMenu[20];
+	bool bGotMeme = false;
+	void serverMemeSend(std::string option);
+	void serverDownloadMeme(std::string option);
+	int memeNaming = 0;
+	std::string memestring;
+	bool newGifSelected = false;
+	AnimatedGIF* MemeGif;
+	AnimatedGIF* MemeGifDisplay = nullptr;
+	std::thread* threadDL;
+	bool bMemeCreated = false;
+	
+	//std::thread j;
+	//cpr::Response rDL; //for status code
 	void collisionDetect(); 
 	void socialReset();
 	//get the currently selected npc

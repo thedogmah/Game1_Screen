@@ -34,6 +34,7 @@ AnimatedGIF::AnimatedGIF(const char* filename)
 
     totalDelay = sf::Time::Zero;
     startTime = clock.getElapsedTime();
+    fclose(f);
 }
 
 const sf::Vector2i&
