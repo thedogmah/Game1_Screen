@@ -1,10 +1,11 @@
 #pragma once
+
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
-#define STB_IMAGE_IMPLEMENTATION
+
 
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
@@ -49,6 +50,8 @@ public:
 	bool bShowMeme = false;
 	bool bServerSendMeme = false;
 	bool bShowMemeList = false; //final list of memes to choose from.
+
+	bool bReceivedMemeWindow = false;
 	// bool bSocialClicked = false;
 	std::optional<sf::Vector2f>optMouseLocation;
 	//menu resources
@@ -81,8 +84,8 @@ public:
 	void serverShowMemeList();
 	AnimatedGIF* showGif[5];
 	sf::Sprite* showSprite[5];
-	bool memesDrawn = false;
 	sf::RectangleShape memelist;
+	bool memesDrawn = false;
 	//variables for hug display.
 	sf::Clock hugDisplay;
 	float hugTimeout;
@@ -106,10 +109,29 @@ public:
 	AnimatedGIF* MemeGifDisplay = nullptr;
 	std::thread* threadDL;
 	bool bMemeCreated = false;
-	
+	void serverSendMeme(std::string id);
 	//std::thread j;
 	//cpr::Response rDL; //for status code
+
+	void clientReceivedMeme(std::string url, std::string username);
+	std::string memeURL, memeUsername;
+	void serverDownloadMemeClient(std::string url);
+	bool receivememeFirstRun = false;
+	bool bMemeReady = false;
+	sf::Sprite* receivedMeme;
+	AnimatedGIF* AniGif;
+	struct sMeme {
+
+		std::string ID;
+		std::string username;
+		std::string filename;
+
+	};
+
+	std::vector<sMeme> vMemes;
+
 	void collisionDetect(); 
+
 	void socialReset();
 	//get the currently selected npc
 	Animation* selectedNpc;

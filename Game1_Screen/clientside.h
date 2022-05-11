@@ -72,6 +72,8 @@ public:
 	//initialisers
 	void startThreads();
 	void getIP();
+
+	std::vector<std::string>oldMemes; //filepaths for old memes.
 };
 
 sf::Packet& operator << (sf::Packet& packet, sf::Vector2i& location);

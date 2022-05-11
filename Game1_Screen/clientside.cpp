@@ -210,6 +210,34 @@ void clientside::ReceivePackets(sf::TcpSocket* socket)
 		std::cout << "\nReceived hug from " << username;
 		}
 
+			else if (header == 22)
+		{
+		std::string username;
+		std::string url;
+		packet >> username >> url;
+		social->bReceivedMemeWindow = true;
+		social->memeURL = url;
+		social->memeUsername = username;
+		social->receivememeFirstRun = true;
+		social->bMemeReady = false;
+		delete social->AniGif;
+		delete social->receivedMeme;
+		social->AniGif = nullptr;
+		social->receivedMeme = nullptr; //make the sprite for the AniGif nullptr.
+
+		if ((std::filesystem::exists("ReceivedMeme.gif")))
+		{
+			int random = 1 + rand() % (10000); //creatin a random suffix to add onto old file for the renaming call.
+			std::string filename = "oldmeme" + std::to_string(random) + ".gif";
+			oldMemes.push_back(filename);
+			std::error_code a;
+			std::filesystem::rename("ReceivedMeme.gif",filename.c_str(), a);
+			std::cout << "\n" << a.message().c_str();
+		}
+		social->clientReceivedMeme(url, username);
+		std::cout << "\nReceived meme from " << username << "url is:" << url;
+		}
+
 			packet.clear();
 			//		std::this_thread::sleep_for((std::chrono::milliseconds)10);
 				//}

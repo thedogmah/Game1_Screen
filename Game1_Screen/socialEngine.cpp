@@ -469,6 +469,9 @@ void socialEngine::checkWindows()
 	{
 		serverShowMemeList();
 	}
+	if (bReceivedMemeWindow){
+		clientReceivedMeme(memeURL, memeUsername);
+	}
 }
 
 void socialEngine::serverClientTrade(std::string username)
@@ -596,32 +599,35 @@ void socialEngine::serverShowMemeList()
 	game->window->draw(memelist);
 	if (bMemeCreated) {
 		int loop = 0;
-		for (int i = memeNaming - 5; i < memeNaming; i++) {
+
+		for (int i =memeNaming -5 ; i < memeNaming; i++) {
 			
 			std::string name = std::to_string(i) + "MemeBomb.gif";
-			if (std::filesystem::exists(name)) {
+			//CHECK whether file name exists first.			
 				if (!memesDrawn) {
-					if (showGif[loop] != nullptr)
+					if (showGif[loop] != NULL)
 					{
-						delete showGif[loop];
-					//	delete showSprite[loop];
+						//delete showGif[loop];
+						//delete showSprite[loop];
 					}
 					showSprite[loop] = new sf::Sprite();
+					showSprite[loop]->setPosition(4200 + (100 * loop), 3400);
+					//showSprite[loop]->setScale(.5, 0.5); // memes are downloaded with 100pixels width
 					showGif[loop] = new AnimatedGIF(name.c_str());
 					
-					showSprite[loop]->setPosition(4200 + (250 * loop), 3400);
-					//std::cout << "\nlooping through showmeme list." << loop << memeNaming << "\nName of file is : " << name.c_str() << '\n';
+					
+					std::cout << "\nlooping through showmeme list." << loop << memeNaming << "\nName of file is : " << name.c_str() << '\n';
 				}
-
-				showGif[loop]->update(*this->showSprite[loop]);
+				float time = this->game->npcClock.getElapsedTime().asSeconds();
+				showGif[loop]->update(*this->showSprite[loop], time);
 
 				game->window->draw(*this->showSprite[loop]);
 				
 
-			}
+			
 			loop++;
 		}
-
+		
 		memesDrawn = true;
 		collisionDetect();
 	
@@ -718,6 +724,7 @@ void socialEngine::collisionDetect()
 					memestring = option.getString().toAnsiString();
 					bShowMeme = false;
 					memeTakeClicks = false;
+					vMemes.clear(); // clear vector of memes before downloading to it
 					serverMemeSend(option.getString().toAnsiString());
 					//close meme window and display option to console. change shortly to start to request then display memes to send.
 
@@ -737,6 +744,10 @@ void socialEngine::collisionDetect()
 			{
 				std::cout << "\nClicked Meme: " << i << "\n";
 				bShowMemeList = false;
+				
+				serverSendMeme(vMemes[i].filename);
+					break; //incase of clicking overlapping memes, only send the first one identified
+
 			}
 		}
 	}
@@ -746,6 +757,72 @@ void socialEngine::socialReset()
 {
 	optMouseLocation.reset();
 }
+
+void socialEngine::serverSendMeme(std::string id)
+{
+	std::cout <<"\n" << id << " \n was the meme sent to:" << serverUsername;
+	sf::Packet memePacket;
+
+	int header = 22;
+	memePacket << 22 << serverUsername << id;
+
+	if (client->socket.send(memePacket) != sf::Socket::Done)
+
+	{
+		std::cout << "\nFailed to send 'meme packet to " << serverUsername;
+	}
+	else { std::cout << "\nMeme Packet sent to " << serverUsername; }
+}
+void socialEngine::clientReceivedMeme(std::string url, std::string username)
+{
+
+	if (receivememeFirstRun) {
+		receivememeFirstRun = false;
+		std::thread dlMeme(&socialEngine::serverDownloadMemeClient, this, url);
+		dlMeme.detach();
+		// turn the switch off so only downloads meme once
+	}
+	ImGui::Begin("ReceivedMeme");
+	ImGui::Text("Received from user: ");
+	ImGui::SameLine(250);
+	ImGui::Text(username.c_str());
+	
+	if (receivememeFirstRun == false  && bMemeReady && (std::filesystem::exists("ReceivedMeme.gif")))
+	{
+
+		if (AniGif == nullptr)
+		{
+			AniGif = new AnimatedGIF("ReceivedMeme.gif");
+		}
+	//display image.
+
+		receivedMeme->setScale(2, 2);
+
+			
+	float time = this->game->npcClock.getElapsedTime().asSeconds();
+	AniGif->update(*receivedMeme, time);
+
+	//game->window->draw(*receivedMeme);
+	ImGui::Image(*receivedMeme);
+
+
+
+
+	}
+
+	if (ImGui::Button("Close")) //closes Meme Box
+	{
+		receivememeFirstRun = true;
+		AniGif = nullptr;
+		bReceivedMemeWindow = false;
+		bMemeReady = false;
+
+	}
+	ImGui::End();
+
+
+}
+
 
 
 void socialEngine::serverChooseMeme(std::string option)
@@ -792,7 +869,7 @@ void socialEngine::serverChooseMeme(std::string option)
 
 void socialEngine::serverMemeSend(std::string option) {
 	bShowMeme = true;
-	bMemeCreated = false;
+		bMemeCreated = false;
 	//bShowMeme = false;
 	if (bGotMeme)
 	{
@@ -866,7 +943,8 @@ void socialEngine::serverDownloadMeme(std::string option)
 			std::string name = std::to_string(memeNaming)+ "MemeBomb.gif";
 
 			json content = a;
-			json data = content["data"][i]["images"]["downsized"]["url"];
+			std::string ID = content["data"][i]["id"];
+			json data = content["data"][i]["images"]["fixed_width_small"]["url"];
 			//	json zeroeth = data[arr];
 				//json images = zeroeth["images"];
 				//json downsized = images["downsized"];
@@ -877,16 +955,37 @@ void socialEngine::serverDownloadMeme(std::string option)
 			//	pGif = new AnimatedGIF("MemeBomb.gif");
 			while (rDL.status_code != 200) { std::cout << "\nwaiting on d/l\n"; }
 			of.close();
-				std::cout << "http status code = " << rDL.status_code << std::endl << std::endl;
+				std::cout << "Meme Unique ID: " << ID << "\nhttp status code = " << rDL.status_code << std::endl << std::endl;
 				
 			std::cout << url_s << "\n\n\n";
 			
-			
+			sMeme memeData;
+			memeData.username = game->username;
+			memeData.filename = url_s;
+			memeData.ID = ID;
+			vMemes.push_back(memeData);
 			
 			memeNaming++;
 			
 	}
+	//memeNaming = 0;
 	bShowMemeList = true; //displays memes to screen
 	memesDrawn = false; //not yet displayed to screen (i.e another load have been downloaded in this function / user interaction taken place to download more
 	bMemeCreated = true; //memes have been created, just not displayed (see above comment)
+}
+
+
+void socialEngine::serverDownloadMemeClient(std::string url) {
+	std::string MemeName = "ReceivedMeme.gif";
+	std::ofstream of(MemeName, std::ios::binary);
+	cpr::Response rDL = cpr::Download(of, cpr::Url{url });
+	
+	receivedMeme = new sf::Sprite();
+	receivedMeme->setPosition(4200, 3400);
+	of.close();
+	//showSprite[loop]->setScale(.5, 0.5); // memes are downloaded with 100pixels width
+	std::cout << "\nMeme url is " << this->memeURL; // checkes the url passed into displaymeme ImGui function.
+	AniGif = nullptr;
+	receivememeFirstRun = false;
+	bMemeReady = true;
 }

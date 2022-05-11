@@ -1,61 +1,82 @@
+
+#pragma once
 #include "AnimatedGIF.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_GIF
 #include "stb_image.h"
-
-AnimatedGIF::AnimatedGIF(const char* filename)
+#include <iostream>
+AnimatedGIF::AnimatedGIF(const std::string& filename)
 {
-    FILE* f = stbi__fopen(filename, "rb");
+    std::cout << "\n" << filename;
+    FILE* f = stbi__fopen(filename.c_str(), "rb");
     stbi__context s;
     stbi__start_file(&s, f);
 
     int* delays;
-    int z = 0, comp = 0;
-
-    void* pixels = stbi__load_gif_main(&s, &delays, &size.x, &size.y, &z, &comp, STBI_rgb_alpha);
+    int frameCount = 0;
+    int _unused = 0;
+    std::cout << "\n" << filename;
+    void* pixels = stbi__load_gif_main(&s, &delays, &size.x, &size.y, &frameCount, &_unused, STBI_rgb_alpha);
 
     sf::Image image;
     int step = size.x * size.y * 4;
 
-    for (int i = 0; i < z; i++)
+    totalDuration = 0;
+    for (int i = 0; i < frameCount; i++)
     {
+        frames.push_back({});
+        GifFrame& frame = frames.back();
+
         image.create(size.x, size.y, (const sf::Uint8*)pixels + step * i);
 
-        sf::Texture texture;
-        texture.loadFromImage(image);
-
-        frames.push_back(std::tuple<int, sf::Texture>(delays[i], texture));
+        frame.texture.loadFromImage(image);
+        frame.duration = delays[i] / 1000.f;
+        frame.position = totalDuration;
+        totalDuration += frame.duration;
     }
-
-    frameIter = frames.begin();
 
     stbi_image_free(pixels);
 
-    totalDelay = sf::Time::Zero;
-    startTime = clock.getElapsedTime();
+    frameIndex = 0;
+    frameDuration = 0;
     fclose(f);
 }
 
-const sf::Vector2i&
-AnimatedGIF::getSize()
+const sf::Vector2i& AnimatedGIF::getSize()
 {
     return size;
 }
 
-void
-AnimatedGIF::update(sf::Sprite& sprite)
+void AnimatedGIF::update(sf::Sprite& sprite, float deltaTime)
 {
-    sf::Time delay = sf::milliseconds(std::get<0>(*frameIter));
-
-    while (startTime + totalDelay + delay < clock.getElapsedTime())
+    frameDuration += deltaTime;
+    if (frames.size() == 0) return;
+    do
     {
-        frameIter++;
-        if (frameIter == frames.end()) frameIter = frames.begin();
-        totalDelay += delay;
-        delay = sf::milliseconds(std::get<0>(*frameIter));
-    }
+        const auto& frame = frames[frameIndex];
+      //uncomment to printout debug info
+        //std::cout << "\nDT: " << deltaTime << "  FI: " << frameIndex << " framesize: " << frames.size() << "\n";
 
-    sf::Texture& texture = std::get<1>(*frameIter);
-    sprite.setTexture(texture);
+        if (frame.duration <= frameDuration)
+        {
+            frameDuration -= frame.duration;
+            frameIndex++;
+            if (frameIndex >= frames.size())
+            {
+                frameIndex = 0;
+            }
+
+            if (frame.duration <= 0)
+            {
+                break;
+            }
+        }
+        else
+        {
+            break;
+        }
+    } while (true);
+
+    sprite.setTexture(frames[frameIndex].texture);
 }

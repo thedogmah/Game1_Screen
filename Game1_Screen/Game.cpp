@@ -14,7 +14,8 @@
 #include "socialEngine.h"
 #include <cmath>
 #include "AnimatedGIF.h"
-
+#include "curl//curl.h"
+#include "cpr/cpr.h"
 namespace social {
 class DialogueNode;
 class DialogueTree;
@@ -469,7 +470,7 @@ void Game::initWindow()
 
 	if (!scootersManSandyJacket.imgHuman.loadFromFile("scooterManSandyJacket.png"))
 		std::cout << "Sandy Jacket Male Scooter Not Loaded. Ouch." << '\n';
-	scootersManSandyJacket.peopleAmount = 10;
+	scootersManSandyJacket.peopleAmount = 20;
 	scootersManSandyJacket.populate();
 	scootersManSandyJacket.window = window;
 	
@@ -477,14 +478,14 @@ void Game::initWindow()
 	//snug grey coat woman population
 	if (!humanityWomanSnugGrey.imgHuman.loadFromFile("WomanSnugGrey.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugGrey.peopleAmount = 10;
+	humanityWomanSnugGrey.peopleAmount = 20;
 	humanityWomanSnugGrey.populate();
 	humanityWomanSnugGrey.window = window;
 	humanityWomanSnugGrey.createBounds();
 	//snug black coat woman population
 	if (!humanityWomanSnugBlack.imgHuman.loadFromFile("WomanSnugBlack.png"))
 		std::cout << "Snug Grey Woman Asset not loaded - not a bad thing really, have you seen that jacket?";
-	humanityWomanSnugBlack.peopleAmount = 10;
+	humanityWomanSnugBlack.peopleAmount = 40;
 	humanityWomanSnugBlack.populate();
 	humanityWomanSnugBlack.window = window;
 	humanityWomanSnugBlack.createBounds(); 
@@ -1226,7 +1227,7 @@ std::string Game::npcCareer(Animation person)
 		return "Journalist";
 	case 30:
 		return "Graduate";
-
+		//Entertainer 
 	}
 }
 std::string Game::npcSexuality(Animation person)
@@ -1916,7 +1917,7 @@ void Game::pollEvents()
 							if(socialengine->MemeRect.getGlobalBounds().contains(worldPos))
 								socialengine->optMouseLocation.emplace(ev.mouseButton.x, ev.mouseButton.y);
 							}
-
+							
 						}
 
 						if(socialengine->bShowMemeList)
@@ -4982,6 +4983,35 @@ void Game::login()
 	std::cout << "\n" << username;
 	//username = "Beta";
 	userText.setString(username);
+	
+	
+	//json content = a;
+	//std::string ID = content["data"][0]["id"];
+	//json data = content["data"][i]["images"]["fixed_width_small"]["url"];
+
+	cpr::Response r = cpr::Get(cpr::Url{ "https://app.ticketmaster.com/discovery/v2/events.json?city=Nottingham&apikey=i9GXlO4vPGsL4hzk2NbEkTp6med6JpuN" });
+		auto dataParsed = json::parse(r.text);
+
+		for (int i = 0; i < dataParsed["_embedded"]["events"].size(); i++)
+		{
+			std::cout << "\nEvent: " << '\n';
+			std::cout << dataParsed["_embedded"]["events"][i]["name"] << "\n";
+		//	std::cout << dataParsed["_embedded"]["events"][i]["description"] << "\n";
+		//	std::cout << dataParsed["_embedded"]["events"][i]["additionalInfo"] << "n";
+		//	std::cout << dataParsed["_embedded"]["events"][i]["place"]["name"] << '\n';
+			//std::cout << dataParsed["_embedded"]["events"][i]["info"] << '\n';
+		//	std::cout << "Ticket info : " <<dataParsed["_embedded"]["events"][i]["ticketlimit"]["info"] << '\n';
+			//std::cout << dataParsed["_embedded"]["events"][i]["place"]["postalcode"] << '\n';
+			//std::cout << dataParsed["_embedded"]["events"][i]["place"]["name"]["address"]["line1"] << '\n';
+		//	std::cout << dataParsed["_embedded"]["events"][i]["place"]["name"]["address"]["line2"] << '\n';
+			//std::cout << dataParsed["_embedded"]["events"][i]["place"]["name"]["address"]["line3"] << '\n';
+			std::cout << "" <<dataParsed["_embedded"]["events"][i]["dates"]["start"]["dateTime"] << "\n";
+	//	std::cout << dataParsed["_embedded"]["events"][i]["dates"]["end"]["dateTime"] << "\n";
+		
+		//URL for tickermaster API Docs: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/
+		}
+
+
 }
 
 

@@ -1,26 +1,30 @@
-#ifndef __ANIMATEDGIF_H__
-#define __ANIMATEDGIF_H__
-
+#pragma once
 #include <SFML/Graphics.hpp>
 
 #include <vector>
-#include <tuple>
+#include <string>
 
 class AnimatedGIF
-{
-public:
-    AnimatedGIF(const char* filename);
+{public:
+    AnimatedGIF(const std::string& filename);
 
-    const sf::Vector2i& getSize(void);
-    void update(sf::Sprite& sprite);
+    const sf::Vector2i& getSize();
 
+    void update(sf::Sprite& sprite, float deltaTime);
+
+
+    struct GifFrame
+    {
+        float position;
+        float duration;
+        sf::Texture texture;
+    };
 
     sf::Vector2i size;
-    sf::Clock clock;
-    sf::Time startTime;
-    sf::Time totalDelay;
-    std::vector<std::tuple<int, sf::Texture>> frames;
-    std::vector<std::tuple<int, sf::Texture>>::iterator frameIter;
+    int frameIndex = 0;
+    float frameDuration = 0;
+    float totalDuration;
+    std::vector<GifFrame> frames;
 };
 
-#endif
+
